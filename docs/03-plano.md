@@ -24,7 +24,7 @@ Dados: **WC14 original** (frame a frame) e **SoccerNet-GSR** (temporal). Ver
   GSR `train` (57), `valid` (58), `test` (49). Layout em `02-dados.md`.
 - [x] Repositório: `CLAUDE.md`, `README.md` e `.gitignore` na raiz; docs
   revisados em `docs/`.
-- [ ] Remover as cópias antigas `docs/CLAUDE.md` e `docs/README.md` (passo 0 da
+- [x] Remover as cópias antigas `docs/CLAUDE.md` e `docs/README.md` (passo 0 da
   Fatia 1).
 
 ### Fatia 1 — Modelo do campo e carregamento (semana 1)
