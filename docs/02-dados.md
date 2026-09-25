@@ -48,8 +48,11 @@ Dataset de referência para registro de campo em futebol, de Homayounfar et al.
   `H_gt = inv(H_arquivo) @ A` (ver `decisoes.md` para `A`);
 - `N_grass_gt.mat` — variável `grass`, máscara binária 720×1280 do gramado no
   espaço da imagem. **É gabarito pronto para a Etapa 1**: permite medir a
-  segmentação do gramado com IoU, e não só por inspeção visual. O molde projetado
-  pelo gabarito cobre essa máscara com IoU entre 0,90 e 0,96.
+  segmentação do gramado com IoU, e não só por inspeção visual. A máscara inclui
+  o gramado **fora** das linhas (atrás do gol, além das laterais): o molde
+  projetado pelo gabarito cai sobre ela em ≥ 99,7% da área nas 209 imagens de
+  treino, mas o IoU entre os dois vai de 0,72 a ~0,98 (mediana 0,93), conforme
+  quanto gramado extra aparece no quadro (ver `decisoes.md`).
 
 A pasta `train_val` é o treino (o WC14 não tem validação separada). Ela traz
 um arquivo a mais, `100_seg_pred.mat`, que é uma **predição** de segmentação dos
@@ -105,10 +108,12 @@ clipe (`SNGS-XXX/`), com `img1/000001.jpg … 000750.jpg` (consecutivos) e
 - **Não há parâmetros de câmera no arquivo.** A categoria `camera` existe, mas sem
   nenhuma anotação. `H_gt` é estimada por frame a partir das **pessoas, sem a
   bola** (ver `decisoes.md`): verificada contra as linhas anotadas com erro
-  mediano de 2,4 px.
-- **Qualidade do gabarito:** em ~3% dos frames do SNGS-070 a `H_gt` discorda das
-  linhas anotadas por mais de 10 px (mediana). Esses frames são marcados como
-  "gabarito duvidoso" e as métricas saem com e sem eles.
+  mediano de 2,8 px no SNGS-070 (a definição exata está em `decisoes.md`).
+  Algumas pessoas vêm com `bbox_pitch` nulo (9 anotações no SNGS-070) e ficam
+  fora.
+- **Qualidade do gabarito:** em 7 dos 750 frames do SNGS-070 (354–359 e 365) a
+  `H_gt` discorda das linhas anotadas por mais de 10 px (mediana). Esses frames
+  são marcados como "gabarito duvidoso" e as métricas saem com e sem eles.
 
 **Partições:** calibrar no **treino**, escolher variantes na **validação**,
 medir uma vez no **teste**. As comparações com o AuxFlow usam o teste (tabelas 5
@@ -231,9 +236,19 @@ de visão, `scipy` para otimização.
   dela não toca o gramado; incluí-la na estimativa da `H_gt` criou um falso
   "corte" de ~104 px no SNGS-070. Vale também para qualquer uso futuro de caixas
   como pontos no plano (Etapa 8c, LocSim).
+- **Rótulos de classe trocados nas linhas do GSR** (ex.: o círculo central
+  anotado como `Circle right` no SNGS-149), às vezes só num trecho do clipe.
+  Corrigidos na leitura por `gsr_label_fixes`; a varredura que os acha está no
+  `--gsr-quality` (`gsr_gt_classes.csv`). Nem toda classe com erro alto é rótulo:
+  a `H_gt` erra do lado da câmera, e há anotação congelada (SNGS-153).
 - **Traves e travessão também não estão no plano.** As classes `Goal …` das
   linhas anotadas do GSR ficam fora de qualquer ajuste ou erro medido no
   gramado.
+- **Reta com uma ponta atrás da câmera.** Projetar só as duas pontas de uma
+  linha e ligá-las na imagem dá um segmento absurdo quando uma delas tem
+  `w ≤ 0`: no SNGS-070, a `Side line bottom` saiu a ~1.800 px das marcações em
+  64 frames. Amostre toda polilinha densamente em metros e descarte as amostras
+  com `w ≤ 0` antes de ligar.
 - **`100_seg_pred.mat` no WC14** não é gabarito. Um `glob("*.mat")` o
   misturaria às máscaras.
 - **Molde de campo na avaliação** — 105 × 68 m (interno, GSR), 115 × 74 jardas

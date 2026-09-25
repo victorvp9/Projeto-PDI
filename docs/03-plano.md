@@ -18,7 +18,7 @@ Dados: **WC14 original** (frame a frame) e **SoccerNet-GSR** (temporal). Ver
 - [x] Download: WC14 e GSR (treino). GSR sem NDA, via Hugging Face.
 - [x] Convenção do WC14 verificada (imagem → jardas 115 × 74; 3 imagens).
 - [x] GSR verificado no SNGS-070: não há parâmetros de câmera; `H_gt` derivada
-  das pessoas (sem a bola) e conferida contra as linhas anotadas (2,4 px);
+  das pessoas (sem a bola) e conferida contra as linhas anotadas (2,8 px);
   frames consecutivos a 25 fps, 1920×1080; sem cortes no clipe.
 - [x] Download completo (2026-09-25): WC14 `train_val` (209) e `test` (186);
   GSR `train` (57), `valid` (58), `test` (49). Layout em `02-dados.md`.
@@ -37,9 +37,11 @@ homografia, renderizador sintético.
 
 **Módulos**
 - `src/pitch_model.py` — as constantes do modelo e cada elemento do campo como
-  **polilinha em metros**: retas com dois pontos, círculo e arcos amostrados
-  densamente (a cada 0,25 m, por exemplo). Uma representação só serve para
-  desenhar, renderizar e medir distância.
+  **polilinha em metros**, toda ela amostrada a cada 0,25 m — **inclusive as
+  retas**. Ao projetar, amostras com `w ≤ 0` (atrás da câmera) são descartadas;
+  uma reta guardada só com as duas pontas vira um segmento absurdo quando uma
+  delas cai atrás da câmera (ver `02-dados.md`). Uma representação só serve
+  para desenhar, renderizar e medir distância.
 - `src/io/wc14.py` — lê `N.jpg`, `N.homographyMatrix` e `N_grass_gt.mat`
   (variável `grass`) pelo nome exato, sem pegar `*_seg_pred.mat`. Converte com
   `H_gt = inv(H_arquivo) @ A` (ver `decisoes.md`).
@@ -47,9 +49,10 @@ homografia, renderizador sintético.
   estima a `H_gt` por DLT (`cv2.findHomography(src, dst, 0)`) sobre as pessoas
   (`category_id` 1, 2, 3 e 7). Os pontos `bottom_left`/`middle`/`right` do
   `bbox_pitch` correspondem, na base da `bbox_image`, a `(x, y+h)`,
-  `(x+w/2, y+h)` e `(x+w, y+h)`. Frame com menos de 4 pessoas fica com
-  `H_gt = None` e é contado no resumo; o recurso às linhas só se implementa se
-  esse caso aparecer.
+  `(x+w/2, y+h)` e `(x+w, y+h)`. Pessoas com `bbox_pitch` nulo ficam fora.
+  Frame com menos de 4 pessoas fica com
+  `H_gt = None` e é contado no resumo. O caso apareceu (2.322 frames, ver
+  `decisoes.md`); o recurso pelas linhas entra no começo da Fatia 2.
 - **Linhas anotadas do GSR:** coordenadas normalizadas × (1920, 1080). Mapear
   cada classe do JSON para a polilinha correspondente do modelo; **as classes
   `Goal …` ficam fora**, porque não estão no plano. Registrar o mapeamento em
@@ -66,25 +69,31 @@ homografia, renderizador sintético.
     salvam o modelo desenhado sobre a imagem em `outputs/debug/`. Se isso não
     ficar perfeito, nada adiante vai funcionar.
   - `--gsr-quality` gera `outputs/gsr_gt_quality.csv`, com uma linha por clipe:
-    frames, frames sem `H_gt`, frames duvidosos, mediana e p90 do erro. Roda nas
-    três partições: é controle de qualidade do gabarito, não ajuste, então usar
-    o teste não contamina nada.
+    frames, frames sem `H_gt`, frames duvidosos, mediana e p90 do erro; e
+    `outputs/gsr_gt_classes.csv`, por clipe × classe, com a marca de rótulo
+    suspeito. Roda nas três partições: é controle de qualidade do gabarito, não
+    ajuste, então usar o teste não contamina nada.
+- **Rótulos trocados** nas linhas anotadas do GSR: corrigidos na leitura por
+  `gsr_label_fixes` (config), com a evidência em `decisoes.md`.
 
 **Testes**
 - As bandeirinhas ficam em `(±52.5, ±34)`.
 - **WC14, conversão:** a `H_gt` aplicada a `(±52.5, ±34)` cai nos mesmos pixels
   que `inv(H_arquivo)` aplicada aos cantos do molde em jardas, de `(0, 0)` a
   `(115, 74)`. É o teste de `A`.
-- **WC14, cobertura:** o campo projetado com a `H_gt` cobre a máscara `grass`
-  com IoU ≥ 0,85 em **todas** as 209 imagens de `train_val`. Projete com
+- **WC14, cobertura:** a fração do campo projetado com a `H_gt` que cai sobre a
+  máscara `grass` é ≥ 0,99 em **todas** as 209 imagens de `train_val`; o IoU
+  entre os dois é só número informativo (mediana e mínimo no log), porque a
+  `grass` inclui o gramado fora das linhas (ver `decisoes.md`). Projete com
   `cv2.warpPerspective` a partir de uma máscara em vista de cima, e não com
   `fillPoly` sobre os quatro cantos projetados: se um canto cair atrás da
-  câmera, o polígono se inverte. Se alguma imagem ficar abaixo do limiar,
-  investigue e registre; não baixe o limiar.
-- **GSR, SNGS-070:** o erro mediano contra as linhas deve dar perto de 2,4 px, e
-  ≤ 5 px fora dos frames duvidosos. Os duvidosos devem ser cerca de 21, em blocos
-  próximos de 81–83, 246–249, 713–715 e 739–750. Se o resultado ficar muito
-  longe disso, pare e investigue antes de seguir.
+  câmera, o polígono se inverte. Este teste é cego a espelhamento e a uma `H`
+  que encolhe o campo; quem protege a convenção é o teste de `A` e os overlays.
+- **GSR, SNGS-070** (valores de referência em `decisoes.md`, frames numerados
+  pelo nome do arquivo): a mediana, sobre os frames, do erro por frame fica em
+  2,8 ± 0,3 px, e ≤ 5 px só com os frames não duvidosos. Os duvidosos devem ser
+  de 5 a 10, incluindo o bloco 354–359 inteiro (referência: 354–359 e 365). Se o
+  resultado ficar muito longe disso, pare e investigue antes de seguir.
 - **GSR, bola:** acrescente às anotações uma bola com `bbox_pitch` absurdo e
   verifique que a `H_gt` não muda.
 - **Sintético:** renderize com uma `H` conhecida e confira que os pixels das
@@ -93,10 +102,24 @@ homografia, renderizador sintético.
 **Saídas**
 - `outputs/debug/`: overlays de 3 imagens do WC14 e dos frames 418–424 do
   SNGS-070 (o trecho da bola no ar).
-- `outputs/gsr_gt_quality.csv`.
+- `outputs/gsr_gt_quality.csv` e `outputs/gsr_gt_classes.csv`.
 
 ### Fatia 2 — Avaliação (semana 1)
 `IoU_whole`, `IoU_part`, erro de reprojeção, taxa de cobertura; LocSim no GSR.
+
+**Primeiro: `H_gt` pelas linhas nos frames do GSR sem pessoas suficientes.**
+- Ajuste ponto-linha (`scipy.optimize.least_squares`): minimizar a distância dos
+  pontos anotados às polilinhas do modelo projetadas pela `H`, iniciando pela
+  `H_gt` do vizinho mais próximo com `H` por pessoas. É **a mesma função** do
+  refinamento da Etapa 7 (termo ponto-linha): escreva uma vez só, em
+  `src/homography.py`, e a Fatia 5 reaproveita.
+- **Teste:** em frames com `H` por pessoas, partir da `H` do vizinho e recuperar
+  essa `H`.
+- Esses frames ganham a marca **"gabarito pelas linhas"**, e as métricas saem com
+  e sem eles (como os duvidosos).
+- Risco medido: a distância até o vizinho com `H` chega a 374 frames (mediana
+  69). Se o ajuste não convergir partindo de longe, encadear — cada frame
+  iniciado pela `H` recém-ajustada do frame adjacente — e medir as duas formas.
 
 - **Teste:** `H_gt` contra `H_gt` dá IoU = 1 e erro = 0.
 - **Teste:** `H_gt` perturbada por translação conhecida degrada de forma monótona.
@@ -130,7 +153,8 @@ Etapas 3 e 4.
 Etapas 5, 6 e 7. É a semana mais difícil.
 
 - Classificação semântica dos segmentos, correspondências, RANSAC + DLT.
-- Refinamento não-linear com termo ponto-linha.
+- Refinamento não-linear com termo ponto-linha — reaproveita a função escrita na
+  Fatia 2 para a `H_gt` pelas linhas.
 - **Teste:** na imagem sintética, a homografia recuperada bate com a usada para
   renderizar.
 - **Marco:** primeiro número real no WC14, com taxa de cobertura, e o mesmo

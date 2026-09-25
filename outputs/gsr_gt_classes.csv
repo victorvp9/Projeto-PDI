@@ -1,0 +1,2366 @@
+split,clip,classe,frames,mediana_px,frac_acima,suspeita
+train,SNGS-060,Big rect. left bottom,50,10.94,0.0,False
+train,SNGS-060,Big rect. left main,278,2.11,0.0,False
+train,SNGS-060,Big rect. left top,279,0.87,0.0,False
+train,SNGS-060,Big rect. right bottom,131,1.43,0.0,False
+train,SNGS-060,Big rect. right main,352,2.88,0.0,False
+train,SNGS-060,Big rect. right top,352,2.7,0.0,False
+train,SNGS-060,Circle central,750,2.46,0.0,False
+train,SNGS-060,Circle left,219,2.98,0.0,False
+train,SNGS-060,Circle right,297,2.52,0.0,False
+train,SNGS-060,Middle line,623,4.12,0.029,False
+train,SNGS-060,Side line bottom,501,5.26,0.0,False
+train,SNGS-060,Side line left,185,1.1,0.0,False
+train,SNGS-060,Side line right,271,2.08,0.0,False
+train,SNGS-060,Side line top,750,1.45,0.0,False
+train,SNGS-060,Small rect. left bottom,53,2.18,0.0,False
+train,SNGS-060,Small rect. left main,145,0.97,0.0,False
+train,SNGS-060,Small rect. left top,145,0.87,0.0,False
+train,SNGS-060,Small rect. right bottom,131,2.12,0.0,False
+train,SNGS-060,Small rect. right main,189,2.57,0.0,False
+train,SNGS-060,Small rect. right top,190,1.67,0.0,False
+train,SNGS-061,Big rect. left bottom,90,2.89,0.0,False
+train,SNGS-061,Big rect. left main,185,2.76,0.0,False
+train,SNGS-061,Big rect. left top,185,2.99,0.0,False
+train,SNGS-061,Big rect. right bottom,331,2.29,0.0,False
+train,SNGS-061,Big rect. right main,475,1.81,0.0,False
+train,SNGS-061,Big rect. right top,475,3.12,0.0,False
+train,SNGS-061,Circle central,277,2.74,0.0,False
+train,SNGS-061,Circle left,172,2.39,0.012,False
+train,SNGS-061,Circle right,445,3.33,0.0,False
+train,SNGS-061,Middle line,119,4.57,0.0,False
+train,SNGS-061,Side line bottom,340,18.41,0.112,False
+train,SNGS-061,Side line left,279,4.26,0.398,False
+train,SNGS-061,Side line right,438,3.47,0.0,False
+train,SNGS-061,Side line top,510,2.36,0.0,False
+train,SNGS-061,Small rect. left bottom,91,3.01,0.0,False
+train,SNGS-061,Small rect. left main,149,2.22,0.0,False
+train,SNGS-061,Small rect. left top,149,1.95,0.0,False
+train,SNGS-061,Small rect. right bottom,332,1.17,0.0,False
+train,SNGS-061,Small rect. right main,366,1.29,0.0,False
+train,SNGS-061,Small rect. right top,366,1.66,0.0,False
+train,SNGS-062,Big rect. left main,98,2.94,0.0,False
+train,SNGS-062,Big rect. left top,98,1.6,0.0,False
+train,SNGS-062,Big rect. right bottom,98,2.56,0.0,False
+train,SNGS-062,Big rect. right main,475,2.95,0.0,False
+train,SNGS-062,Big rect. right top,475,2.03,0.0,False
+train,SNGS-062,Circle central,600,2.01,0.063,False
+train,SNGS-062,Circle right,355,5.37,0.0,False
+train,SNGS-062,Middle line,524,3.6,0.017,False
+train,SNGS-062,Side line bottom,236,6.33,0.169,False
+train,SNGS-062,Side line right,264,2.57,0.0,False
+train,SNGS-062,Side line top,748,1.89,0.0,False
+train,SNGS-062,Small rect. right bottom,100,1.98,0.0,False
+train,SNGS-062,Small rect. right main,202,2.46,0.0,False
+train,SNGS-062,Small rect. right top,202,2.08,0.0,False
+train,SNGS-063,Big rect. left bottom,11,5.66,0.0,False
+train,SNGS-063,Big rect. left main,276,2.51,0.0,False
+train,SNGS-063,Big rect. left top,276,1.59,0.0,False
+train,SNGS-063,Big rect. right main,109,1.94,0.0,False
+train,SNGS-063,Big rect. right top,109,1.89,0.0,False
+train,SNGS-063,Circle central,578,2.2,0.014,False
+train,SNGS-063,Circle left,191,5.78,0.0,False
+train,SNGS-063,Circle right,99,2.48,0.0,False
+train,SNGS-063,Middle line,493,4.22,0.002,False
+train,SNGS-063,Side line left,155,3.12,0.0,False
+train,SNGS-063,Side line right,95,2.53,0.0,False
+train,SNGS-063,Side line top,750,1.57,0.0,False
+train,SNGS-063,Small rect. left bottom,21,4.08,0.0,False
+train,SNGS-063,Small rect. left main,130,1.68,0.0,False
+train,SNGS-063,Small rect. left top,130,1.57,0.0,False
+train,SNGS-063,Small rect. right main,55,2.72,0.0,False
+train,SNGS-063,Small rect. right top,55,1.32,0.0,False
+train,SNGS-064,Big rect. left bottom,354,1.75,0.153,False
+train,SNGS-064,Big rect. left main,750,4.18,0.0,False
+train,SNGS-064,Big rect. left top,750,1.43,0.0,False
+train,SNGS-064,Circle central,353,10.58,0.374,False
+train,SNGS-064,Circle left,750,4.98,0.0,False
+train,SNGS-064,Middle line,193,49.19,0.497,False
+train,SNGS-064,Side line bottom,235,12.61,0.043,False
+train,SNGS-064,Side line left,750,1.75,0.0,False
+train,SNGS-064,Side line top,689,3.56,0.0,False
+train,SNGS-064,Small rect. left bottom,355,1.12,0.0,False
+train,SNGS-064,Small rect. left main,750,2.41,0.0,False
+train,SNGS-064,Small rect. left top,750,2.13,0.0,False
+train,SNGS-065,Big rect. left bottom,156,2.43,0.0,False
+train,SNGS-065,Big rect. left main,200,3.31,0.0,False
+train,SNGS-065,Big rect. left top,200,0.99,0.0,False
+train,SNGS-065,Big rect. right main,114,2.16,0.0,False
+train,SNGS-065,Big rect. right top,114,1.48,0.0,False
+train,SNGS-065,Circle central,750,2.38,0.0,False
+train,SNGS-065,Circle left,192,4.05,0.0,False
+train,SNGS-065,Circle right,86,2.37,0.0,False
+train,SNGS-065,Middle line,705,3.92,0.016,False
+train,SNGS-065,Side line bottom,178,6.37,0.0,False
+train,SNGS-065,Side line left,189,1.27,0.0,False
+train,SNGS-065,Side line right,74,5.05,0.0,False
+train,SNGS-065,Side line top,750,1.38,0.0,False
+train,SNGS-065,Small rect. left bottom,156,0.62,0.0,False
+train,SNGS-065,Small rect. left main,178,1.25,0.0,False
+train,SNGS-065,Small rect. left top,178,1.77,0.0,False
+train,SNGS-065,Small rect. right main,34,5.82,0.0,False
+train,SNGS-065,Small rect. right top,34,1.03,0.0,False
+train,SNGS-066,Big rect. left bottom,377,15.32,0.194,False
+train,SNGS-066,Big rect. left main,516,2.53,0.0,False
+train,SNGS-066,Big rect. left top,516,1.2,0.006,False
+train,SNGS-066,Big rect. right main,47,5.43,0.0,False
+train,SNGS-066,Big rect. right top,47,2.94,0.0,False
+train,SNGS-066,Circle central,458,1.79,0.0,False
+train,SNGS-066,Circle left,508,2.97,0.0,False
+train,SNGS-066,Circle right,35,4.0,0.0,False
+train,SNGS-066,Middle line,447,2.9,0.009,False
+train,SNGS-066,Side line bottom,210,3.57,0.024,False
+train,SNGS-066,Side line left,506,1.26,0.0,False
+train,SNGS-066,Side line right,31,9.67,0.0,False
+train,SNGS-066,Side line top,686,1.53,0.0,False
+train,SNGS-066,Small rect. left bottom,377,3.03,0.0,False
+train,SNGS-066,Small rect. left main,494,0.89,0.0,False
+train,SNGS-066,Small rect. left top,494,1.3,0.0,False
+train,SNGS-067,Big rect. left main,224,3.2,0.009,False
+train,SNGS-067,Big rect. left top,224,2.57,0.009,False
+train,SNGS-067,Big rect. right bottom,399,5.15,0.005,False
+train,SNGS-067,Big rect. right main,505,2.59,0.0,False
+train,SNGS-067,Big rect. right top,505,2.34,0.0,False
+train,SNGS-067,Circle central,363,2.51,0.0,False
+train,SNGS-067,Circle left,208,2.84,0.01,False
+train,SNGS-067,Circle right,492,4.72,0.0,False
+train,SNGS-067,Middle line,336,7.27,0.006,False
+train,SNGS-067,Side line bottom,423,13.09,0.054,False
+train,SNGS-067,Side line left,202,7.77,0.005,False
+train,SNGS-067,Side line right,487,1.95,0.002,False
+train,SNGS-067,Side line top,682,2.54,0.0,False
+train,SNGS-067,Small rect. left main,66,3.74,0.0,False
+train,SNGS-067,Small rect. left top,66,3.75,0.0,False
+train,SNGS-067,Small rect. right bottom,399,3.17,0.0,False
+train,SNGS-067,Small rect. right main,462,1.29,0.0,False
+train,SNGS-067,Small rect. right top,462,0.91,0.0,False
+train,SNGS-068,Big rect. right bottom,323,2.93,0.0,False
+train,SNGS-068,Big rect. right main,609,1.72,0.0,False
+train,SNGS-068,Big rect. right top,609,1.59,0.0,False
+train,SNGS-068,Circle central,448,3.48,0.083,False
+train,SNGS-068,Circle right,595,2.91,0.0,False
+train,SNGS-068,Middle line,358,3.16,0.003,False
+train,SNGS-068,Side line bottom,405,20.07,0.091,False
+train,SNGS-068,Side line right,591,1.95,0.0,False
+train,SNGS-068,Side line top,655,2.99,0.0,False
+train,SNGS-068,Small rect. right bottom,325,1.37,0.0,False
+train,SNGS-068,Small rect. right main,514,1.49,0.0,False
+train,SNGS-068,Small rect. right top,514,1.77,0.0,False
+train,SNGS-069,Big rect. left main,306,1.12,0.0,False
+train,SNGS-069,Big rect. left top,306,0.82,0.0,False
+train,SNGS-069,Big rect. right main,79,4.52,0.0,False
+train,SNGS-069,Big rect. right top,80,2.69,0.0,False
+train,SNGS-069,Circle central,514,1.71,0.029,False
+train,SNGS-069,Circle left,269,1.73,0.004,False
+train,SNGS-069,Circle right,46,5.64,0.0,False
+train,SNGS-069,Middle line,446,4.34,0.0,False
+train,SNGS-069,Side line left,258,2.9,0.004,False
+train,SNGS-069,Side line right,32,7.59,0.0,False
+train,SNGS-069,Side line top,737,1.58,0.0,False
+train,SNGS-070,Big rect. left bottom,84,9.23,0.0,False
+train,SNGS-070,Big rect. left main,130,5.12,0.0,False
+train,SNGS-070,Big rect. left top,130,3.82,0.0,False
+train,SNGS-070,Big rect. right bottom,111,10.87,0.0,False
+train,SNGS-070,Big rect. right main,365,2.93,0.0,False
+train,SNGS-070,Big rect. right top,365,2.76,0.0,False
+train,SNGS-070,Circle central,513,2.71,0.014,False
+train,SNGS-070,Circle left,121,3.92,0.0,False
+train,SNGS-070,Circle right,265,2.59,0.0,False
+train,SNGS-070,Middle line,379,5.8,0.0,False
+train,SNGS-070,Side line bottom,175,7.72,0.131,False
+train,SNGS-070,Side line left,117,8.96,0.0,False
+train,SNGS-070,Side line right,252,3.22,0.0,False
+train,SNGS-070,Side line top,750,1.99,0.0,False
+train,SNGS-070,Small rect. left bottom,84,2.14,0.0,False
+train,SNGS-070,Small rect. left main,105,2.27,0.0,False
+train,SNGS-070,Small rect. left top,105,2.31,0.0,False
+train,SNGS-070,Small rect. right bottom,116,3.76,0.0,False
+train,SNGS-070,Small rect. right main,200,2.39,0.0,False
+train,SNGS-070,Small rect. right top,199,1.72,0.0,False
+train,SNGS-071,Big rect. right bottom,462,5.6,0.0,False
+train,SNGS-071,Big rect. right main,750,3.27,0.0,False
+train,SNGS-071,Big rect. right top,750,2.65,0.0,False
+train,SNGS-071,Circle right,750,4.15,0.0,False
+train,SNGS-071,Side line right,750,2.7,0.0,False
+train,SNGS-071,Side line top,750,4.41,0.0,False
+train,SNGS-071,Small rect. right bottom,467,2.02,0.0,False
+train,SNGS-071,Small rect. right main,750,1.99,0.0,False
+train,SNGS-071,Small rect. right top,750,1.91,0.0,False
+train,SNGS-072,Big rect. right main,505,2.59,0.0,False
+train,SNGS-072,Big rect. right top,505,1.48,0.0,False
+train,SNGS-072,Circle central,497,4.86,0.149,False
+train,SNGS-072,Circle right,461,4.67,0.037,False
+train,SNGS-072,Middle line,139,5.91,0.0,False
+train,SNGS-072,Side line right,393,2.95,0.0,False
+train,SNGS-072,Side line top,669,1.95,0.0,False
+train,SNGS-072,Small rect. right main,158,1.76,0.0,False
+train,SNGS-072,Small rect. right top,158,2.65,0.0,False
+train,SNGS-073,Big rect. left main,225,1.86,0.0,False
+train,SNGS-073,Big rect. left top,225,1.08,0.0,False
+train,SNGS-073,Big rect. right bottom,438,6.25,0.039,False
+train,SNGS-073,Big rect. right main,512,1.96,0.0,False
+train,SNGS-073,Big rect. right top,512,1.15,0.0,False
+train,SNGS-073,Circle central,513,3.71,0.0,False
+train,SNGS-073,Circle left,175,2.55,0.0,False
+train,SNGS-073,Circle right,503,2.64,0.0,False
+train,SNGS-073,Middle line,399,24.05,0.01,False
+train,SNGS-073,Side line bottom,287,21.17,0.003,False
+train,SNGS-073,Side line left,166,2.34,0.0,False
+train,SNGS-073,Side line right,499,1.55,0.0,False
+train,SNGS-073,Side line top,750,1.29,0.0,False
+train,SNGS-073,Small rect. left main,131,1.81,0.0,False
+train,SNGS-073,Small rect. left top,131,0.96,0.0,False
+train,SNGS-073,Small rect. right bottom,439,7.08,0.002,False
+train,SNGS-073,Small rect. right main,478,1.43,0.0,False
+train,SNGS-073,Small rect. right top,478,2.36,0.0,False
+train,SNGS-074,Big rect. left main,114,3.13,0.0,False
+train,SNGS-074,Big rect. left top,114,2.08,0.0,False
+train,SNGS-074,Big rect. right bottom,169,4.7,0.0,False
+train,SNGS-074,Big rect. right main,545,3.73,0.0,False
+train,SNGS-074,Big rect. right top,546,2.72,0.0,False
+train,SNGS-074,Circle central,629,3.24,0.118,False
+train,SNGS-074,Circle left,31,2.37,0.0,False
+train,SNGS-074,Circle right,509,4.68,0.0,False
+train,SNGS-074,Middle line,455,4.89,0.0,False
+train,SNGS-074,Side line bottom,205,3.68,0.0,False
+train,SNGS-074,Side line right,498,4.96,0.0,False
+train,SNGS-074,Side line top,750,1.95,0.0,False
+train,SNGS-074,Small rect. right bottom,169,1.73,0.006,False
+train,SNGS-074,Small rect. right main,415,4.34,0.0,False
+train,SNGS-074,Small rect. right top,415,1.36,0.0,False
+train,SNGS-075,Big rect. right bottom,691,3.85,0.006,False
+train,SNGS-075,Big rect. right main,750,2.84,0.0,False
+train,SNGS-075,Big rect. right top,668,2.33,0.0,False
+train,SNGS-075,Circle right,750,3.84,0.0,False
+train,SNGS-075,Side line bottom,282,21.14,0.043,False
+train,SNGS-075,Side line right,750,3.56,0.0,False
+train,SNGS-075,Side line top,419,4.15,0.0,False
+train,SNGS-075,Small rect. right bottom,697,1.57,0.0,False
+train,SNGS-075,Small rect. right main,750,1.62,0.0,False
+train,SNGS-075,Small rect. right top,750,1.62,0.0,False
+train,SNGS-076,Big rect. left main,76,5.3,0.079,False
+train,SNGS-076,Big rect. left top,76,3.74,0.079,False
+train,SNGS-076,Big rect. right bottom,486,6.79,0.0,False
+train,SNGS-076,Big rect. right main,685,7.78,0.022,False
+train,SNGS-076,Big rect. right top,685,5.26,0.022,False
+train,SNGS-076,Circle central,750,2.15,0.024,False
+train,SNGS-076,Circle left,62,8.04,0.0,False
+train,SNGS-076,Circle right,675,11.41,0.01,False
+train,SNGS-076,Middle line,750,4.54,0.04,False
+train,SNGS-076,Side line bottom,718,4.05,0.01,False
+train,SNGS-076,Side line left,55,4.3,0.0,False
+train,SNGS-076,Side line right,672,7.24,0.006,False
+train,SNGS-076,Side line top,750,5.15,0.005,False
+train,SNGS-076,Small rect. right bottom,486,3.1,0.002,False
+train,SNGS-076,Small rect. right main,635,6.43,0.0,False
+train,SNGS-076,Small rect. right top,635,9.39,0.0,False
+train,SNGS-077,Big rect. left bottom,579,2.4,0.0,False
+train,SNGS-077,Big rect. left main,592,1.52,0.0,False
+train,SNGS-077,Big rect. left top,451,1.23,0.0,False
+train,SNGS-077,Circle central,332,5.55,0.0,False
+train,SNGS-077,Circle left,531,1.63,0.0,False
+train,SNGS-077,Middle line,243,8.54,0.012,False
+train,SNGS-077,Side line bottom,592,5.31,0.0,False
+train,SNGS-077,Side line left,592,1.5,0.0,False
+train,SNGS-077,Side line top,402,1.31,0.0,False
+train,SNGS-077,Small rect. left bottom,579,1.87,0.0,False
+train,SNGS-077,Small rect. left main,592,1.79,0.0,False
+train,SNGS-077,Small rect. left top,546,1.76,0.0,False
+train,SNGS-097,Big rect. right bottom,732,1.88,0.0,False
+train,SNGS-097,Big rect. right main,750,1.64,0.0,False
+train,SNGS-097,Big rect. right top,750,2.38,0.0,False
+train,SNGS-097,Circle central,114,6.22,0.0,False
+train,SNGS-097,Circle right,750,3.33,0.0,False
+train,SNGS-097,Middle line,24,62.46,0.917,True
+train,SNGS-097,Side line bottom,399,25.23,0.05,False
+train,SNGS-097,Side line right,750,2.1,0.0,False
+train,SNGS-097,Side line top,678,2.93,0.0,False
+train,SNGS-097,Small rect. right bottom,736,1.67,0.0,False
+train,SNGS-097,Small rect. right main,750,1.12,0.0,False
+train,SNGS-097,Small rect. right top,750,1.44,0.0,False
+train,SNGS-098,Big rect. left bottom,201,2.74,0.0,False
+train,SNGS-098,Big rect. left main,341,5.56,0.0,False
+train,SNGS-098,Big rect. left top,341,4.97,0.0,False
+train,SNGS-098,Big rect. right main,330,2.41,0.0,False
+train,SNGS-098,Big rect. right top,330,1.47,0.0,False
+train,SNGS-098,Circle central,288,2.1,0.08,False
+train,SNGS-098,Circle left,306,11.82,0.0,False
+train,SNGS-098,Circle right,313,7.07,0.0,False
+train,SNGS-098,Middle line,191,3.0,0.0,False
+train,SNGS-098,Side line bottom,200,292.95,1.0,True
+train,SNGS-098,Side line left,301,2.1,0.0,False
+train,SNGS-098,Side line right,311,2.65,0.0,False
+train,SNGS-098,Side line top,750,2.11,0.0,False
+train,SNGS-098,Small rect. left bottom,207,3.1,0.0,False
+train,SNGS-098,Small rect. left main,257,3.17,0.0,False
+train,SNGS-098,Small rect. left top,258,1.83,0.0,False
+train,SNGS-098,Small rect. right main,281,3.05,0.0,False
+train,SNGS-098,Small rect. right top,281,6.01,0.0,False
+train,SNGS-099,Big rect. left bottom,201,6.0,0.01,False
+train,SNGS-099,Big rect. left main,327,1.43,0.003,False
+train,SNGS-099,Big rect. left top,327,1.43,0.0,False
+train,SNGS-099,Big rect. right bottom,375,3.75,0.024,False
+train,SNGS-099,Big rect. right main,413,2.01,0.0,False
+train,SNGS-099,Big rect. right top,303,3.16,0.003,False
+train,SNGS-099,Circle central,139,2.74,0.237,False
+train,SNGS-099,Circle left,321,1.92,0.003,False
+train,SNGS-099,Circle right,355,3.58,0.0,False
+train,SNGS-099,Middle line,68,4.73,0.0,False
+train,SNGS-099,Side line bottom,393,15.88,0.135,False
+train,SNGS-099,Side line left,319,4.81,0.009,False
+train,SNGS-099,Side line right,407,2.33,0.0,False
+train,SNGS-099,Side line top,503,2.69,0.0,False
+train,SNGS-099,Small rect. left bottom,209,3.34,0.0,False
+train,SNGS-099,Small rect. left main,301,2.56,0.003,False
+train,SNGS-099,Small rect. left top,301,2.45,0.0,False
+train,SNGS-099,Small rect. right bottom,376,2.32,0.0,False
+train,SNGS-099,Small rect. right main,397,2.94,0.0,False
+train,SNGS-099,Small rect. right top,377,2.52,0.0,False
+train,SNGS-100,Big rect. left bottom,237,32.72,0.114,False
+train,SNGS-100,Big rect. left main,360,3.6,0.0,False
+train,SNGS-100,Big rect. left top,371,1.31,0.03,False
+train,SNGS-100,Big rect. right bottom,134,3.58,0.0,False
+train,SNGS-100,Big rect. right main,280,2.09,0.0,False
+train,SNGS-100,Big rect. right top,203,1.42,0.0,False
+train,SNGS-100,Circle central,238,2.66,0.0,False
+train,SNGS-100,Circle left,333,6.87,0.0,False
+train,SNGS-100,Circle right,257,3.69,0.0,False
+train,SNGS-100,Middle line,144,3.21,0.0,False
+train,SNGS-100,Side line bottom,68,43.39,0.279,False
+train,SNGS-100,Side line left,330,1.88,0.0,False
+train,SNGS-100,Side line right,254,1.96,0.0,False
+train,SNGS-100,Side line top,644,2.58,0.0,False
+train,SNGS-100,Small rect. left bottom,246,3.23,0.0,False
+train,SNGS-100,Small rect. left main,306,1.15,0.0,False
+train,SNGS-100,Small rect. left top,306,2.3,0.0,False
+train,SNGS-100,Small rect. right bottom,139,1.12,0.0,False
+train,SNGS-100,Small rect. right main,214,1.85,0.0,False
+train,SNGS-100,Small rect. right top,214,2.22,0.0,False
+train,SNGS-101,Big rect. left bottom,61,23.26,0.0,False
+train,SNGS-101,Big rect. left main,264,2.43,0.0,False
+train,SNGS-101,Big rect. left top,264,1.84,0.0,False
+train,SNGS-101,Big rect. right bottom,152,20.55,0.217,False
+train,SNGS-101,Big rect. right main,321,3.38,0.0,False
+train,SNGS-101,Big rect. right top,321,2.74,0.0,False
+train,SNGS-101,Circle central,385,2.14,0.029,False
+train,SNGS-101,Circle left,234,4.19,0.0,False
+train,SNGS-101,Circle right,291,4.94,0.0,False
+train,SNGS-101,Middle line,226,3.69,0.0,False
+train,SNGS-101,Side line left,228,3.35,0.0,False
+train,SNGS-101,Side line right,287,4.38,0.007,False
+train,SNGS-101,Side line top,750,2.53,0.005,False
+train,SNGS-101,Small rect. left bottom,69,5.53,0.0,False
+train,SNGS-101,Small rect. left main,145,2.62,0.0,False
+train,SNGS-101,Small rect. left top,145,2.11,0.0,False
+train,SNGS-101,Small rect. right bottom,155,14.19,0.09,False
+train,SNGS-101,Small rect. right main,211,9.04,0.114,False
+train,SNGS-101,Small rect. right top,211,2.68,0.047,False
+train,SNGS-102,Big rect. left main,183,20.18,0.016,False
+train,SNGS-102,Big rect. left top,183,20.26,0.016,False
+train,SNGS-102,Big rect. right bottom,215,3.6,0.065,False
+train,SNGS-102,Big rect. right main,668,2.8,0.0,False
+train,SNGS-102,Big rect. right top,668,3.53,0.003,False
+train,SNGS-102,Circle central,750,4.2,0.012,False
+train,SNGS-102,Circle right,456,3.11,0.0,False
+train,SNGS-102,Middle line,537,11.65,0.132,False
+train,SNGS-102,Side line bottom,559,14.46,0.097,False
+train,SNGS-102,Side line right,429,3.06,0.0,False
+train,SNGS-102,Side line top,750,2.58,0.0,False
+train,SNGS-102,Small rect. right bottom,235,2.37,0.021,False
+train,SNGS-102,Small rect. right main,391,1.91,0.003,False
+train,SNGS-102,Small rect. right top,384,1.99,0.0,False
+train,SNGS-103,Big rect. left bottom,376,6.18,0.003,False
+train,SNGS-103,Big rect. left main,540,3.4,0.0,False
+train,SNGS-103,Big rect. left top,540,2.09,0.0,False
+train,SNGS-103,Circle central,274,1.92,0.131,False
+train,SNGS-103,Circle left,529,6.52,0.0,False
+train,SNGS-103,Middle line,218,4.29,0.0,False
+train,SNGS-103,Side line left,528,1.85,0.0,False
+train,SNGS-103,Side line top,718,3.58,0.0,False
+train,SNGS-103,Small rect. left bottom,389,2.66,0.0,False
+train,SNGS-103,Small rect. left main,512,1.39,0.0,False
+train,SNGS-103,Small rect. left top,512,2.29,0.0,False
+train,SNGS-104,Big rect. right bottom,244,13.93,0.025,False
+train,SNGS-104,Big rect. right main,750,2.0,0.0,False
+train,SNGS-104,Big rect. right top,662,0.95,0.0,False
+train,SNGS-104,Circle central,384,183.88,0.779,True
+train,SNGS-104,Circle right,689,4.75,0.0,False
+train,SNGS-104,Side line right,750,1.4,0.0,False
+train,SNGS-104,Side line top,609,1.98,0.0,False
+train,SNGS-104,Small rect. right bottom,269,3.01,0.0,False
+train,SNGS-104,Small rect. right main,701,2.06,0.0,False
+train,SNGS-104,Small rect. right top,678,2.48,0.0,False
+train,SNGS-105,Big rect. left main,127,2.13,0.0,False
+train,SNGS-105,Big rect. left top,127,1.53,0.0,False
+train,SNGS-105,Big rect. right bottom,490,10.5,0.006,False
+train,SNGS-105,Big rect. right main,624,2.42,0.0,False
+train,SNGS-105,Big rect. right top,624,2.93,0.0,False
+train,SNGS-105,Circle central,239,2.92,0.0,False
+train,SNGS-105,Circle left,122,1.77,0.0,False
+train,SNGS-105,Circle right,619,2.94,0.0,False
+train,SNGS-105,Middle line,216,3.07,0.0,False
+train,SNGS-105,Side line bottom,510,17.32,0.3,False
+train,SNGS-105,Side line left,122,6.8,0.0,False
+train,SNGS-105,Side line right,618,2.91,0.0,False
+train,SNGS-105,Side line top,658,4.04,0.0,False
+train,SNGS-105,Small rect. left main,91,1.57,0.0,False
+train,SNGS-105,Small rect. left top,91,1.73,0.0,False
+train,SNGS-105,Small rect. right bottom,529,2.37,0.0,False
+train,SNGS-105,Small rect. right main,607,1.87,0.0,False
+train,SNGS-105,Small rect. right top,607,1.87,0.0,False
+train,SNGS-106,Big rect. left bottom,738,3.2,0.0,False
+train,SNGS-106,Big rect. left main,750,1.68,0.0,False
+train,SNGS-106,Big rect. left top,705,2.14,0.0,False
+train,SNGS-106,Circle left,750,3.02,0.0,False
+train,SNGS-106,Side line bottom,508,25.29,0.152,False
+train,SNGS-106,Side line left,750,1.84,0.0,False
+train,SNGS-106,Side line top,115,5.14,0.0,False
+train,SNGS-106,Small rect. left bottom,743,1.58,0.0,False
+train,SNGS-106,Small rect. left main,750,1.35,0.0,False
+train,SNGS-106,Small rect. left top,750,1.91,0.0,False
+train,SNGS-107,Big rect. left main,310,19.54,0.0,False
+train,SNGS-107,Big rect. left top,310,19.5,0.0,False
+train,SNGS-107,Big rect. right bottom,221,4.51,0.0,False
+train,SNGS-107,Big rect. right main,604,4.35,0.0,False
+train,SNGS-107,Big rect. right top,604,5.51,0.0,False
+train,SNGS-107,Circle central,497,6.9,0.066,False
+train,SNGS-107,Circle left,76,4.77,0.0,False
+train,SNGS-107,Circle right,380,3.11,0.0,False
+train,SNGS-107,Middle line,425,3.24,0.007,False
+train,SNGS-107,Side line bottom,216,6.13,0.0,False
+train,SNGS-107,Side line left,55,7.08,0.0,False
+train,SNGS-107,Side line right,377,2.23,0.0,False
+train,SNGS-107,Side line top,750,3.26,0.0,False
+train,SNGS-107,Small rect. left main,24,3.13,0.0,False
+train,SNGS-107,Small rect. left top,24,1.41,0.0,False
+train,SNGS-107,Small rect. right bottom,238,4.82,0.0,False
+train,SNGS-107,Small rect. right main,331,3.48,0.003,False
+train,SNGS-107,Small rect. right top,331,2.32,0.0,False
+train,SNGS-108,Big rect. left bottom,291,7.17,0.0,False
+train,SNGS-108,Big rect. left main,356,3.75,0.0,False
+train,SNGS-108,Big rect. left top,356,3.94,0.0,False
+train,SNGS-108,Big rect. right bottom,171,9.74,0.006,False
+train,SNGS-108,Big rect. right main,214,1.95,0.0,False
+train,SNGS-108,Big rect. right top,214,1.37,0.0,False
+train,SNGS-108,Circle central,280,3.85,0.061,False
+train,SNGS-108,Circle left,345,7.52,0.0,False
+train,SNGS-108,Circle right,206,2.31,0.005,False
+train,SNGS-108,Middle line,225,10.15,0.0,False
+train,SNGS-108,Side line bottom,251,97.66,0.876,True
+train,SNGS-108,Side line left,344,2.2,0.0,False
+train,SNGS-108,Side line right,205,1.63,0.015,False
+train,SNGS-108,Side line top,664,2.35,0.0,False
+train,SNGS-108,Small rect. left bottom,294,1.76,0.0,False
+train,SNGS-108,Small rect. left main,324,2.51,0.0,False
+train,SNGS-108,Small rect. left top,324,2.16,0.0,False
+train,SNGS-108,Small rect. right bottom,174,1.65,0.011,False
+train,SNGS-108,Small rect. right main,194,1.41,0.0,False
+train,SNGS-108,Small rect. right top,194,1.17,0.0,False
+train,SNGS-109,Big rect. left bottom,214,12.59,0.005,False
+train,SNGS-109,Big rect. left main,480,3.56,0.0,False
+train,SNGS-109,Big rect. left top,480,3.89,0.0,False
+train,SNGS-109,Big rect. right main,52,6.38,0.0,False
+train,SNGS-109,Big rect. right top,51,4.83,0.0,False
+train,SNGS-109,Circle central,489,2.74,0.018,False
+train,SNGS-109,Circle left,438,4.5,0.0,False
+train,SNGS-109,Middle line,340,8.41,0.0,False
+train,SNGS-109,Side line left,429,8.25,0.0,False
+train,SNGS-109,Side line top,750,2.42,0.0,False
+train,SNGS-109,Small rect. left bottom,218,6.83,0.0,False
+train,SNGS-109,Small rect. left main,264,5.19,0.0,False
+train,SNGS-109,Small rect. left top,264,2.59,0.0,False
+train,SNGS-110,Big rect. left bottom,281,12.04,0.011,False
+train,SNGS-110,Big rect. left main,526,3.95,0.0,False
+train,SNGS-110,Big rect. left top,526,3.03,0.0,False
+train,SNGS-110,Circle central,357,3.76,0.143,False
+train,SNGS-110,Circle left,514,3.97,0.0,False
+train,SNGS-110,Middle line,225,9.68,0.031,False
+train,SNGS-110,Side line bottom,203,31.73,0.35,False
+train,SNGS-110,Side line left,513,2.21,0.0,False
+train,SNGS-110,Side line top,557,2.52,0.0,False
+train,SNGS-110,Small rect. left bottom,286,1.89,0.0,False
+train,SNGS-110,Small rect. left main,418,3.21,0.0,False
+train,SNGS-110,Small rect. left top,418,3.86,0.0,False
+train,SNGS-111,Big rect. left bottom,199,2.06,0.0,False
+train,SNGS-111,Big rect. left main,364,1.36,0.0,False
+train,SNGS-111,Big rect. left top,364,0.87,0.0,False
+train,SNGS-111,Big rect. right bottom,138,3.14,0.0,False
+train,SNGS-111,Big rect. right main,330,2.94,0.0,False
+train,SNGS-111,Big rect. right top,330,2.41,0.0,False
+train,SNGS-111,Circle central,262,7.5,0.408,False
+train,SNGS-111,Circle left,351,1.29,0.0,False
+train,SNGS-111,Circle right,316,5.77,0.0,False
+train,SNGS-111,Middle line,116,17.14,0.009,False
+train,SNGS-111,Side line bottom,75,15.01,0.08,False
+train,SNGS-111,Side line left,349,2.96,0.0,False
+train,SNGS-111,Side line right,314,2.91,0.0,False
+train,SNGS-111,Side line top,670,1.85,0.0,False
+train,SNGS-111,Small rect. left bottom,219,3.61,0.0,False
+train,SNGS-111,Small rect. left main,326,2.23,0.0,False
+train,SNGS-111,Small rect. left top,326,1.73,0.0,False
+train,SNGS-111,Small rect. right bottom,142,2.69,0.0,False
+train,SNGS-111,Small rect. right main,291,4.68,0.0,False
+train,SNGS-111,Small rect. right top,291,2.29,0.0,False
+train,SNGS-112,Big rect. left main,3,5.4,0.0,False
+train,SNGS-112,Big rect. left top,3,3.75,0.0,False
+train,SNGS-112,Big rect. right bottom,406,3.28,0.0,False
+train,SNGS-112,Big rect. right main,489,1.6,0.0,False
+train,SNGS-112,Big rect. right top,489,1.46,0.0,False
+train,SNGS-112,Circle central,376,1.83,0.0,False
+train,SNGS-112,Circle right,477,2.89,0.0,False
+train,SNGS-112,Middle line,327,2.38,0.009,False
+train,SNGS-112,Side line bottom,154,14.86,0.058,False
+train,SNGS-112,Side line right,475,2.27,0.0,False
+train,SNGS-112,Side line top,750,1.87,0.0,False
+train,SNGS-112,Small rect. right bottom,409,1.41,0.0,False
+train,SNGS-112,Small rect. right main,450,1.17,0.0,False
+train,SNGS-112,Small rect. right top,450,1.36,0.0,False
+train,SNGS-113,Big rect. left main,502,8.37,0.03,False
+train,SNGS-113,Big rect. left top,502,8.08,0.026,False
+train,SNGS-113,Big rect. right bottom,1,15.41,0.0,False
+train,SNGS-113,Big rect. right main,750,5.73,0.0,False
+train,SNGS-113,Big rect. right top,750,5.88,0.0,False
+train,SNGS-113,Circle central,750,6.29,0.0,False
+train,SNGS-113,Circle left,180,19.19,0.0,False
+train,SNGS-113,Circle right,563,4.29,0.0,False
+train,SNGS-113,Middle line,750,5.87,0.0,False
+train,SNGS-113,Side line bottom,750,5.82,0.0,False
+train,SNGS-113,Side line right,310,6.09,0.0,False
+train,SNGS-113,Side line top,750,3.46,0.0,False
+train,SNGS-113,Small rect. right bottom,6,6.08,0.0,False
+train,SNGS-113,Small rect. right main,43,1.7,0.0,False
+train,SNGS-113,Small rect. right top,43,0.96,0.0,False
+train,SNGS-114,Big rect. left bottom,225,4.17,0.0,False
+train,SNGS-114,Big rect. left main,372,5.05,0.04,False
+train,SNGS-114,Big rect. left top,372,2.92,0.04,False
+train,SNGS-114,Circle central,553,2.25,0.0,False
+train,SNGS-114,Circle left,289,5.83,0.0,False
+train,SNGS-114,Middle line,501,4.27,0.0,False
+train,SNGS-114,Side line bottom,251,116.24,0.685,True
+train,SNGS-114,Side line left,287,2.35,0.0,False
+train,SNGS-114,Side line top,750,1.48,0.0,False
+train,SNGS-114,Small rect. left bottom,229,2.44,0.0,False
+train,SNGS-114,Small rect. left main,263,3.2,0.0,False
+train,SNGS-114,Small rect. left top,263,1.57,0.0,False
+train,SNGS-115,Big rect. right bottom,384,4.11,0.0,False
+train,SNGS-115,Big rect. right main,750,2.65,0.0,False
+train,SNGS-115,Big rect. right top,750,1.99,0.0,False
+train,SNGS-115,Circle central,87,18.0,0.172,False
+train,SNGS-115,Circle right,750,4.15,0.0,False
+train,SNGS-115,Side line right,735,2.31,0.0,False
+train,SNGS-115,Side line top,750,3.31,0.0,False
+train,SNGS-115,Small rect. right bottom,409,2.43,0.0,False
+train,SNGS-115,Small rect. right main,604,1.25,0.0,False
+train,SNGS-115,Small rect. right top,606,1.37,0.0,False
+train,SNGS-151,Big rect. left main,179,2.87,0.0,False
+train,SNGS-151,Big rect. left top,179,2.47,0.0,False
+train,SNGS-151,Big rect. right bottom,197,3.78,0.0,False
+train,SNGS-151,Big rect. right main,217,1.01,0.0,False
+train,SNGS-151,Big rect. right top,217,1.44,0.0,False
+train,SNGS-151,Circle central,592,2.93,0.044,False
+train,SNGS-151,Circle left,155,3.05,0.013,False
+train,SNGS-151,Circle right,215,2.9,0.0,False
+train,SNGS-151,Middle line,412,3.65,0.0,False
+train,SNGS-151,Side line bottom,334,33.46,0.249,False
+train,SNGS-151,Side line left,153,2.41,0.0,False
+train,SNGS-151,Side line right,214,2.29,0.0,False
+train,SNGS-151,Side line top,750,2.07,0.0,False
+train,SNGS-151,Small rect. left main,123,2.38,0.0,False
+train,SNGS-151,Small rect. left top,123,2.33,0.0,False
+train,SNGS-151,Small rect. right bottom,199,1.74,0.0,False
+train,SNGS-151,Small rect. right main,210,1.54,0.0,False
+train,SNGS-151,Small rect. right top,210,1.86,0.0,False
+train,SNGS-152,Big rect. right main,750,2.49,0.0,False
+train,SNGS-152,Big rect. right top,750,1.22,0.0,False
+train,SNGS-152,Circle right,750,5.53,0.0,False
+train,SNGS-152,Side line right,750,2.21,0.0,False
+train,SNGS-152,Side line top,750,1.43,0.0,False
+train,SNGS-152,Small rect. right bottom,2,49.17,0.0,False
+train,SNGS-152,Small rect. right main,750,2.04,0.0,False
+train,SNGS-152,Small rect. right top,750,1.4,0.0,False
+train,SNGS-153,Big rect. left main,365,5.09,0.0,False
+train,SNGS-153,Big rect. left top,365,1.66,0.0,False
+train,SNGS-153,Big rect. right bottom,404,25.62,0.349,False
+train,SNGS-153,Big rect. right main,290,4.83,0.0,False
+train,SNGS-153,Big rect. right top,290,3.7,0.0,False
+train,SNGS-153,Circle central,173,2.95,0.029,False
+train,SNGS-153,Circle left,352,8.42,0.0,False
+train,SNGS-153,Circle right,285,3.18,0.0,False
+train,SNGS-153,Middle line,405,1807.88,0.667,True
+train,SNGS-153,Side line bottom,96,34.11,0.302,False
+train,SNGS-153,Side line left,351,2.05,0.0,False
+train,SNGS-153,Side line right,284,1.64,0.0,False
+train,SNGS-153,Side line top,609,3.95,0.0,False
+train,SNGS-153,Small rect. left bottom,190,2.71,0.0,False
+train,SNGS-153,Small rect. left main,333,1.35,0.0,False
+train,SNGS-153,Small rect. left top,333,1.28,0.0,False
+train,SNGS-153,Small rect. right bottom,266,1.54,0.0,False
+train,SNGS-153,Small rect. right main,278,1.63,0.0,False
+train,SNGS-153,Small rect. right top,278,1.65,0.0,False
+train,SNGS-154,Big rect. left bottom,196,10.23,0.015,False
+train,SNGS-154,Big rect. left main,665,4.97,0.0,False
+train,SNGS-154,Big rect. left top,665,1.18,0.0,False
+train,SNGS-154,Circle central,234,3.49,0.038,False
+train,SNGS-154,Circle left,581,6.2,0.0,False
+train,SNGS-154,Middle line,72,7.83,0.0,False
+train,SNGS-154,Side line left,576,1.99,0.0,False
+train,SNGS-154,Side line top,721,4.54,0.0,False
+train,SNGS-154,Small rect. left bottom,375,1.31,0.0,False
+train,SNGS-154,Small rect. left main,499,1.34,0.0,False
+train,SNGS-154,Small rect. left top,499,1.81,0.0,False
+train,SNGS-155,Big rect. left bottom,400,5.69,0.0,False
+train,SNGS-155,Big rect. left main,750,3.97,0.0,False
+train,SNGS-155,Big rect. left top,750,1.24,0.0,False
+train,SNGS-155,Circle central,290,4.01,0.048,False
+train,SNGS-155,Circle left,615,5.04,0.0,False
+train,SNGS-155,Middle line,166,4.02,0.024,False
+train,SNGS-155,Side line left,609,2.8,0.0,False
+train,SNGS-155,Side line top,573,2.97,0.0,False
+train,SNGS-155,Small rect. left bottom,408,2.79,0.0,False
+train,SNGS-155,Small rect. left main,457,1.1,0.0,False
+train,SNGS-155,Small rect. left top,457,2.48,0.0,False
+train,SNGS-156,Big rect. left bottom,451,7.38,0.0,False
+train,SNGS-156,Big rect. left main,750,2.1,0.0,False
+train,SNGS-156,Big rect. left top,750,2.92,0.0,False
+train,SNGS-156,Circle left,750,1.81,0.0,False
+train,SNGS-156,Side line bottom,180,32.93,0.3,False
+train,SNGS-156,Side line left,750,1.38,0.0,False
+train,SNGS-156,Side line top,382,1.56,0.0,False
+train,SNGS-156,Small rect. left bottom,481,1.65,0.0,False
+train,SNGS-156,Small rect. left main,750,1.73,0.0,False
+train,SNGS-156,Small rect. left top,750,1.63,0.0,False
+train,SNGS-157,Big rect. left bottom,462,7.14,0.002,False
+train,SNGS-157,Big rect. left main,574,3.27,0.0,False
+train,SNGS-157,Big rect. left top,574,1.77,0.0,False
+train,SNGS-157,Big rect. right main,107,3.02,0.0,False
+train,SNGS-157,Big rect. right top,107,2.8,0.0,False
+train,SNGS-157,Circle central,301,3.58,0.007,False
+train,SNGS-157,Circle left,544,4.36,0.002,False
+train,SNGS-157,Circle right,88,4.15,0.034,False
+train,SNGS-157,Middle line,235,5.08,0.0,False
+train,SNGS-157,Side line bottom,400,48.62,0.487,False
+train,SNGS-157,Side line left,542,3.3,0.0,False
+train,SNGS-157,Side line right,83,5.2,0.0,False
+train,SNGS-157,Side line top,669,5.29,0.0,False
+train,SNGS-157,Small rect. left bottom,465,1.54,0.0,False
+train,SNGS-157,Small rect. left main,508,1.81,0.0,False
+train,SNGS-157,Small rect. left top,508,2.16,0.0,False
+train,SNGS-158,Big rect. left main,157,3.8,0.045,False
+train,SNGS-158,Big rect. left top,157,4.61,0.089,False
+train,SNGS-158,Big rect. right bottom,278,1.3,0.0,False
+train,SNGS-158,Big rect. right main,496,1.1,0.0,False
+train,SNGS-158,Big rect. right top,496,0.91,0.0,False
+train,SNGS-158,Circle central,351,3.47,0.034,False
+train,SNGS-158,Circle left,117,2.58,0.0,False
+train,SNGS-158,Circle right,479,2.95,0.0,False
+train,SNGS-158,Middle line,260,6.46,0.012,False
+train,SNGS-158,Side line bottom,346,28.41,0.009,False
+train,SNGS-158,Side line left,112,5.65,0.0,False
+train,SNGS-158,Side line right,476,2.22,0.0,False
+train,SNGS-158,Side line top,750,1.63,0.0,False
+train,SNGS-158,Small rect. left main,43,7.09,0.0,False
+train,SNGS-158,Small rect. left top,43,5.52,0.0,False
+train,SNGS-158,Small rect. right bottom,280,1.52,0.0,False
+train,SNGS-158,Small rect. right main,446,1.42,0.0,False
+train,SNGS-158,Small rect. right top,446,1.58,0.0,False
+train,SNGS-159,Big rect. left bottom,263,6.88,0.008,False
+train,SNGS-159,Big rect. left main,750,3.49,0.0,False
+train,SNGS-159,Big rect. left top,750,2.24,0.0,False
+train,SNGS-159,Circle central,217,3.28,0.051,False
+train,SNGS-159,Circle left,698,4.68,0.0,False
+train,SNGS-159,Middle line,105,7.21,0.0,False
+train,SNGS-159,Side line bottom,209,8.8,0.029,False
+train,SNGS-159,Side line left,695,7.88,0.0,False
+train,SNGS-159,Side line top,750,3.93,0.0,False
+train,SNGS-159,Small rect. left bottom,296,5.49,0.0,False
+train,SNGS-159,Small rect. left main,541,3.91,0.0,False
+train,SNGS-159,Small rect. left top,541,3.35,0.0,False
+train,SNGS-160,Big rect. left main,218,4.24,0.0,False
+train,SNGS-160,Big rect. left top,218,4.09,0.0,False
+train,SNGS-160,Big rect. right bottom,115,2.29,0.0,False
+train,SNGS-160,Big rect. right main,159,2.95,0.0,False
+train,SNGS-160,Big rect. right top,159,3.08,0.0,False
+train,SNGS-160,Circle central,660,2.98,0.0,False
+train,SNGS-160,Circle left,144,4.42,0.0,False
+train,SNGS-160,Circle right,150,3.15,0.0,False
+train,SNGS-160,Middle line,648,5.22,0.0,False
+train,SNGS-160,Side line bottom,148,11.66,0.0,False
+train,SNGS-160,Side line left,133,4.87,0.0,False
+train,SNGS-160,Side line right,148,4.37,0.0,False
+train,SNGS-160,Side line top,723,1.72,0.0,False
+train,SNGS-160,Small rect. left main,15,4.14,0.0,False
+train,SNGS-160,Small rect. left top,15,3.11,0.0,False
+train,SNGS-160,Small rect. right bottom,117,1.66,0.0,False
+train,SNGS-160,Small rect. right main,135,2.7,0.0,False
+train,SNGS-160,Small rect. right top,135,2.39,0.0,False
+train,SNGS-161,Big rect. left bottom,179,8.09,0.022,False
+train,SNGS-161,Big rect. left main,412,3.41,0.0,False
+train,SNGS-161,Big rect. left top,412,2.19,0.0,False
+train,SNGS-161,Big rect. right main,121,4.23,0.0,False
+train,SNGS-161,Big rect. right top,121,1.86,0.0,False
+train,SNGS-161,Circle central,304,4.55,0.01,False
+train,SNGS-161,Circle left,405,5.91,0.079,False
+train,SNGS-161,Circle right,108,2.54,0.0,False
+train,SNGS-161,Middle line,228,14.82,0.0,False
+train,SNGS-161,Side line left,373,3.21,0.0,False
+train,SNGS-161,Side line right,108,3.79,0.0,False
+train,SNGS-161,Side line top,669,2.4,0.0,False
+train,SNGS-161,Small rect. left bottom,195,1.86,0.0,False
+train,SNGS-161,Small rect. left main,314,2.25,0.0,False
+train,SNGS-161,Small rect. left top,314,1.89,0.0,False
+train,SNGS-161,Small rect. right main,89,1.71,0.0,False
+train,SNGS-161,Small rect. right top,89,2.38,0.0,False
+train,SNGS-162,Big rect. left bottom,54,14.55,0.0,False
+train,SNGS-162,Big rect. left main,192,4.55,0.0,False
+train,SNGS-162,Big rect. left top,192,3.71,0.0,False
+train,SNGS-162,Big rect. right bottom,125,2.9,0.0,False
+train,SNGS-162,Big rect. right main,534,2.42,0.0,False
+train,SNGS-162,Big rect. right top,534,2.2,0.0,False
+train,SNGS-162,Circle central,305,3.12,0.007,False
+train,SNGS-162,Circle left,167,4.84,0.0,False
+train,SNGS-162,Circle right,509,2.97,0.0,False
+train,SNGS-162,Middle line,226,5.49,0.0,False
+train,SNGS-162,Side line bottom,357,13.03,0.182,False
+train,SNGS-162,Side line left,163,8.01,0.006,False
+train,SNGS-162,Side line right,506,2.98,0.0,False
+train,SNGS-162,Side line top,750,2.66,0.0,False
+train,SNGS-162,Small rect. left bottom,65,2.64,0.0,False
+train,SNGS-162,Small rect. left main,132,3.33,0.0,False
+train,SNGS-162,Small rect. left top,132,2.18,0.0,False
+train,SNGS-162,Small rect. right bottom,170,2.64,0.0,False
+train,SNGS-162,Small rect. right main,436,3.08,0.007,False
+train,SNGS-162,Small rect. right top,437,1.9,0.0,False
+train,SNGS-163,Big rect. left bottom,136,32.98,0.044,False
+train,SNGS-163,Big rect. left main,307,3.88,0.0,False
+train,SNGS-163,Big rect. left top,307,1.86,0.0,False
+train,SNGS-163,Big rect. right main,144,2.48,0.0,False
+train,SNGS-163,Big rect. right top,144,1.75,0.0,False
+train,SNGS-163,Circle central,426,2.89,0.026,False
+train,SNGS-163,Circle left,298,6.78,0.0,False
+train,SNGS-163,Circle right,120,3.28,0.0,False
+train,SNGS-163,Middle line,297,3.67,0.0,False
+train,SNGS-163,Side line left,297,1.64,0.0,False
+train,SNGS-163,Side line right,120,3.89,0.0,False
+train,SNGS-163,Side line top,750,2.0,0.0,False
+train,SNGS-163,Small rect. left bottom,155,2.31,0.0,False
+train,SNGS-163,Small rect. left main,263,1.49,0.0,False
+train,SNGS-163,Small rect. left top,263,1.45,0.0,False
+train,SNGS-163,Small rect. right main,83,2.13,0.0,False
+train,SNGS-163,Small rect. right top,83,1.57,0.0,False
+train,SNGS-164,Big rect. left bottom,279,7.78,0.0,False
+train,SNGS-164,Big rect. left main,750,2.43,0.0,False
+train,SNGS-164,Big rect. left top,750,2.62,0.0,False
+train,SNGS-164,Circle central,569,3.83,0.019,False
+train,SNGS-164,Circle left,712,3.97,0.0,False
+train,SNGS-164,Middle line,498,4.95,0.016,False
+train,SNGS-164,Side line bottom,592,12.54,0.204,False
+train,SNGS-164,Side line left,707,3.09,0.0,False
+train,SNGS-164,Side line top,750,2.05,0.0,False
+train,SNGS-164,Small rect. left bottom,290,1.71,0.0,False
+train,SNGS-164,Small rect. left main,535,3.92,0.0,False
+train,SNGS-164,Small rect. left top,535,3.36,0.0,False
+train,SNGS-165,Big rect. left bottom,387,2.24,0.0,False
+train,SNGS-165,Big rect. left main,482,1.31,0.0,False
+train,SNGS-165,Big rect. left top,482,3.73,0.0,False
+train,SNGS-165,Big rect. right bottom,222,3.75,0.005,False
+train,SNGS-165,Big rect. right main,263,3.12,0.004,False
+train,SNGS-165,Big rect. right top,144,5.32,0.007,False
+train,SNGS-165,Circle central,108,4.63,0.009,False
+train,SNGS-165,Circle left,474,2.2,0.0,False
+train,SNGS-165,Circle right,216,6.38,0.005,False
+train,SNGS-165,Middle line,74,10.42,0.041,False
+train,SNGS-165,Side line bottom,388,14.91,0.075,False
+train,SNGS-165,Side line left,473,1.46,0.0,False
+train,SNGS-165,Side line right,256,1.91,0.004,False
+train,SNGS-165,Side line top,280,4.31,0.0,False
+train,SNGS-165,Small rect. left bottom,395,1.23,0.0,False
+train,SNGS-165,Small rect. left main,456,1.7,0.0,False
+train,SNGS-165,Small rect. left top,456,2.35,0.0,False
+train,SNGS-165,Small rect. right bottom,227,2.35,0.0,False
+train,SNGS-165,Small rect. right main,250,2.66,0.0,False
+train,SNGS-165,Small rect. right top,250,2.83,0.0,False
+train,SNGS-166,Big rect. left main,595,15.23,0.0,False
+train,SNGS-166,Big rect. left top,595,15.12,0.0,False
+train,SNGS-166,Big rect. right main,724,28.19,0.0,False
+train,SNGS-166,Big rect. right top,724,33.48,0.023,False
+train,SNGS-166,Circle central,750,9.51,0.0,False
+train,SNGS-166,Circle left,7,7.52,0.0,False
+train,SNGS-166,Circle right,419,30.13,0.425,False
+train,SNGS-166,Middle line,750,4.94,0.0,False
+train,SNGS-166,Side line bottom,750,6.62,0.0,False
+train,SNGS-166,Side line left,6,10.19,0.0,False
+train,SNGS-166,Side line right,388,55.69,0.619,True
+train,SNGS-166,Side line top,750,3.17,0.0,False
+train,SNGS-166,Small rect. right main,95,5.04,0.0,False
+train,SNGS-166,Small rect. right top,95,5.38,0.0,False
+train,SNGS-167,Big rect. left main,158,2.21,0.0,False
+train,SNGS-167,Big rect. left top,158,1.23,0.0,False
+train,SNGS-167,Big rect. right bottom,241,4.68,0.0,False
+train,SNGS-167,Big rect. right main,415,4.7,0.0,False
+train,SNGS-167,Big rect. right top,415,2.67,0.0,False
+train,SNGS-167,Circle central,358,4.32,0.042,False
+train,SNGS-167,Circle left,143,3.8,0.0,False
+train,SNGS-167,Circle right,399,6.38,0.0,False
+train,SNGS-167,Middle line,173,6.04,0.0,False
+train,SNGS-167,Side line left,141,1.49,0.0,False
+train,SNGS-167,Side line right,398,2.41,0.0,False
+train,SNGS-167,Side line top,749,2.23,0.0,False
+train,SNGS-167,Small rect. right bottom,323,3.5,0.0,False
+train,SNGS-167,Small rect. right main,376,1.62,0.0,False
+train,SNGS-167,Small rect. right top,376,2.01,0.0,False
+train,SNGS-168,Big rect. left main,116,5.08,0.0,False
+train,SNGS-168,Big rect. left top,116,2.07,0.0,False
+train,SNGS-168,Big rect. right main,190,2.83,0.0,False
+train,SNGS-168,Big rect. right top,190,2.26,0.0,False
+train,SNGS-168,Circle central,750,3.71,0.0,False
+train,SNGS-168,Circle right,113,4.83,0.0,False
+train,SNGS-168,Middle line,750,2.98,0.0,False
+train,SNGS-168,Side line bottom,91,8.15,0.0,False
+train,SNGS-168,Side line right,109,5.34,0.0,False
+train,SNGS-168,Side line top,750,1.6,0.0,False
+train,SNGS-168,Small rect. right main,57,4.4,0.0,False
+train,SNGS-168,Small rect. right top,57,3.16,0.0,False
+train,SNGS-169,Big rect. left bottom,96,6.23,0.0,False
+train,SNGS-169,Big rect. left main,319,2.23,0.0,False
+train,SNGS-169,Big rect. left top,334,1.48,0.033,False
+train,SNGS-169,Big rect. right bottom,301,1.76,0.0,False
+train,SNGS-169,Big rect. right main,338,2.35,0.044,False
+train,SNGS-169,Big rect. right top,243,3.87,0.029,False
+train,SNGS-169,Circle central,284,3.32,0.049,False
+train,SNGS-169,Circle left,275,3.3,0.0,False
+train,SNGS-169,Circle right,319,2.88,0.0,False
+train,SNGS-169,Middle line,184,4.45,0.011,False
+train,SNGS-169,Side line bottom,268,31.02,0.138,False
+train,SNGS-169,Side line left,274,2.14,0.0,False
+train,SNGS-169,Side line right,318,1.62,0.0,False
+train,SNGS-169,Side line top,657,2.08,0.014,False
+train,SNGS-169,Small rect. left bottom,107,2.86,0.0,False
+train,SNGS-169,Small rect. left main,205,2.16,0.0,False
+train,SNGS-169,Small rect. left top,205,2.98,0.0,False
+train,SNGS-169,Small rect. right bottom,303,1.32,0.0,False
+train,SNGS-169,Small rect. right main,313,2.82,0.0,False
+train,SNGS-169,Small rect. right top,313,3.04,0.0,False
+train,SNGS-170,Big rect. left bottom,616,3.75,0.0,False
+train,SNGS-170,Big rect. left main,653,2.31,0.0,False
+train,SNGS-170,Big rect. left top,537,1.55,0.0,False
+train,SNGS-170,Big rect. right main,68,5.05,0.0,False
+train,SNGS-170,Big rect. right top,68,2.75,0.0,False
+train,SNGS-170,Circle central,132,3.2,0.0,False
+train,SNGS-170,Circle left,649,4.24,0.0,False
+train,SNGS-170,Circle right,57,7.5,0.0,False
+train,SNGS-170,Middle line,111,3.18,0.0,False
+train,SNGS-170,Side line bottom,391,36.25,0.281,False
+train,SNGS-170,Side line left,648,10.54,0.0,False
+train,SNGS-170,Side line right,55,7.0,0.0,False
+train,SNGS-170,Side line top,441,2.94,0.0,False
+train,SNGS-170,Small rect. left bottom,621,1.15,0.0,False
+train,SNGS-170,Small rect. left main,642,1.56,0.0,False
+train,SNGS-170,Small rect. left top,642,1.83,0.0,False
+valid,SNGS-021,Big rect. left bottom,367,2.79,0.0,False
+valid,SNGS-021,Big rect. left main,425,2.29,0.0,False
+valid,SNGS-021,Big rect. left top,425,2.79,0.0,False
+valid,SNGS-021,Big rect. right main,73,4.32,0.0,False
+valid,SNGS-021,Big rect. right top,73,3.59,0.0,False
+valid,SNGS-021,Circle central,431,1.74,0.009,False
+valid,SNGS-021,Circle left,415,2.91,0.0,False
+valid,SNGS-021,Circle right,53,3.39,0.0,False
+valid,SNGS-021,Middle line,390,2.44,0.013,False
+valid,SNGS-021,Side line bottom,446,10.72,0.235,False
+valid,SNGS-021,Side line left,413,2.5,0.0,False
+valid,SNGS-021,Side line right,49,10.06,0.0,False
+valid,SNGS-021,Side line top,750,2.52,0.0,False
+valid,SNGS-021,Small rect. left bottom,373,2.31,0.0,False
+valid,SNGS-021,Small rect. left main,406,1.84,0.0,False
+valid,SNGS-021,Small rect. left top,406,2.3,0.0,False
+valid,SNGS-022,Big rect. left bottom,105,12.63,0.086,False
+valid,SNGS-022,Big rect. left main,266,5.75,0.008,False
+valid,SNGS-022,Big rect. left top,266,3.32,0.011,False
+valid,SNGS-022,Big rect. right main,141,5.48,0.0,False
+valid,SNGS-022,Big rect. right top,141,1.91,0.0,False
+valid,SNGS-022,Circle central,523,3.44,0.006,False
+valid,SNGS-022,Circle left,250,6.82,0.012,False
+valid,SNGS-022,Middle line,488,3.77,0.006,False
+valid,SNGS-022,Side line left,248,4.75,0.008,False
+valid,SNGS-022,Side line top,750,3.23,0.004,False
+valid,SNGS-022,Small rect. left bottom,138,6.67,0.058,False
+valid,SNGS-022,Small rect. left main,223,4.09,0.045,False
+valid,SNGS-022,Small rect. left top,223,3.43,0.009,False
+valid,SNGS-023,Big rect. right bottom,209,18.33,0.0,False
+valid,SNGS-023,Big rect. right main,749,4.61,0.0,False
+valid,SNGS-023,Big rect. right top,749,2.83,0.0,False
+valid,SNGS-023,Circle central,522,660.49,0.617,True
+valid,SNGS-023,Circle right,749,3.43,0.0,False
+valid,SNGS-023,Side line right,749,2.59,0.0,False
+valid,SNGS-023,Side line top,749,4.63,0.0,False
+valid,SNGS-023,Small rect. right bottom,213,4.67,0.0,False
+valid,SNGS-023,Small rect. right main,555,4.44,0.0,False
+valid,SNGS-023,Small rect. right top,555,4.52,0.0,False
+valid,SNGS-024,Big rect. left bottom,43,68.82,0.698,True
+valid,SNGS-024,Big rect. left main,451,5.03,0.002,False
+valid,SNGS-024,Big rect. left top,451,4.47,0.093,False
+valid,SNGS-024,Big rect. right main,98,3.87,0.0,False
+valid,SNGS-024,Big rect. right top,98,2.01,0.0,False
+valid,SNGS-024,Circle central,479,3.42,0.023,False
+valid,SNGS-024,Circle left,419,6.2,0.01,False
+valid,SNGS-024,Circle right,70,13.29,0.0,False
+valid,SNGS-024,Middle line,233,6.9,0.0,False
+valid,SNGS-024,Side line left,416,4.71,0.13,False
+valid,SNGS-024,Side line right,59,13.99,0.0,False
+valid,SNGS-024,Side line top,750,3.65,0.076,False
+valid,SNGS-024,Small rect. left bottom,69,36.05,0.333,False
+valid,SNGS-024,Small rect. left main,360,5.15,0.0,False
+valid,SNGS-024,Small rect. left top,361,7.07,0.028,False
+valid,SNGS-025,Big rect. left bottom,414,3.03,0.0,False
+valid,SNGS-025,Big rect. left main,746,3.49,0.0,False
+valid,SNGS-025,Big rect. left top,567,2.23,0.0,False
+valid,SNGS-025,Circle central,149,8.16,0.255,False
+valid,SNGS-025,Circle left,611,7.74,0.0,False
+valid,SNGS-025,Side line bottom,315,19.59,0.003,False
+valid,SNGS-025,Side line left,746,2.5,0.0,False
+valid,SNGS-025,Side line top,498,2.45,0.0,False
+valid,SNGS-025,Small rect. left bottom,580,1.99,0.0,False
+valid,SNGS-025,Small rect. left main,617,1.76,0.0,False
+valid,SNGS-025,Small rect. left top,497,2.31,0.0,False
+valid,SNGS-026,Big rect. left bottom,234,3.34,0.0,False
+valid,SNGS-026,Big rect. left main,280,2.2,0.0,False
+valid,SNGS-026,Big rect. left top,97,3.19,0.0,False
+valid,SNGS-026,Big rect. right bottom,153,9.51,0.0,False
+valid,SNGS-026,Big rect. right main,451,2.92,0.004,False
+valid,SNGS-026,Big rect. right top,451,3.39,0.011,False
+valid,SNGS-026,Circle central,161,7.51,0.0,False
+valid,SNGS-026,Circle left,109,3.54,0.0,False
+valid,SNGS-026,Circle right,420,3.54,0.007,False
+valid,SNGS-026,Middle line,78,8.58,0.013,False
+valid,SNGS-026,Side line bottom,11,14.99,0.273,False
+valid,SNGS-026,Side line left,273,3.48,0.0,False
+valid,SNGS-026,Side line right,418,6.69,0.012,False
+valid,SNGS-026,Side line top,556,5.35,0.0,False
+valid,SNGS-026,Small rect. left bottom,239,1.96,0.0,False
+valid,SNGS-026,Small rect. left main,263,3.05,0.0,False
+valid,SNGS-026,Small rect. left top,263,2.9,0.0,False
+valid,SNGS-026,Small rect. right bottom,169,4.96,0.0,False
+valid,SNGS-026,Small rect. right main,378,2.99,0.011,False
+valid,SNGS-026,Small rect. right top,378,2.18,0.005,False
+valid,SNGS-027,Big rect. left bottom,630,5.54,0.021,False
+valid,SNGS-027,Big rect. left main,750,4.25,0.0,False
+valid,SNGS-027,Big rect. left top,441,3.33,0.0,False
+valid,SNGS-027,Circle left,595,5.99,0.0,False
+valid,SNGS-027,Side line bottom,304,14.13,0.109,False
+valid,SNGS-027,Side line left,750,3.7,0.0,False
+valid,SNGS-027,Side line top,236,11.34,0.034,False
+valid,SNGS-027,Small rect. left bottom,689,2.71,0.0,False
+valid,SNGS-027,Small rect. left main,750,1.78,0.0,False
+valid,SNGS-027,Small rect. left top,638,3.55,0.003,False
+valid,SNGS-028,Big rect. left main,113,5.33,0.0,False
+valid,SNGS-028,Big rect. left top,113,1.11,0.0,False
+valid,SNGS-028,Big rect. right bottom,378,9.82,0.005,False
+valid,SNGS-028,Big rect. right main,502,3.19,0.006,False
+valid,SNGS-028,Big rect. right top,465,3.26,0.009,False
+valid,SNGS-028,Circle central,171,3.4,0.064,False
+valid,SNGS-028,Circle left,100,11.51,0.0,False
+valid,SNGS-028,Circle right,488,4.54,0.006,False
+valid,SNGS-028,Middle line,111,5.33,0.018,False
+valid,SNGS-028,Side line left,98,5.86,0.0,False
+valid,SNGS-028,Side line right,486,3.56,0.006,False
+valid,SNGS-028,Side line top,599,3.06,0.005,False
+valid,SNGS-028,Small rect. left main,66,11.55,0.0,False
+valid,SNGS-028,Small rect. left top,66,4.53,0.0,False
+valid,SNGS-028,Small rect. right bottom,383,17.71,0.0,False
+valid,SNGS-028,Small rect. right main,462,1.97,0.011,False
+valid,SNGS-028,Small rect. right top,462,3.23,0.024,False
+valid,SNGS-029,Big rect. left main,66,7.0,0.015,False
+valid,SNGS-029,Big rect. left top,66,7.64,0.015,False
+valid,SNGS-029,Big rect. right bottom,281,2.06,0.0,False
+valid,SNGS-029,Big rect. right main,558,4.35,0.004,False
+valid,SNGS-029,Big rect. right top,558,4.0,0.0,False
+valid,SNGS-029,Circle central,396,5.21,0.0,False
+valid,SNGS-029,Circle left,53,7.02,0.0,False
+valid,SNGS-029,Circle right,550,4.06,0.004,False
+valid,SNGS-029,Middle line,297,12.68,0.024,False
+valid,SNGS-029,Side line bottom,479,12.98,0.148,False
+valid,SNGS-029,Side line left,50,9.59,0.0,False
+valid,SNGS-029,Side line right,539,3.39,0.0,False
+valid,SNGS-029,Side line top,639,4.16,0.009,False
+valid,SNGS-029,Small rect. right bottom,310,1.16,0.0,False
+valid,SNGS-029,Small rect. right main,463,1.86,0.0,False
+valid,SNGS-029,Small rect. right top,464,2.11,0.0,False
+valid,SNGS-030,Big rect. right bottom,636,9.5,0.0,False
+valid,SNGS-030,Big rect. right main,750,4.42,0.0,False
+valid,SNGS-030,Big rect. right top,750,2.52,0.0,False
+valid,SNGS-030,Circle right,750,3.47,0.0,False
+valid,SNGS-030,Side line bottom,180,30.7,0.144,False
+valid,SNGS-030,Side line right,750,3.48,0.0,False
+valid,SNGS-030,Side line top,621,5.17,0.002,False
+valid,SNGS-030,Small rect. right bottom,750,2.59,0.0,False
+valid,SNGS-030,Small rect. right main,750,2.84,0.0,False
+valid,SNGS-030,Small rect. right top,750,1.39,0.0,False
+valid,SNGS-031,Big rect. left bottom,215,4.06,0.0,False
+valid,SNGS-031,Big rect. left main,748,4.83,0.0,False
+valid,SNGS-031,Big rect. left top,748,2.11,0.0,False
+valid,SNGS-031,Circle central,210,8.48,0.105,False
+valid,SNGS-031,Circle left,743,6.07,0.0,False
+valid,SNGS-031,Middle line,52,5.63,0.038,False
+valid,SNGS-031,Side line bottom,61,7.24,0.066,False
+valid,SNGS-031,Side line left,710,3.09,0.0,False
+valid,SNGS-031,Side line top,748,4.44,0.0,False
+valid,SNGS-031,Small rect. left bottom,375,2.2,0.0,False
+valid,SNGS-031,Small rect. left main,586,2.82,0.0,False
+valid,SNGS-031,Small rect. left top,586,2.82,0.0,False
+valid,SNGS-032,Big rect. left bottom,223,9.84,0.004,False
+valid,SNGS-032,Big rect. left main,386,3.96,0.0,False
+valid,SNGS-032,Big rect. left top,386,3.59,0.0,False
+valid,SNGS-032,Big rect. right bottom,49,32.82,0.184,False
+valid,SNGS-032,Big rect. right main,304,4.84,0.0,False
+valid,SNGS-032,Big rect. right top,304,4.55,0.0,False
+valid,SNGS-032,Circle central,437,4.63,0.073,False
+valid,SNGS-032,Circle left,361,4.75,0.0,False
+valid,SNGS-032,Circle right,290,5.3,0.0,False
+valid,SNGS-032,Middle line,343,10.9,0.035,False
+valid,SNGS-032,Side line bottom,315,23.5,0.267,False
+valid,SNGS-032,Side line left,357,6.27,0.0,False
+valid,SNGS-032,Side line right,287,7.07,0.0,False
+valid,SNGS-032,Side line top,739,4.5,0.0,False
+valid,SNGS-032,Small rect. left bottom,243,3.52,0.0,False
+valid,SNGS-032,Small rect. left main,324,3.07,0.0,False
+valid,SNGS-032,Small rect. left top,324,2.6,0.0,False
+valid,SNGS-032,Small rect. right bottom,57,6.21,0.0,False
+valid,SNGS-032,Small rect. right main,208,3.42,0.005,False
+valid,SNGS-032,Small rect. right top,208,4.42,0.005,False
+valid,SNGS-033,Big rect. left main,153,2.19,0.0,False
+valid,SNGS-033,Big rect. left top,153,2.25,0.0,False
+valid,SNGS-033,Big rect. right bottom,517,2.34,0.008,False
+valid,SNGS-033,Big rect. right main,584,2.53,0.0,False
+valid,SNGS-033,Big rect. right top,584,1.34,0.0,False
+valid,SNGS-033,Circle central,469,4.94,0.0,False
+valid,SNGS-033,Circle left,120,2.68,0.0,False
+valid,SNGS-033,Circle right,578,2.99,0.0,False
+valid,SNGS-033,Middle line,345,3.58,0.006,False
+valid,SNGS-033,Side line bottom,690,23.27,0.02,False
+valid,SNGS-033,Side line left,119,1.88,0.0,False
+valid,SNGS-033,Side line right,578,4.43,0.002,False
+valid,SNGS-033,Side line top,750,2.81,0.0,False
+valid,SNGS-033,Small rect. left main,69,1.13,0.0,False
+valid,SNGS-033,Small rect. left top,69,2.19,0.0,False
+valid,SNGS-033,Small rect. right bottom,517,1.69,0.002,False
+valid,SNGS-033,Small rect. right main,568,1.7,0.002,False
+valid,SNGS-033,Small rect. right top,568,2.56,0.0,False
+valid,SNGS-034,Big rect. right bottom,531,114.91,0.9,True
+valid,SNGS-034,Big rect. right main,750,2.29,0.0,False
+valid,SNGS-034,Big rect. right top,750,2.28,0.0,False
+valid,SNGS-034,Circle right,750,7.5,0.0,False
+valid,SNGS-034,Side line right,750,2.04,0.0,False
+valid,SNGS-034,Side line top,750,2.26,0.061,False
+valid,SNGS-034,Small rect. right main,750,2.28,0.0,False
+valid,SNGS-034,Small rect. right top,750,8.05,0.0,False
+valid,SNGS-035,Big rect. left main,132,1.72,0.0,False
+valid,SNGS-035,Big rect. left top,132,2.54,0.0,False
+valid,SNGS-035,Circle central,376,3.85,0.0,False
+valid,SNGS-035,Circle left,107,4.48,0.0,False
+valid,SNGS-035,Middle line,366,2.42,0.0,False
+valid,SNGS-035,Side line bottom,88,4.1,0.0,False
+valid,SNGS-035,Side line left,97,3.98,0.0,False
+valid,SNGS-035,Side line top,376,3.38,0.0,False
+valid,SNGS-035,Small rect. left main,46,6.34,0.0,False
+valid,SNGS-035,Small rect. left top,46,3.58,0.0,False
+valid,SNGS-036,Big rect. left bottom,311,2.37,0.0,False
+valid,SNGS-036,Big rect. left main,750,7.1,0.0,False
+valid,SNGS-036,Big rect. left top,750,11.77,0.024,False
+valid,SNGS-036,Big rect. right main,319,26.4,0.025,False
+valid,SNGS-036,Big rect. right top,319,18.86,0.022,False
+valid,SNGS-036,Circle central,539,4.11,0.0,False
+valid,SNGS-036,Circle left,455,3.27,0.0,False
+valid,SNGS-036,Circle right,21,34.11,0.0,False
+valid,SNGS-036,Middle line,481,2.09,0.0,False
+valid,SNGS-036,Side line bottom,750,6.39,0.0,False
+valid,SNGS-036,Side line left,453,6.04,0.0,False
+valid,SNGS-036,Side line right,2,32.11,0.0,False
+valid,SNGS-036,Side line top,750,5.57,0.0,False
+valid,SNGS-036,Small rect. left bottom,313,3.25,0.0,False
+valid,SNGS-036,Small rect. left main,415,4.21,0.0,False
+valid,SNGS-036,Small rect. left top,415,3.64,0.0,False
+valid,SNGS-037,Big rect. left main,159,4.52,0.0,False
+valid,SNGS-037,Big rect. left top,159,1.77,0.0,False
+valid,SNGS-037,Big rect. right bottom,357,14.07,0.14,False
+valid,SNGS-037,Big rect. right main,477,4.28,0.0,False
+valid,SNGS-037,Big rect. right top,477,2.51,0.0,False
+valid,SNGS-037,Circle central,231,4.62,0.134,False
+valid,SNGS-037,Circle left,114,11.01,0.0,False
+valid,SNGS-037,Circle right,466,5.74,0.0,False
+valid,SNGS-037,Middle line,98,4.67,0.0,False
+valid,SNGS-037,Side line left,116,4.67,0.0,False
+valid,SNGS-037,Side line right,464,2.35,0.0,False
+valid,SNGS-037,Side line top,613,3.99,0.0,False
+valid,SNGS-037,Small rect. left main,31,4.4,0.0,False
+valid,SNGS-037,Small rect. left top,31,3.28,0.0,False
+valid,SNGS-037,Small rect. right bottom,409,2.17,0.005,False
+valid,SNGS-037,Small rect. right main,448,1.6,0.0,False
+valid,SNGS-037,Small rect. right top,448,1.77,0.0,False
+valid,SNGS-038,Big rect. right main,750,4.05,0.0,False
+valid,SNGS-038,Big rect. right top,750,0.82,0.0,False
+valid,SNGS-038,Circle right,750,12.39,0.0,False
+valid,SNGS-038,Side line right,750,1.49,0.0,False
+valid,SNGS-038,Side line top,750,2.56,0.0,False
+valid,SNGS-038,Small rect. right main,726,1.44,0.0,False
+valid,SNGS-038,Small rect. right top,726,2.0,0.003,False
+valid,SNGS-039,Big rect. left bottom,545,3.66,0.017,False
+valid,SNGS-039,Big rect. left main,750,2.47,0.0,False
+valid,SNGS-039,Big rect. left top,750,1.48,0.0,False
+valid,SNGS-039,Circle central,370,5.38,0.0,False
+valid,SNGS-039,Circle left,750,2.61,0.0,False
+valid,SNGS-039,Side line bottom,424,11.04,0.028,False
+valid,SNGS-039,Side line left,750,1.86,0.0,False
+valid,SNGS-039,Side line top,676,5.1,0.0,False
+valid,SNGS-039,Small rect. left bottom,569,2.28,0.0,False
+valid,SNGS-039,Small rect. left main,750,1.41,0.0,False
+valid,SNGS-039,Small rect. left top,750,1.07,0.0,False
+valid,SNGS-040,Big rect. left main,57,8.59,0.0,False
+valid,SNGS-040,Big rect. left top,57,2.91,0.0,False
+valid,SNGS-040,Big rect. right bottom,302,2.32,0.0,False
+valid,SNGS-040,Big rect. right main,616,3.31,0.0,False
+valid,SNGS-040,Big rect. right top,616,2.79,0.0,False
+valid,SNGS-040,Circle central,464,4.84,0.114,False
+valid,SNGS-040,Circle right,587,5.36,0.0,False
+valid,SNGS-040,Middle line,246,3.05,0.0,False
+valid,SNGS-040,Side line bottom,204,9.5,0.005,False
+valid,SNGS-040,Side line right,570,5.2,0.0,False
+valid,SNGS-040,Side line top,750,2.52,0.0,False
+valid,SNGS-040,Small rect. right bottom,297,1.82,0.0,False
+valid,SNGS-040,Small rect. right main,433,2.44,0.0,False
+valid,SNGS-040,Small rect. right top,433,2.35,0.0,False
+valid,SNGS-041,Big rect. left bottom,205,6.46,0.0,False
+valid,SNGS-041,Big rect. left main,298,3.55,0.0,False
+valid,SNGS-041,Big rect. left top,346,3.2,0.0,False
+valid,SNGS-041,Big rect. right main,95,2695.24,0.505,True
+valid,SNGS-041,Big rect. right top,47,2.47,0.0,False
+valid,SNGS-041,Circle central,750,6.24,0.0,False
+valid,SNGS-041,Circle left,300,2.19,0.0,False
+valid,SNGS-041,Middle line,556,4.21,0.0,False
+valid,SNGS-041,Side line bottom,5,19.36,0.0,False
+valid,SNGS-041,Side line left,277,5.06,0.0,False
+valid,SNGS-041,Side line top,750,2.04,0.0,False
+valid,SNGS-041,Small rect. left bottom,200,2.48,0.0,False
+valid,SNGS-041,Small rect. left main,248,1.57,0.0,False
+valid,SNGS-041,Small rect. left top,248,2.42,0.0,False
+valid,SNGS-042,Big rect. right bottom,634,3.85,0.0,False
+valid,SNGS-042,Big rect. right main,750,2.84,0.0,False
+valid,SNGS-042,Big rect. right top,750,2.35,0.0,False
+valid,SNGS-042,Circle central,373,6.37,0.0,False
+valid,SNGS-042,Circle right,739,2.52,0.0,False
+valid,SNGS-042,Middle line,126,4.6,0.0,False
+valid,SNGS-042,Side line bottom,465,29.53,0.254,False
+valid,SNGS-042,Side line right,722,2.14,0.0,False
+valid,SNGS-042,Side line top,750,2.25,0.0,False
+valid,SNGS-042,Small rect. right bottom,630,1.26,0.0,False
+valid,SNGS-042,Small rect. right main,679,1.45,0.0,False
+valid,SNGS-042,Small rect. right top,679,2.17,0.0,False
+valid,SNGS-043,Big rect. left bottom,147,2.23,0.0,False
+valid,SNGS-043,Big rect. left main,190,1.58,0.0,False
+valid,SNGS-043,Big rect. left top,190,0.93,0.0,False
+valid,SNGS-043,Big rect. right bottom,185,21.11,0.135,False
+valid,SNGS-043,Big rect. right main,522,4.49,0.002,False
+valid,SNGS-043,Big rect. right top,522,2.52,0.0,False
+valid,SNGS-043,Circle central,553,3.48,0.0,False
+valid,SNGS-043,Circle left,180,1.49,0.0,False
+valid,SNGS-043,Circle right,380,4.81,0.0,False
+valid,SNGS-043,Middle line,345,3.49,0.003,False
+valid,SNGS-043,Side line bottom,141,7.38,0.0,False
+valid,SNGS-043,Side line left,173,1.69,0.0,False
+valid,SNGS-043,Side line right,350,8.6,0.0,False
+valid,SNGS-043,Side line top,750,2.22,0.004,False
+valid,SNGS-043,Small rect. left bottom,145,1.82,0.0,False
+valid,SNGS-043,Small rect. left main,163,1.43,0.0,False
+valid,SNGS-043,Small rect. left top,163,1.51,0.0,False
+valid,SNGS-043,Small rect. right bottom,179,4.3,0.0,False
+valid,SNGS-043,Small rect. right main,289,2.71,0.0,False
+valid,SNGS-043,Small rect. right top,289,1.92,0.0,False
+valid,SNGS-044,Big rect. left bottom,137,3.91,0.0,False
+valid,SNGS-044,Big rect. left main,185,5.69,0.0,False
+valid,SNGS-044,Big rect. left top,185,6.02,0.0,False
+valid,SNGS-044,Big rect. right main,383,3.73,0.0,False
+valid,SNGS-044,Big rect. right top,383,3.53,0.0,False
+valid,SNGS-044,Circle central,659,3.8,0.036,False
+valid,SNGS-044,Circle left,176,11.1,0.0,False
+valid,SNGS-044,Circle right,370,7.71,0.0,False
+valid,SNGS-044,Middle line,595,3.75,0.0,False
+valid,SNGS-044,Side line left,171,2.63,0.0,False
+valid,SNGS-044,Side line right,358,5.34,0.0,False
+valid,SNGS-044,Side line top,750,3.02,0.0,False
+valid,SNGS-044,Small rect. left bottom,116,5.24,0.0,False
+valid,SNGS-044,Small rect. left main,161,3.69,0.0,False
+valid,SNGS-044,Small rect. left top,161,2.35,0.0,False
+valid,SNGS-044,Small rect. right main,327,15.22,0.0,False
+valid,SNGS-044,Small rect. right top,327,8.56,0.0,False
+valid,SNGS-045,Big rect. left bottom,64,2.14,0.0,False
+valid,SNGS-045,Big rect. left main,217,2.7,0.0,False
+valid,SNGS-045,Big rect. left top,217,1.99,0.0,False
+valid,SNGS-045,Big rect. right main,332,3.62,0.0,False
+valid,SNGS-045,Big rect. right top,332,2.28,0.0,False
+valid,SNGS-045,Circle central,578,2.72,0.0,False
+valid,SNGS-045,Circle left,199,2.4,0.0,False
+valid,SNGS-045,Circle right,308,3.73,0.0,False
+valid,SNGS-045,Middle line,531,3.72,0.0,False
+valid,SNGS-045,Side line bottom,306,2.6,0.0,False
+valid,SNGS-045,Side line left,184,2.91,0.0,False
+valid,SNGS-045,Side line right,287,4.16,0.0,False
+valid,SNGS-045,Side line top,591,2.33,0.0,False
+valid,SNGS-045,Small rect. left bottom,45,1.57,0.0,False
+valid,SNGS-045,Small rect. left main,153,2.01,0.0,False
+valid,SNGS-045,Small rect. left top,153,1.48,0.0,False
+valid,SNGS-045,Small rect. right main,209,2.03,0.0,False
+valid,SNGS-045,Small rect. right top,209,1.69,0.0,False
+valid,SNGS-046,Big rect. left bottom,394,2.95,0.0,False
+valid,SNGS-046,Big rect. left main,635,2.55,0.0,False
+valid,SNGS-046,Big rect. left top,635,2.07,0.0,False
+valid,SNGS-046,Circle central,451,4.53,0.0,False
+valid,SNGS-046,Circle left,617,3.54,0.0,False
+valid,SNGS-046,Middle line,212,8.07,0.014,False
+valid,SNGS-046,Side line bottom,238,15.29,0.0,False
+valid,SNGS-046,Side line left,603,2.43,0.0,False
+valid,SNGS-046,Side line top,750,2.52,0.0,False
+valid,SNGS-046,Small rect. left bottom,364,1.96,0.0,False
+valid,SNGS-046,Small rect. left main,557,2.54,0.0,False
+valid,SNGS-046,Small rect. left top,557,1.99,0.0,False
+valid,SNGS-047,Big rect. left bottom,171,10.33,0.0,False
+valid,SNGS-047,Big rect. left main,580,4.85,0.0,False
+valid,SNGS-047,Big rect. left top,530,1.83,0.0,False
+valid,SNGS-047,Circle central,361,5.52,0.011,False
+valid,SNGS-047,Circle left,544,4.11,0.0,False
+valid,SNGS-047,Middle line,220,3.4,0.0,False
+valid,SNGS-047,Side line left,529,6.23,0.0,False
+valid,SNGS-047,Side line top,634,1.82,0.0,False
+valid,SNGS-047,Small rect. left bottom,256,4.93,0.0,False
+valid,SNGS-047,Small rect. left main,412,2.06,0.0,False
+valid,SNGS-047,Small rect. left top,412,1.96,0.002,False
+valid,SNGS-048,Big rect. left main,352,1.02,0.0,False
+valid,SNGS-048,Big rect. left top,352,3.05,0.0,False
+valid,SNGS-048,Big rect. right bottom,173,1.77,0.0,False
+valid,SNGS-048,Big rect. right main,600,1.66,0.0,False
+valid,SNGS-048,Big rect. right top,600,1.96,0.0,False
+valid,SNGS-048,Circle central,629,3.08,0.0,False
+valid,SNGS-048,Circle left,317,9.29,0.0,False
+valid,SNGS-048,Circle right,578,4.94,0.0,False
+valid,SNGS-048,Middle line,598,4.04,0.0,False
+valid,SNGS-048,Side line bottom,750,11.1,0.005,False
+valid,SNGS-048,Side line left,266,23.3,0.0,False
+valid,SNGS-048,Side line right,558,3.78,0.0,False
+valid,SNGS-048,Side line top,750,1.61,0.0,False
+valid,SNGS-048,Small rect. left main,20,4.26,0.0,False
+valid,SNGS-048,Small rect. left top,20,2.81,0.0,False
+valid,SNGS-048,Small rect. right bottom,170,1.51,0.0,False
+valid,SNGS-048,Small rect. right main,202,1.44,0.0,False
+valid,SNGS-048,Small rect. right top,202,1.19,0.0,False
+valid,SNGS-049,Big rect. left main,411,8.85,0.0,False
+valid,SNGS-049,Big rect. left top,410,8.22,0.0,False
+valid,SNGS-049,Big rect. right bottom,132,4.64,0.0,False
+valid,SNGS-049,Big rect. right main,515,7.51,0.0,False
+valid,SNGS-049,Big rect. right top,496,7.24,0.0,False
+valid,SNGS-049,Circle central,603,4.58,0.0,False
+valid,SNGS-049,Circle left,344,7.68,0.0,False
+valid,SNGS-049,Circle right,474,7.12,0.0,False
+valid,SNGS-049,Middle line,557,11.64,0.0,False
+valid,SNGS-049,Side line bottom,310,17.93,0.013,False
+valid,SNGS-049,Side line left,277,26.69,0.0,False
+valid,SNGS-049,Side line right,441,24.53,0.0,False
+valid,SNGS-049,Side line top,709,2.73,0.0,False
+valid,SNGS-049,Small rect. right bottom,122,2.04,0.0,False
+valid,SNGS-049,Small rect. right main,202,2.84,0.0,False
+valid,SNGS-049,Small rect. right top,201,1.92,0.0,False
+valid,SNGS-050,Big rect. left bottom,277,14.22,0.011,False
+valid,SNGS-050,Big rect. left main,750,3.12,0.0,False
+valid,SNGS-050,Big rect. left top,750,1.33,0.0,False
+valid,SNGS-050,Circle central,305,3.57,0.043,False
+valid,SNGS-050,Circle left,750,3.78,0.0,False
+valid,SNGS-050,Middle line,67,12.41,0.0,False
+valid,SNGS-050,Side line left,602,2.38,0.0,False
+valid,SNGS-050,Side line top,750,2.08,0.0,False
+valid,SNGS-050,Small rect. left bottom,271,7.33,0.0,False
+valid,SNGS-050,Small rect. left main,492,4.55,0.0,False
+valid,SNGS-050,Small rect. left top,492,1.51,0.0,False
+valid,SNGS-051,Big rect. left main,88,4.99,0.0,False
+valid,SNGS-051,Big rect. left top,88,2.51,0.0,False
+valid,SNGS-051,Big rect. right bottom,198,2.2,0.0,False
+valid,SNGS-051,Big rect. right main,228,4.55,0.013,False
+valid,SNGS-051,Big rect. right top,228,8.9,0.009,False
+valid,SNGS-051,Circle central,750,4.44,0.243,False
+valid,SNGS-051,Circle left,10,8.81,0.0,False
+valid,SNGS-051,Circle right,222,9.35,0.009,False
+valid,SNGS-051,Middle line,554,3.47,0.0,False
+valid,SNGS-051,Side line right,219,4.53,0.014,False
+valid,SNGS-051,Side line top,750,1.56,0.0,False
+valid,SNGS-051,Small rect. right bottom,196,2.87,0.0,False
+valid,SNGS-051,Small rect. right main,285,4.89,0.281,False
+valid,SNGS-051,Small rect. right top,285,3.95,0.274,False
+valid,SNGS-052,Big rect. right bottom,391,2.86,0.0,False
+valid,SNGS-052,Big rect. right main,652,2.03,0.0,False
+valid,SNGS-052,Big rect. right top,652,1.36,0.0,False
+valid,SNGS-052,Circle central,520,3.72,0.0,False
+valid,SNGS-052,Circle right,565,1.78,0.0,False
+valid,SNGS-052,Middle line,224,5.02,0.0,False
+valid,SNGS-052,Side line bottom,240,16.65,0.0,False
+valid,SNGS-052,Side line right,546,1.78,0.0,False
+valid,SNGS-052,Side line top,750,2.57,0.0,False
+valid,SNGS-052,Small rect. right bottom,345,3.77,0.0,False
+valid,SNGS-052,Small rect. right main,498,2.07,0.0,False
+valid,SNGS-052,Small rect. right top,498,1.42,0.0,False
+valid,SNGS-053,Big rect. left bottom,687,1.8,0.0,False
+valid,SNGS-053,Big rect. left main,734,1.35,0.0,False
+valid,SNGS-053,Big rect. left top,734,1.36,0.0,False
+valid,SNGS-053,Circle central,387,3.19,0.0,False
+valid,SNGS-053,Circle left,726,1.85,0.0,False
+valid,SNGS-053,Middle line,165,7.58,0.061,False
+valid,SNGS-053,Side line bottom,727,15.54,0.188,False
+valid,SNGS-053,Side line left,721,1.51,0.0,False
+valid,SNGS-053,Side line top,750,1.47,0.0,False
+valid,SNGS-053,Small rect. left bottom,684,1.19,0.0,False
+valid,SNGS-053,Small rect. left main,708,1.1,0.0,False
+valid,SNGS-053,Small rect. left top,708,1.44,0.0,False
+valid,SNGS-054,Big rect. left bottom,53,66.55,0.755,True
+valid,SNGS-054,Big rect. left main,225,4.21,0.004,False
+valid,SNGS-054,Big rect. left top,225,3.89,0.004,False
+valid,SNGS-054,Big rect. right bottom,89,8.16,0.0,False
+valid,SNGS-054,Big rect. right main,373,3.64,0.0,False
+valid,SNGS-054,Big rect. right top,373,2.52,0.0,False
+valid,SNGS-054,Circle central,445,5.76,0.0,False
+valid,SNGS-054,Circle left,216,4.13,0.0,False
+valid,SNGS-054,Circle right,282,4.39,0.0,False
+valid,SNGS-054,Middle line,300,2.93,0.05,False
+valid,SNGS-054,Side line bottom,75,18.93,0.0,False
+valid,SNGS-054,Side line left,209,24.72,0.043,False
+valid,SNGS-054,Side line right,271,3.05,0.0,False
+valid,SNGS-054,Side line top,750,2.89,0.009,False
+valid,SNGS-054,Small rect. left bottom,159,9.68,0.019,False
+valid,SNGS-054,Small rect. left main,193,2.63,0.0,False
+valid,SNGS-054,Small rect. left top,193,2.44,0.0,False
+valid,SNGS-054,Small rect. right bottom,74,2.54,0.0,False
+valid,SNGS-054,Small rect. right main,254,2.41,0.0,False
+valid,SNGS-054,Small rect. right top,254,1.83,0.0,False
+valid,SNGS-055,Big rect. left main,316,7.6,0.13,False
+valid,SNGS-055,Big rect. left top,316,2.54,0.136,False
+valid,SNGS-055,Big rect. right main,137,5.09,0.0,False
+valid,SNGS-055,Big rect. right top,137,4.46,0.0,False
+valid,SNGS-055,Circle central,750,6.6,0.0,False
+valid,SNGS-055,Circle left,174,17.77,0.0,False
+valid,SNGS-055,Circle right,92,6.39,0.0,False
+valid,SNGS-055,Middle line,335,5.26,0.06,False
+valid,SNGS-055,Side line left,32,7.19,0.0,False
+valid,SNGS-055,Side line right,74,5.69,0.0,False
+valid,SNGS-055,Side line top,750,1.87,0.0,False
+valid,SNGS-056,Big rect. right bottom,652,4.72,0.0,False
+valid,SNGS-056,Big rect. right main,750,8.01,0.0,False
+valid,SNGS-056,Big rect. right top,750,7.79,0.0,False
+valid,SNGS-056,Circle right,750,8.98,0.0,False
+valid,SNGS-056,Side line right,750,4.45,0.0,False
+valid,SNGS-056,Side line top,623,12.87,0.0,False
+valid,SNGS-056,Small rect. right bottom,750,4.01,0.0,False
+valid,SNGS-056,Small rect. right main,750,2.19,0.0,False
+valid,SNGS-056,Small rect. right top,750,3.4,0.0,False
+valid,SNGS-057,Big rect. left bottom,256,20.8,0.0,False
+valid,SNGS-057,Big rect. left main,390,2.91,0.0,False
+valid,SNGS-057,Big rect. left top,390,1.38,0.0,False
+valid,SNGS-057,Circle central,489,6.9,0.0,False
+valid,SNGS-057,Circle left,335,4.54,0.0,False
+valid,SNGS-057,Middle line,402,4.68,0.0,False
+valid,SNGS-057,Side line bottom,183,61.26,0.967,True
+valid,SNGS-057,Side line left,295,2.85,0.0,False
+valid,SNGS-057,Side line top,748,1.91,0.0,False
+valid,SNGS-057,Small rect. left bottom,246,2.77,0.0,False
+valid,SNGS-057,Small rect. left main,283,1.5,0.0,False
+valid,SNGS-057,Small rect. left top,283,2.55,0.0,False
+valid,SNGS-058,Big rect. right bottom,293,5.97,0.0,False
+valid,SNGS-058,Big rect. right main,548,3.1,0.0,False
+valid,SNGS-058,Big rect. right top,480,2.57,0.0,False
+valid,SNGS-058,Circle central,429,6.59,0.0,False
+valid,SNGS-058,Circle right,403,5.05,0.0,False
+valid,SNGS-058,Middle line,354,4.09,0.0,False
+valid,SNGS-058,Side line bottom,151,6.26,0.079,False
+valid,SNGS-058,Side line right,429,3.08,0.0,False
+valid,SNGS-058,Side line top,643,2.73,0.0,False
+valid,SNGS-058,Small rect. right bottom,276,2.35,0.0,False
+valid,SNGS-058,Small rect. right main,387,2.56,0.0,False
+valid,SNGS-058,Small rect. right top,355,1.64,0.0,False
+valid,SNGS-059,Big rect. right bottom,526,3.5,0.0,False
+valid,SNGS-059,Big rect. right main,750,1.61,0.0,False
+valid,SNGS-059,Big rect. right top,750,2.18,0.0,False
+valid,SNGS-059,Circle central,354,4.16,0.0,False
+valid,SNGS-059,Circle right,750,2.92,0.0,False
+valid,SNGS-059,Middle line,238,5.1,0.029,False
+valid,SNGS-059,Side line bottom,662,25.65,0.0,False
+valid,SNGS-059,Side line right,723,2.48,0.0,False
+valid,SNGS-059,Side line top,750,3.63,0.0,False
+valid,SNGS-059,Small rect. right bottom,509,2.82,0.0,False
+valid,SNGS-059,Small rect. right main,644,2.58,0.0,False
+valid,SNGS-059,Small rect. right top,644,1.93,0.0,False
+valid,SNGS-078,Big rect. left bottom,199,1.72,0.0,False
+valid,SNGS-078,Big rect. left main,366,1.4,0.0,False
+valid,SNGS-078,Big rect. left top,291,1.35,0.0,False
+valid,SNGS-078,Big rect. right bottom,180,20.59,0.0,False
+valid,SNGS-078,Big rect. right main,308,2.57,0.006,False
+valid,SNGS-078,Big rect. right top,309,2.18,0.006,False
+valid,SNGS-078,Circle central,369,2.34,0.008,False
+valid,SNGS-078,Circle left,357,1.61,0.0,False
+valid,SNGS-078,Circle right,301,6.86,0.02,False
+valid,SNGS-078,Middle line,222,5.3,0.009,False
+valid,SNGS-078,Side line bottom,342,7.94,0.006,False
+valid,SNGS-078,Side line left,355,2.99,0.0,False
+valid,SNGS-078,Side line right,298,4.02,0.027,False
+valid,SNGS-078,Side line top,642,2.82,0.005,False
+valid,SNGS-078,Small rect. left bottom,200,1.86,0.0,False
+valid,SNGS-078,Small rect. left main,255,1.66,0.0,False
+valid,SNGS-078,Small rect. left top,255,1.84,0.0,False
+valid,SNGS-078,Small rect. right main,286,2.12,0.0,False
+valid,SNGS-078,Small rect. right top,286,2.19,0.0,False
+valid,SNGS-079,Big rect. left main,97,5.38,0.0,False
+valid,SNGS-079,Big rect. left top,97,4.26,0.0,False
+valid,SNGS-079,Big rect. right bottom,338,4.29,0.0,False
+valid,SNGS-079,Big rect. right main,580,3.14,0.0,False
+valid,SNGS-079,Big rect. right top,580,2.32,0.0,False
+valid,SNGS-079,Circle central,424,2.56,0.0,False
+valid,SNGS-079,Circle left,76,3.39,0.0,False
+valid,SNGS-079,Circle right,557,2.96,0.0,False
+valid,SNGS-079,Middle line,228,7.57,0.004,False
+valid,SNGS-079,Side line bottom,384,9.03,0.003,False
+valid,SNGS-079,Side line left,69,8.12,0.0,False
+valid,SNGS-079,Side line right,552,1.54,0.0,False
+valid,SNGS-079,Side line top,559,2.76,0.0,False
+valid,SNGS-079,Small rect. right bottom,345,2.08,0.0,False
+valid,SNGS-079,Small rect. right main,513,1.78,0.0,False
+valid,SNGS-079,Small rect. right top,513,2.23,0.0,False
+valid,SNGS-080,Big rect. right bottom,397,133.52,0.519,True
+valid,SNGS-080,Big rect. right main,582,2.87,0.0,False
+valid,SNGS-080,Big rect. right top,582,1.97,0.0,False
+valid,SNGS-080,Circle central,98,10.25,0.194,False
+valid,SNGS-080,Circle right,581,4.35,0.052,False
+valid,SNGS-080,Side line bottom,28,126.96,0.964,True
+valid,SNGS-080,Side line right,520,3.99,0.0,False
+valid,SNGS-080,Side line top,499,2.59,0.0,False
+valid,SNGS-080,Small rect. right bottom,201,2.06,0.0,False
+valid,SNGS-080,Small rect. right main,446,1.47,0.0,False
+valid,SNGS-080,Small rect. right top,447,2.46,0.0,False
+valid,SNGS-081,Big rect. left main,154,2.65,0.0,False
+valid,SNGS-081,Big rect. left top,154,1.05,0.0,False
+valid,SNGS-081,Big rect. right bottom,102,2.84,0.0,False
+valid,SNGS-081,Big rect. right main,274,2.16,0.0,False
+valid,SNGS-081,Big rect. right top,274,2.49,0.0,False
+valid,SNGS-081,Circle central,575,2.22,0.009,False
+valid,SNGS-081,Circle left,130,7.02,0.038,False
+valid,SNGS-081,Circle right,244,2.24,0.0,False
+valid,SNGS-081,Middle line,471,4.78,0.006,False
+valid,SNGS-081,Side line bottom,176,21.1,0.006,False
+valid,SNGS-081,Side line left,120,3.97,0.008,False
+valid,SNGS-081,Side line right,236,3.08,0.0,False
+valid,SNGS-081,Side line top,715,1.91,0.0,False
+valid,SNGS-081,Small rect. left main,77,5.13,0.0,False
+valid,SNGS-081,Small rect. left top,77,1.9,0.0,False
+valid,SNGS-081,Small rect. right bottom,103,1.52,0.0,False
+valid,SNGS-081,Small rect. right main,210,1.79,0.0,False
+valid,SNGS-081,Small rect. right top,210,2.76,0.0,False
+valid,SNGS-082,Big rect. right bottom,162,6.07,0.025,False
+valid,SNGS-082,Big rect. right main,643,1.59,0.0,False
+valid,SNGS-082,Big rect. right top,643,1.91,0.0,False
+valid,SNGS-082,Circle central,612,1.64,0.025,False
+valid,SNGS-082,Circle right,621,2.41,0.0,False
+valid,SNGS-082,Middle line,501,2.83,0.006,False
+valid,SNGS-082,Side line bottom,248,4.77,0.0,False
+valid,SNGS-082,Side line right,612,2.42,0.0,False
+valid,SNGS-082,Side line top,750,1.74,0.0,False
+valid,SNGS-082,Small rect. right bottom,172,1.39,0.0,False
+valid,SNGS-082,Small rect. right main,431,1.54,0.0,False
+valid,SNGS-082,Small rect. right top,431,1.14,0.0,False
+valid,SNGS-083,Big rect. left bottom,462,3.91,0.0,False
+valid,SNGS-083,Big rect. left main,521,2.17,0.0,False
+valid,SNGS-083,Big rect. left top,521,2.38,0.0,False
+valid,SNGS-083,Big rect. right main,170,2.37,0.006,False
+valid,SNGS-083,Big rect. right top,170,2.87,0.006,False
+valid,SNGS-083,Circle central,505,2.52,0.024,False
+valid,SNGS-083,Circle left,511,2.18,0.008,False
+valid,SNGS-083,Circle right,141,3.82,0.007,False
+valid,SNGS-083,Middle line,449,5.4,0.013,False
+valid,SNGS-083,Side line bottom,189,7.68,0.302,False
+valid,SNGS-083,Side line left,511,2.96,0.0,False
+valid,SNGS-083,Side line right,121,3.51,0.0,False
+valid,SNGS-083,Side line top,750,2.14,0.0,False
+valid,SNGS-083,Small rect. left bottom,462,2.13,0.0,False
+valid,SNGS-083,Small rect. left main,501,1.48,0.0,False
+valid,SNGS-083,Small rect. left top,501,1.92,0.0,False
+valid,SNGS-084,Big rect. left bottom,240,12.27,0.163,False
+valid,SNGS-084,Big rect. left main,448,2.69,0.009,False
+valid,SNGS-084,Big rect. left top,497,2.66,0.004,False
+valid,SNGS-084,Big rect. right main,226,2.86,0.027,False
+valid,SNGS-084,Big rect. right top,226,1.94,0.027,False
+valid,SNGS-084,Circle central,466,3.47,0.034,False
+valid,SNGS-084,Circle left,408,3.21,0.056,False
+valid,SNGS-084,Circle right,209,4.41,0.057,False
+valid,SNGS-084,Middle line,410,4.02,0.029,False
+valid,SNGS-084,Side line bottom,407,5.83,0.096,False
+valid,SNGS-084,Side line left,427,4.16,0.009,False
+valid,SNGS-084,Side line right,189,5.93,0.058,False
+valid,SNGS-084,Side line top,750,1.86,0.003,False
+valid,SNGS-084,Small rect. left bottom,240,6.39,0.067,False
+valid,SNGS-084,Small rect. left main,381,2.39,0.021,False
+valid,SNGS-084,Small rect. left top,456,2.53,0.18,False
+valid,SNGS-084,Small rect. right main,125,5.91,0.12,False
+valid,SNGS-084,Small rect. right top,50,6.01,0.08,False
+valid,SNGS-085,Big rect. right main,376,2.63,0.0,False
+valid,SNGS-085,Big rect. right top,376,2.33,0.0,False
+valid,SNGS-085,Circle central,725,2.0,0.072,False
+valid,SNGS-085,Circle right,345,3.18,0.0,False
+valid,SNGS-085,Middle line,493,2.3,0.0,False
+valid,SNGS-085,Side line right,333,4.42,0.0,False
+valid,SNGS-085,Side line top,750,2.13,0.0,False
+valid,SNGS-085,Small rect. right main,181,3.19,0.0,False
+valid,SNGS-085,Small rect. right top,181,1.8,0.0,False
+valid,SNGS-086,Big rect. left bottom,532,17.84,0.15,False
+valid,SNGS-086,Big rect. left main,750,2.69,0.0,False
+valid,SNGS-086,Big rect. left top,750,2.07,0.0,False
+valid,SNGS-086,Circle central,42,34.08,0.214,False
+valid,SNGS-086,Circle left,750,4.89,0.0,False
+valid,SNGS-086,Side line bottom,71,19.01,0.268,False
+valid,SNGS-086,Side line left,750,2.08,0.0,False
+valid,SNGS-086,Side line top,706,2.2,0.0,False
+valid,SNGS-086,Small rect. left bottom,550,4.35,0.002,False
+valid,SNGS-086,Small rect. left main,750,1.59,0.001,False
+valid,SNGS-086,Small rect. left top,750,1.75,0.0,False
+valid,SNGS-087,Big rect. left main,419,2.9,0.0,False
+valid,SNGS-087,Big rect. left top,419,1.14,0.0,False
+valid,SNGS-087,Big rect. right bottom,168,24.99,0.304,False
+valid,SNGS-087,Big rect. right main,229,8.06,0.052,False
+valid,SNGS-087,Big rect. right top,229,5.3,0.017,False
+valid,SNGS-087,Circle central,337,6.03,0.059,False
+valid,SNGS-087,Circle left,400,3.55,0.0,False
+valid,SNGS-087,Circle right,219,6.05,0.014,False
+valid,SNGS-087,Middle line,113,15.27,0.009,False
+valid,SNGS-087,Side line left,394,3.65,0.0,False
+valid,SNGS-087,Side line right,216,5.17,0.019,False
+valid,SNGS-087,Side line top,614,6.61,0.034,False
+valid,SNGS-087,Small rect. left main,209,4.86,0.0,False
+valid,SNGS-087,Small rect. left top,209,2.63,0.0,False
+valid,SNGS-087,Small rect. right bottom,170,8.34,0.041,False
+valid,SNGS-087,Small rect. right main,203,2.94,0.0,False
+valid,SNGS-087,Small rect. right top,203,2.19,0.0,False
+valid,SNGS-088,Big rect. left main,190,3.29,0.0,False
+valid,SNGS-088,Big rect. left top,190,2.82,0.0,False
+valid,SNGS-088,Big rect. right bottom,290,5.43,0.0,False
+valid,SNGS-088,Big rect. right main,473,2.21,0.0,False
+valid,SNGS-088,Big rect. right top,473,3.0,0.0,False
+valid,SNGS-088,Circle central,588,2.82,0.01,False
+valid,SNGS-088,Circle left,165,4.1,0.0,False
+valid,SNGS-088,Circle right,444,3.03,0.0,False
+valid,SNGS-088,Middle line,559,5.77,0.002,False
+valid,SNGS-088,Side line bottom,576,4.64,0.057,False
+valid,SNGS-088,Side line left,156,6.13,0.0,False
+valid,SNGS-088,Side line right,432,2.1,0.0,False
+valid,SNGS-088,Side line top,750,1.83,0.0,False
+valid,SNGS-088,Small rect. left main,82,1.63,0.0,False
+valid,SNGS-088,Small rect. left top,82,1.62,0.0,False
+valid,SNGS-088,Small rect. right bottom,291,3.05,0.0,False
+valid,SNGS-088,Small rect. right main,398,1.7,0.0,False
+valid,SNGS-088,Small rect. right top,398,1.96,0.0,False
+valid,SNGS-089,Big rect. left bottom,36,9.4,0.0,False
+valid,SNGS-089,Big rect. left main,460,2.57,0.035,False
+valid,SNGS-089,Big rect. left top,460,2.24,0.035,False
+valid,SNGS-089,Big rect. right main,290,3.94,0.066,False
+valid,SNGS-089,Big rect. right top,290,2.1,0.066,False
+valid,SNGS-089,Circle central,660,4.96,0.211,False
+valid,SNGS-089,Circle left,418,4.9,0.0,False
+valid,SNGS-089,Circle right,249,3.61,0.048,False
+valid,SNGS-089,Middle line,411,8.03,0.068,False
+valid,SNGS-089,Side line bottom,403,19.86,0.325,False
+valid,SNGS-089,Side line left,403,2.82,0.0,False
+valid,SNGS-089,Side line right,232,2.82,0.043,False
+valid,SNGS-089,Side line top,750,2.25,0.0,False
+valid,SNGS-089,Small rect. left bottom,36,1.32,0.0,False
+valid,SNGS-089,Small rect. left main,285,3.03,0.0,False
+valid,SNGS-089,Small rect. left top,285,3.04,0.0,False
+valid,SNGS-089,Small rect. right main,189,3.36,0.011,False
+valid,SNGS-089,Small rect. right top,190,3.05,0.016,False
+valid,SNGS-090,Big rect. right bottom,609,2.53,0.0,False
+valid,SNGS-090,Big rect. right main,750,1.46,0.0,False
+valid,SNGS-090,Big rect. right top,740,2.74,0.0,False
+valid,SNGS-090,Circle central,137,2.47,0.007,False
+valid,SNGS-090,Circle right,750,3.08,0.0,False
+valid,SNGS-090,Middle line,85,4.1,0.012,False
+valid,SNGS-090,Side line bottom,448,6.81,0.038,False
+valid,SNGS-090,Side line right,750,2.48,0.0,False
+valid,SNGS-090,Side line top,597,2.33,0.0,False
+valid,SNGS-090,Small rect. right bottom,610,1.53,0.0,False
+valid,SNGS-090,Small rect. right main,646,2.0,0.0,False
+valid,SNGS-090,Small rect. right top,646,2.6,0.0,False
+valid,SNGS-091,Big rect. left bottom,535,3.33,0.0,False
+valid,SNGS-091,Big rect. left main,649,2.84,0.0,False
+valid,SNGS-091,Big rect. left top,649,1.72,0.0,False
+valid,SNGS-091,Big rect. right main,142,2.61,0.0,False
+valid,SNGS-091,Big rect. right top,142,2.91,0.0,False
+valid,SNGS-091,Circle central,696,7.62,0.223,False
+valid,SNGS-091,Circle left,635,3.05,0.0,False
+valid,SNGS-091,Circle right,127,3.57,0.0,False
+valid,SNGS-091,Middle line,447,8.99,0.186,False
+valid,SNGS-091,Side line bottom,750,18.91,0.251,False
+valid,SNGS-091,Side line left,630,1.61,0.003,False
+valid,SNGS-091,Side line right,122,2.17,0.0,False
+valid,SNGS-091,Side line top,750,2.25,0.0,False
+valid,SNGS-091,Small rect. left bottom,536,1.62,0.0,False
+valid,SNGS-091,Small rect. left main,607,1.61,0.0,False
+valid,SNGS-091,Small rect. left top,607,1.17,0.0,False
+valid,SNGS-091,Small rect. right main,96,1.43,0.0,False
+valid,SNGS-091,Small rect. right top,96,1.13,0.0,False
+valid,SNGS-092,Big rect. left bottom,93,18.21,0.108,False
+valid,SNGS-092,Big rect. left main,470,3.69,0.0,False
+valid,SNGS-092,Big rect. left top,470,3.44,0.0,False
+valid,SNGS-092,Big rect. right main,262,2.64,0.0,False
+valid,SNGS-092,Big rect. right top,262,2.07,0.0,False
+valid,SNGS-092,Circle central,601,3.22,0.0,False
+valid,SNGS-092,Circle left,407,3.15,0.0,False
+valid,SNGS-092,Circle right,245,2.86,0.004,False
+valid,SNGS-092,Middle line,548,3.76,0.002,False
+valid,SNGS-092,Side line bottom,431,6.82,0.009,False
+valid,SNGS-092,Side line left,383,4.57,0.0,False
+valid,SNGS-092,Side line right,238,2.15,0.0,False
+valid,SNGS-092,Side line top,717,2.58,0.0,False
+valid,SNGS-092,Small rect. left bottom,100,4.12,0.03,False
+valid,SNGS-092,Small rect. left main,255,3.54,0.0,False
+valid,SNGS-092,Small rect. left top,254,2.07,0.0,False
+valid,SNGS-092,Small rect. right main,176,2.17,0.0,False
+valid,SNGS-092,Small rect. right top,176,1.38,0.0,False
+valid,SNGS-093,Big rect. left bottom,225,11.59,0.0,False
+valid,SNGS-093,Big rect. left main,484,3.01,0.0,False
+valid,SNGS-093,Big rect. left top,484,2.71,0.0,False
+valid,SNGS-093,Big rect. right main,184,1.93,0.0,False
+valid,SNGS-093,Big rect. right top,184,1.13,0.0,False
+valid,SNGS-093,Circle central,427,2.59,0.0,False
+valid,SNGS-093,Circle left,446,5.51,0.0,False
+valid,SNGS-093,Circle right,167,2.47,0.0,False
+valid,SNGS-093,Middle line,323,4.65,0.0,False
+valid,SNGS-093,Side line bottom,58,5.63,0.0,False
+valid,SNGS-093,Side line left,432,2.84,0.0,False
+valid,SNGS-093,Side line right,162,2.81,0.0,False
+valid,SNGS-093,Side line top,730,1.94,0.0,False
+valid,SNGS-093,Small rect. left bottom,227,2.86,0.0,False
+valid,SNGS-093,Small rect. left main,306,1.65,0.0,False
+valid,SNGS-093,Small rect. left top,306,2.25,0.0,False
+valid,SNGS-093,Small rect. right main,122,1.89,0.0,False
+valid,SNGS-093,Small rect. right top,122,0.96,0.0,False
+valid,SNGS-094,Big rect. left bottom,144,14.3,0.167,False
+valid,SNGS-094,Big rect. left main,318,3.04,0.0,False
+valid,SNGS-094,Big rect. left top,318,1.98,0.003,False
+valid,SNGS-094,Big rect. right bottom,6,25.2,0.0,False
+valid,SNGS-094,Big rect. right main,271,3.75,0.0,False
+valid,SNGS-094,Big rect. right top,271,3.74,0.0,False
+valid,SNGS-094,Circle central,475,2.37,0.023,False
+valid,SNGS-094,Circle left,304,4.02,0.0,False
+valid,SNGS-094,Circle right,210,4.27,0.0,False
+valid,SNGS-094,Middle line,421,3.57,0.002,False
+valid,SNGS-094,Side line bottom,267,4.22,0.0,False
+valid,SNGS-094,Side line left,299,2.37,0.0,False
+valid,SNGS-094,Side line right,189,7.97,0.0,False
+valid,SNGS-094,Side line top,750,2.58,0.001,False
+valid,SNGS-094,Small rect. left bottom,146,2.93,0.007,False
+valid,SNGS-094,Small rect. left main,276,3.24,0.0,False
+valid,SNGS-094,Small rect. left top,276,2.81,0.0,False
+valid,SNGS-094,Small rect. right bottom,6,5.18,0.0,False
+valid,SNGS-094,Small rect. right main,39,3.74,0.0,False
+valid,SNGS-094,Small rect. right top,39,3.93,0.0,False
+valid,SNGS-095,Big rect. right bottom,399,1.75,0.0,False
+valid,SNGS-095,Big rect. right main,488,2.72,0.0,False
+valid,SNGS-095,Big rect. right top,488,1.82,0.0,False
+valid,SNGS-095,Circle central,433,1.89,0.0,False
+valid,SNGS-095,Circle right,473,2.64,0.0,False
+valid,SNGS-095,Middle line,360,2.17,0.006,False
+valid,SNGS-095,Side line bottom,433,15.82,0.012,False
+valid,SNGS-095,Side line right,466,1.83,0.0,False
+valid,SNGS-095,Side line top,750,2.18,0.001,False
+valid,SNGS-095,Small rect. right bottom,400,0.92,0.0,False
+valid,SNGS-095,Small rect. right main,441,1.08,0.0,False
+valid,SNGS-095,Small rect. right top,442,1.44,0.0,False
+valid,SNGS-096,Big rect. left main,427,5.46,0.016,False
+valid,SNGS-096,Big rect. left top,427,7.03,0.016,False
+valid,SNGS-096,Big rect. right bottom,203,7.07,0.0,False
+valid,SNGS-096,Big rect. right main,750,11.41,0.0,False
+valid,SNGS-096,Big rect. right top,750,9.42,0.0,False
+valid,SNGS-096,Circle central,674,2.06,0.0,False
+valid,SNGS-096,Circle left,414,8.45,0.0,False
+valid,SNGS-096,Circle right,712,13.45,0.0,False
+valid,SNGS-096,Middle line,655,3.52,0.0,False
+valid,SNGS-096,Side line bottom,750,6.58,0.019,False
+valid,SNGS-096,Side line left,409,15.64,0.0,False
+valid,SNGS-096,Side line right,570,26.36,0.0,False
+valid,SNGS-096,Side line top,750,3.17,0.0,False
+valid,SNGS-096,Small rect. right bottom,203,4.06,0.0,False
+valid,SNGS-096,Small rect. right main,244,2.48,0.0,False
+valid,SNGS-096,Small rect. right top,245,2.6,0.0,False
+test,SNGS-116,Big rect. right bottom,100,20.22,0.09,False
+test,SNGS-116,Big rect. right main,623,2.57,0.0,False
+test,SNGS-116,Big rect. right top,623,2.04,0.0,False
+test,SNGS-116,Circle central,149,1.83,0.0,False
+test,SNGS-116,Circle right,615,4.95,0.0,False
+test,SNGS-116,Middle line,138,4.2,0.014,False
+test,SNGS-116,Side line right,615,2.41,0.0,False
+test,SNGS-116,Side line top,679,2.7,0.0,False
+test,SNGS-116,Small rect. right bottom,271,5.29,0.0,False
+test,SNGS-116,Small rect. right main,602,2.64,0.0,False
+test,SNGS-116,Small rect. right top,602,2.37,0.0,False
+test,SNGS-117,Big rect. right bottom,19,10.11,0.0,False
+test,SNGS-117,Big rect. right main,299,2.76,0.01,False
+test,SNGS-117,Big rect. right top,299,1.4,0.007,False
+test,SNGS-117,Circle central,505,2.69,0.036,False
+test,SNGS-117,Circle right,278,5.93,0.029,False
+test,SNGS-117,Middle line,333,5.01,0.009,False
+test,SNGS-117,Side line right,274,3.51,0.029,False
+test,SNGS-117,Side line top,750,2.2,0.003,False
+test,SNGS-117,Small rect. right bottom,26,2.53,0.0,False
+test,SNGS-117,Small rect. right main,236,2.78,0.008,False
+test,SNGS-117,Small rect. right top,236,1.51,0.008,False
+test,SNGS-118,Big rect. right bottom,355,4.37,0.0,False
+test,SNGS-118,Big rect. right main,721,3.5,0.0,False
+test,SNGS-118,Big rect. right top,721,2.99,0.0,False
+test,SNGS-118,Circle central,178,4.12,0.062,False
+test,SNGS-118,Circle right,701,3.5,0.003,False
+test,SNGS-118,Middle line,88,9.6,0.0,False
+test,SNGS-118,Side line bottom,118,39.55,0.432,False
+test,SNGS-118,Side line right,700,6.74,0.0,False
+test,SNGS-118,Side line top,750,3.21,0.0,False
+test,SNGS-118,Small rect. right bottom,412,2.93,0.0,False
+test,SNGS-118,Small rect. right main,647,3.11,0.0,False
+test,SNGS-118,Small rect. right top,647,2.97,0.0,False
+test,SNGS-119,Big rect. right bottom,33,23.83,0.0,False
+test,SNGS-119,Big rect. right main,344,1.34,0.003,False
+test,SNGS-119,Big rect. right top,344,1.95,0.003,False
+test,SNGS-119,Circle central,426,1.57,0.002,False
+test,SNGS-119,Circle right,333,1.45,0.0,False
+test,SNGS-119,Middle line,406,3.88,0.002,False
+test,SNGS-119,Side line right,331,3.12,0.0,False
+test,SNGS-119,Side line top,750,1.25,0.0,False
+test,SNGS-119,Small rect. right bottom,60,2.22,0.0,False
+test,SNGS-119,Small rect. right main,324,1.57,0.003,False
+test,SNGS-119,Small rect. right top,324,1.45,0.003,False
+test,SNGS-120,Big rect. left bottom,7,19.96,0.0,False
+test,SNGS-120,Big rect. left main,223,4.21,0.031,False
+test,SNGS-120,Big rect. left top,223,3.1,0.027,False
+test,SNGS-120,Big rect. right bottom,152,2.96,0.0,False
+test,SNGS-120,Big rect. right main,270,4.02,0.0,False
+test,SNGS-120,Big rect. right top,270,4.69,0.0,False
+test,SNGS-120,Circle central,598,2.21,0.0,False
+test,SNGS-120,Circle left,175,3.68,0.006,False
+test,SNGS-120,Circle right,200,4.82,0.0,False
+test,SNGS-120,Middle line,528,3.6,0.023,False
+test,SNGS-120,Side line bottom,356,11.25,0.028,False
+test,SNGS-120,Side line left,171,5.06,0.023,False
+test,SNGS-120,Side line right,190,4.28,0.0,False
+test,SNGS-120,Side line top,634,2.8,0.0,False
+test,SNGS-120,Small rect. left bottom,37,2.08,0.0,False
+test,SNGS-120,Small rect. left main,108,2.69,0.0,False
+test,SNGS-120,Small rect. left top,108,2.1,0.0,False
+test,SNGS-120,Small rect. right bottom,153,3.68,0.0,False
+test,SNGS-120,Small rect. right main,169,2.86,0.0,False
+test,SNGS-120,Small rect. right top,169,3.12,0.0,False
+test,SNGS-121,Big rect. right bottom,346,3.4,0.0,False
+test,SNGS-121,Big rect. right main,674,2.92,0.0,False
+test,SNGS-121,Big rect. right top,674,2.92,0.0,False
+test,SNGS-121,Circle central,312,4.9,0.154,False
+test,SNGS-121,Circle right,489,2.28,0.0,False
+test,SNGS-121,Middle line,50,24.02,0.0,False
+test,SNGS-121,Side line bottom,351,16.45,0.105,False
+test,SNGS-121,Side line right,487,4.34,0.004,False
+test,SNGS-121,Side line top,620,3.47,0.027,False
+test,SNGS-121,Small rect. right bottom,351,1.68,0.0,False
+test,SNGS-121,Small rect. right main,381,1.78,0.0,False
+test,SNGS-121,Small rect. right top,381,2.15,0.0,False
+test,SNGS-122,Big rect. left main,215,3.44,0.0,False
+test,SNGS-122,Big rect. left top,215,3.71,0.0,False
+test,SNGS-122,Big rect. right bottom,201,4.87,0.0,False
+test,SNGS-122,Big rect. right main,395,3.67,0.0,False
+test,SNGS-122,Big rect. right top,395,2.52,0.0,False
+test,SNGS-122,Circle central,451,5.46,0.188,False
+test,SNGS-122,Circle left,182,7.74,0.005,False
+test,SNGS-122,Circle right,347,4.88,0.0,False
+test,SNGS-122,Middle line,163,4.76,0.0,False
+test,SNGS-122,Side line left,174,6.74,0.006,False
+test,SNGS-122,Side line right,340,3.08,0.0,False
+test,SNGS-122,Side line top,750,4.19,0.0,False
+test,SNGS-122,Small rect. left main,113,8.09,0.0,False
+test,SNGS-122,Small rect. left top,113,5.55,0.0,False
+test,SNGS-122,Small rect. right bottom,205,2.47,0.0,False
+test,SNGS-122,Small rect. right main,263,2.1,0.0,False
+test,SNGS-122,Small rect. right top,263,2.71,0.0,False
+test,SNGS-123,Big rect. left bottom,47,4.24,0.0,False
+test,SNGS-123,Big rect. left main,207,3.48,0.0,False
+test,SNGS-123,Big rect. left top,208,2.71,0.0,False
+test,SNGS-123,Big rect. right bottom,14,29.4,0.071,False
+test,SNGS-123,Big rect. right main,448,2.46,0.0,False
+test,SNGS-123,Big rect. right top,448,2.51,0.0,False
+test,SNGS-123,Circle central,290,3.36,0.21,False
+test,SNGS-123,Circle left,192,4.21,0.0,False
+test,SNGS-123,Circle right,436,4.46,0.0,False
+test,SNGS-123,Middle line,179,5.31,0.022,False
+test,SNGS-123,Side line bottom,81,29.41,0.247,False
+test,SNGS-123,Side line left,189,3.21,0.016,False
+test,SNGS-123,Side line right,433,3.25,0.007,False
+test,SNGS-123,Side line top,729,2.38,0.0,False
+test,SNGS-123,Small rect. left bottom,49,1.68,0.0,False
+test,SNGS-123,Small rect. left main,126,3.21,0.016,False
+test,SNGS-123,Small rect. left top,126,3.61,0.016,False
+test,SNGS-123,Small rect. right bottom,72,9.49,0.0,False
+test,SNGS-123,Small rect. right main,411,2.52,0.0,False
+test,SNGS-123,Small rect. right top,412,2.11,0.0,False
+test,SNGS-124,Big rect. left main,147,5.19,0.102,False
+test,SNGS-124,Big rect. left top,147,3.57,0.095,False
+test,SNGS-124,Big rect. right bottom,226,1.59,0.0,False
+test,SNGS-124,Big rect. right main,322,1.57,0.0,False
+test,SNGS-124,Big rect. right top,322,2.53,0.003,False
+test,SNGS-124,Circle central,468,6.04,0.252,False
+test,SNGS-124,Circle left,141,8.21,0.106,False
+test,SNGS-124,Circle right,305,3.97,0.0,False
+test,SNGS-124,Middle line,329,4.66,0.027,False
+test,SNGS-124,Side line bottom,218,20.4,0.078,False
+test,SNGS-124,Side line left,140,6.49,0.129,False
+test,SNGS-124,Side line right,302,2.98,0.017,False
+test,SNGS-124,Side line top,646,3.84,0.031,False
+test,SNGS-124,Small rect. left main,123,9.77,0.049,False
+test,SNGS-124,Small rect. left top,123,8.46,0.024,False
+test,SNGS-124,Small rect. right bottom,232,1.84,0.0,False
+test,SNGS-124,Small rect. right main,276,2.07,0.0,False
+test,SNGS-124,Small rect. right top,276,2.39,0.0,False
+test,SNGS-125,Big rect. left main,29,6.1,0.0,False
+test,SNGS-125,Big rect. left top,29,6.38,0.0,False
+test,SNGS-125,Big rect. right bottom,76,4.24,0.0,False
+test,SNGS-125,Big rect. right main,401,4.1,0.005,False
+test,SNGS-125,Big rect. right top,401,4.61,0.012,False
+test,SNGS-125,Circle central,413,4.75,0.046,False
+test,SNGS-125,Circle left,22,5.26,0.0,False
+test,SNGS-125,Circle right,397,3.78,0.0,False
+test,SNGS-125,Middle line,229,4.06,0.087,False
+test,SNGS-125,Side line bottom,35,20.66,0.0,False
+test,SNGS-125,Side line left,21,6.96,0.0,False
+test,SNGS-125,Side line right,396,5.48,0.013,False
+test,SNGS-125,Side line top,447,3.85,0.016,False
+test,SNGS-125,Small rect. left main,13,10.5,0.0,False
+test,SNGS-125,Small rect. left top,13,9.97,0.0,False
+test,SNGS-125,Small rect. right bottom,96,4.77,0.021,False
+test,SNGS-125,Small rect. right main,260,3.89,0.012,False
+test,SNGS-125,Small rect. right top,260,3.6,0.008,False
+test,SNGS-126,Big rect. left bottom,522,4.36,0.0,False
+test,SNGS-126,Big rect. left main,668,1.55,0.0,False
+test,SNGS-126,Big rect. left top,668,1.7,0.0,False
+test,SNGS-126,Big rect. right main,45,4.63,0.0,False
+test,SNGS-126,Big rect. right top,45,3.48,0.0,False
+test,SNGS-126,Circle central,250,2.89,0.0,False
+test,SNGS-126,Circle left,654,2.23,0.0,False
+test,SNGS-126,Middle line,167,3.91,0.012,False
+test,SNGS-126,Side line bottom,488,22.74,0.135,False
+test,SNGS-126,Side line left,650,3.1,0.0,False
+test,SNGS-126,Side line top,669,2.71,0.0,False
+test,SNGS-126,Small rect. left bottom,576,2.59,0.0,False
+test,SNGS-126,Small rect. left main,627,2.16,0.002,False
+test,SNGS-126,Small rect. left top,627,2.42,0.0,False
+test,SNGS-127,Big rect. left main,288,12.39,0.0,False
+test,SNGS-127,Big rect. left top,287,12.18,0.0,False
+test,SNGS-127,Circle central,750,1.1,0.096,False
+test,SNGS-127,Middle line,750,2.99,0.105,False
+test,SNGS-127,Side line bottom,750,4.77,0.091,False
+test,SNGS-127,Side line top,505,3.18,0.0,False
+test,SNGS-128,Big rect. left main,291,6.51,0.007,False
+test,SNGS-128,Big rect. left top,262,5.08,0.0,False
+test,SNGS-128,Big rect. right main,95,4.21,0.0,False
+test,SNGS-128,Big rect. right top,95,3.56,0.0,False
+test,SNGS-128,Circle central,750,1.75,0.0,False
+test,SNGS-128,Circle left,146,4.85,0.0,False
+test,SNGS-128,Circle right,8,9.72,0.0,False
+test,SNGS-128,Middle line,678,3.07,0.0,False
+test,SNGS-128,Side line bottom,112,47.38,0.473,False
+test,SNGS-128,Side line left,12,9.21,0.0,False
+test,SNGS-128,Side line top,655,2.46,0.0,False
+test,SNGS-129,Big rect. left bottom,408,3.27,0.0,False
+test,SNGS-129,Big rect. left main,492,2.42,0.002,False
+test,SNGS-129,Big rect. left top,255,4.39,0.0,False
+test,SNGS-129,Big rect. right bottom,10,21.45,0.2,False
+test,SNGS-129,Big rect. right main,146,2.81,0.0,False
+test,SNGS-129,Big rect. right top,146,2.08,0.0,False
+test,SNGS-129,Circle central,190,2.03,0.011,False
+test,SNGS-129,Circle left,407,3.12,0.002,False
+test,SNGS-129,Circle right,125,5.24,0.0,False
+test,SNGS-129,Middle line,127,5.53,0.008,False
+test,SNGS-129,Side line bottom,254,50.95,0.531,True
+test,SNGS-129,Side line left,473,2.96,0.0,False
+test,SNGS-129,Side line right,123,3.37,0.0,False
+test,SNGS-129,Side line top,383,3.52,0.0,False
+test,SNGS-129,Small rect. left bottom,414,1.04,0.0,False
+test,SNGS-129,Small rect. left main,455,1.94,0.007,False
+test,SNGS-129,Small rect. left top,404,2.49,0.007,False
+test,SNGS-129,Small rect. right bottom,24,3.34,0.0,False
+test,SNGS-129,Small rect. right main,97,1.85,0.0,False
+test,SNGS-129,Small rect. right top,97,2.57,0.0,False
+test,SNGS-130,Big rect. right bottom,449,6.6,0.0,False
+test,SNGS-130,Big rect. right main,750,3.33,0.0,False
+test,SNGS-130,Big rect. right top,750,2.84,0.0,False
+test,SNGS-130,Circle central,121,3.1,0.099,False
+test,SNGS-130,Circle right,750,3.75,0.0,False
+test,SNGS-130,Middle line,20,6.4,0.05,False
+test,SNGS-130,Side line bottom,72,55.73,0.528,True
+test,SNGS-130,Side line right,750,3.08,0.0,False
+test,SNGS-130,Side line top,674,3.31,0.0,False
+test,SNGS-130,Small rect. right bottom,541,3.56,0.0,False
+test,SNGS-130,Small rect. right main,661,1.9,0.0,False
+test,SNGS-130,Small rect. right top,662,2.54,0.0,False
+test,SNGS-131,Big rect. left bottom,618,7.55,0.0,False
+test,SNGS-131,Big rect. left main,750,1.75,0.0,False
+test,SNGS-131,Big rect. left top,750,2.52,0.0,False
+test,SNGS-131,Circle central,70,6.11,0.3,False
+test,SNGS-131,Circle left,750,2.7,0.0,False
+test,SNGS-131,Side line bottom,561,20.09,0.257,False
+test,SNGS-131,Side line left,750,3.3,0.0,False
+test,SNGS-131,Side line top,750,4.88,0.0,False
+test,SNGS-131,Small rect. left bottom,631,2.8,0.0,False
+test,SNGS-131,Small rect. left main,720,3.11,0.0,False
+test,SNGS-131,Small rect. left top,720,2.27,0.0,False
+test,SNGS-132,Big rect. left bottom,232,13.7,0.004,False
+test,SNGS-132,Big rect. left main,322,5.42,0.0,False
+test,SNGS-132,Big rect. left top,322,4.71,0.0,False
+test,SNGS-132,Big rect. right main,181,2.68,0.0,False
+test,SNGS-132,Big rect. right top,181,2.4,0.0,False
+test,SNGS-132,Circle central,524,3.64,0.01,False
+test,SNGS-132,Circle left,317,3.63,0.0,False
+test,SNGS-132,Circle right,152,2.26,0.0,False
+test,SNGS-132,Middle line,453,4.84,0.011,False
+test,SNGS-132,Side line bottom,176,8.49,0.148,False
+test,SNGS-132,Side line left,317,6.32,0.0,False
+test,SNGS-132,Side line right,148,3.66,0.0,False
+test,SNGS-132,Side line top,750,1.77,0.0,False
+test,SNGS-132,Small rect. left bottom,250,3.46,0.0,False
+test,SNGS-132,Small rect. left main,309,2.96,0.0,False
+test,SNGS-132,Small rect. left top,309,4.29,0.0,False
+test,SNGS-132,Small rect. right main,97,2.15,0.0,False
+test,SNGS-132,Small rect. right top,97,3.4,0.0,False
+test,SNGS-133,Big rect. left main,618,3.06,0.0,False
+test,SNGS-133,Big rect. left top,618,4.49,0.0,False
+test,SNGS-133,Big rect. right bottom,35,1.89,0.0,False
+test,SNGS-133,Big rect. right main,113,3.59,0.0,False
+test,SNGS-133,Big rect. right top,113,3.55,0.0,False
+test,SNGS-133,Circle central,750,3.09,0.0,False
+test,SNGS-133,Circle left,603,3.85,0.0,False
+test,SNGS-133,Circle right,101,2.68,0.0,False
+test,SNGS-133,Middle line,434,8.44,0.175,False
+test,SNGS-133,Side line bottom,127,6.1,0.0,False
+test,SNGS-133,Side line left,601,5.56,0.0,False
+test,SNGS-133,Side line right,101,3.8,0.01,False
+test,SNGS-133,Side line top,750,3.42,0.0,False
+test,SNGS-133,Small rect. left main,374,8.97,0.0,False
+test,SNGS-133,Small rect. left top,374,5.69,0.0,False
+test,SNGS-133,Small rect. right bottom,51,1.94,0.0,False
+test,SNGS-133,Small rect. right main,88,2.75,0.023,False
+test,SNGS-133,Small rect. right top,88,2.96,0.023,False
+test,SNGS-134,Big rect. left main,380,7.52,0.0,False
+test,SNGS-134,Big rect. left top,380,4.75,0.0,False
+test,SNGS-134,Big rect. right bottom,155,4.51,0.0,False
+test,SNGS-134,Big rect. right main,187,1.93,0.0,False
+test,SNGS-134,Big rect. right top,187,3.34,0.0,False
+test,SNGS-134,Circle central,595,2.79,0.002,False
+test,SNGS-134,Circle right,183,2.41,0.0,False
+test,SNGS-134,Middle line,575,1.73,0.0,False
+test,SNGS-134,Side line bottom,178,38.83,0.315,False
+test,SNGS-134,Side line right,182,2.82,0.0,False
+test,SNGS-134,Side line top,670,1.85,0.0,False
+test,SNGS-134,Small rect. right bottom,157,1.83,0.0,False
+test,SNGS-134,Small rect. right main,174,2.09,0.0,False
+test,SNGS-134,Small rect. right top,174,2.09,0.0,False
+test,SNGS-135,Big rect. left bottom,109,12.93,0.0,False
+test,SNGS-135,Big rect. left main,507,3.64,0.0,False
+test,SNGS-135,Big rect. left top,507,1.47,0.0,False
+test,SNGS-135,Circle central,268,3.13,0.0,False
+test,SNGS-135,Circle left,491,7.57,0.0,False
+test,SNGS-135,Middle line,256,4.04,0.004,False
+test,SNGS-135,Side line left,490,2.31,0.008,False
+test,SNGS-135,Side line top,701,3.21,0.003,False
+test,SNGS-135,Small rect. left bottom,302,1.23,0.0,False
+test,SNGS-135,Small rect. left main,476,1.18,0.0,False
+test,SNGS-135,Small rect. left top,476,1.6,0.0,False
+test,SNGS-136,Big rect. left bottom,341,11.27,0.056,False
+test,SNGS-136,Big rect. left main,523,4.52,0.04,False
+test,SNGS-136,Big rect. left top,523,2.29,0.05,False
+test,SNGS-136,Circle central,185,2.87,0.0,False
+test,SNGS-136,Circle left,507,3.39,0.0,False
+test,SNGS-136,Middle line,123,4.69,0.0,False
+test,SNGS-136,Side line left,505,3.23,0.0,False
+test,SNGS-136,Side line top,406,2.22,0.0,False
+test,SNGS-136,Small rect. left bottom,349,5.86,0.006,False
+test,SNGS-136,Small rect. left main,396,2.76,0.0,False
+test,SNGS-136,Small rect. left top,396,2.37,0.0,False
+test,SNGS-137,Big rect. left main,43,16.88,0.279,False
+test,SNGS-137,Big rect. left top,44,23.13,0.318,False
+test,SNGS-137,Big rect. right bottom,143,1.42,0.0,False
+test,SNGS-137,Big rect. right main,430,2.49,0.005,False
+test,SNGS-137,Big rect. right top,432,3.23,0.002,False
+test,SNGS-137,Circle central,285,4.11,0.06,False
+test,SNGS-137,Circle left,30,36.83,0.367,False
+test,SNGS-137,Circle right,329,4.06,0.015,False
+test,SNGS-137,Middle line,213,8.42,0.0,False
+test,SNGS-137,Side line bottom,138,18.62,0.029,False
+test,SNGS-137,Side line left,29,51.32,0.552,True
+test,SNGS-137,Side line right,321,5.84,0.05,False
+test,SNGS-137,Side line top,509,3.62,0.035,False
+test,SNGS-137,Small rect. left main,14,163.57,0.929,True
+test,SNGS-137,Small rect. left top,14,250.18,0.786,True
+test,SNGS-137,Small rect. right bottom,154,1.96,0.0,False
+test,SNGS-137,Small rect. right main,221,2.27,0.0,False
+test,SNGS-137,Small rect. right top,220,2.45,0.0,False
+test,SNGS-138,Big rect. right main,180,8.31,0.111,False
+test,SNGS-138,Big rect. right top,180,5.6,0.1,False
+test,SNGS-138,Circle central,750,3.88,0.0,False
+test,SNGS-138,Middle line,515,3.8,0.0,False
+test,SNGS-138,Side line top,750,1.41,0.0,False
+test,SNGS-139,Big rect. right bottom,433,4.39,0.032,False
+test,SNGS-139,Big rect. right main,750,3.0,0.0,False
+test,SNGS-139,Big rect. right top,750,2.47,0.003,False
+test,SNGS-139,Circle central,263,4.67,0.008,False
+test,SNGS-139,Circle right,729,5.17,0.0,False
+test,SNGS-139,Middle line,52,4.81,0.0,False
+test,SNGS-139,Side line bottom,103,30.53,0.019,False
+test,SNGS-139,Side line right,719,2.96,0.0,False
+test,SNGS-139,Side line top,613,2.38,0.0,False
+test,SNGS-139,Small rect. right bottom,444,2.25,0.0,False
+test,SNGS-139,Small rect. right main,569,2.18,0.0,False
+test,SNGS-139,Small rect. right top,569,1.94,0.0,False
+test,SNGS-140,Big rect. right bottom,486,5.83,0.012,False
+test,SNGS-140,Big rect. right main,750,2.07,0.009,False
+test,SNGS-140,Big rect. right top,589,3.08,0.0,False
+test,SNGS-140,Circle right,609,3.77,0.0,False
+test,SNGS-140,Side line bottom,142,20.15,0.232,False
+test,SNGS-140,Side line right,750,2.76,0.008,False
+test,SNGS-140,Side line top,563,2.93,0.0,False
+test,SNGS-140,Small rect. right bottom,619,3.94,0.01,False
+test,SNGS-140,Small rect. right main,750,2.82,0.008,False
+test,SNGS-140,Small rect. right top,616,2.13,0.002,False
+test,SNGS-141,Big rect. left main,23,4.98,0.0,False
+test,SNGS-141,Big rect. left top,23,1.59,0.0,False
+test,SNGS-141,Big rect. right bottom,301,9.03,0.03,False
+test,SNGS-141,Big rect. right main,699,3.75,0.006,False
+test,SNGS-141,Big rect. right top,699,2.9,0.006,False
+test,SNGS-141,Circle central,368,4.25,0.008,False
+test,SNGS-141,Circle right,652,5.04,0.003,False
+test,SNGS-141,Middle line,206,9.15,0.029,False
+test,SNGS-141,Side line bottom,93,36.39,0.366,False
+test,SNGS-141,Side line right,621,4.19,0.008,False
+test,SNGS-141,Side line top,548,2.26,0.005,False
+test,SNGS-141,Small rect. right bottom,321,4.86,0.022,False
+test,SNGS-141,Small rect. right main,402,2.83,0.02,False
+test,SNGS-141,Small rect. right top,402,2.91,0.015,False
+test,SNGS-142,Big rect. left bottom,281,7.42,0.011,False
+test,SNGS-142,Big rect. left main,540,2.77,0.002,False
+test,SNGS-142,Big rect. left top,403,6.25,0.0,False
+test,SNGS-142,Big rect. right bottom,45,28.38,0.244,False
+test,SNGS-142,Big rect. right main,174,3.19,0.0,False
+test,SNGS-142,Big rect. right top,174,8.76,0.057,False
+test,SNGS-142,Circle central,87,7.12,0.0,False
+test,SNGS-142,Circle left,535,3.91,0.002,False
+test,SNGS-142,Circle right,160,5.1,0.025,False
+test,SNGS-142,Middle line,53,28.14,0.019,False
+test,SNGS-142,Side line bottom,121,11.19,0.083,False
+test,SNGS-142,Side line left,535,2.05,0.002,False
+test,SNGS-142,Side line right,159,3.55,0.0,False
+test,SNGS-142,Side line top,477,3.27,0.019,False
+test,SNGS-142,Small rect. left bottom,318,3.34,0.003,False
+test,SNGS-142,Small rect. left main,490,2.22,0.002,False
+test,SNGS-142,Small rect. left top,490,3.08,0.002,False
+test,SNGS-142,Small rect. right bottom,55,12.98,0.0,False
+test,SNGS-142,Small rect. right main,134,3.58,0.0,False
+test,SNGS-142,Small rect. right top,134,2.63,0.0,False
+test,SNGS-143,Big rect. left main,65,17.92,0.077,False
+test,SNGS-143,Big rect. left top,65,7.07,0.077,False
+test,SNGS-143,Big rect. right main,368,3.01,0.057,False
+test,SNGS-143,Big rect. right top,368,6.26,0.082,False
+test,SNGS-143,Circle central,412,7.24,0.277,False
+test,SNGS-143,Circle right,329,5.15,0.027,False
+test,SNGS-143,Middle line,144,10.36,0.083,False
+test,SNGS-143,Side line right,323,4.9,0.025,False
+test,SNGS-143,Side line top,740,4.21,0.0,False
+test,SNGS-143,Small rect. right bottom,199,4.61,0.04,False
+test,SNGS-143,Small rect. right main,294,3.38,0.003,False
+test,SNGS-143,Small rect. right top,294,5.95,0.014,False
+test,SNGS-144,Big rect. right bottom,230,5.98,0.009,False
+test,SNGS-144,Big rect. right main,351,5.66,0.014,False
+test,SNGS-144,Big rect. right top,351,7.8,0.014,False
+test,SNGS-144,Circle central,403,4.74,0.005,False
+test,SNGS-144,Circle right,343,6.53,0.0,False
+test,SNGS-144,Middle line,314,4.32,0.21,False
+test,SNGS-144,Side line right,342,2.1,0.003,False
+test,SNGS-144,Side line top,679,2.83,0.0,False
+test,SNGS-144,Small rect. right bottom,248,2.88,0.0,False
+test,SNGS-144,Small rect. right main,315,1.57,0.0,False
+test,SNGS-144,Small rect. right top,315,2.67,0.0,False
+test,SNGS-145,Big rect. left bottom,30,5.75,0.033,False
+test,SNGS-145,Big rect. left main,426,7.24,0.0,False
+test,SNGS-145,Big rect. left top,426,1.7,0.0,False
+test,SNGS-145,Big rect. right main,12,232.14,0.75,True
+test,SNGS-145,Big rect. right top,11,267.39,0.818,True
+test,SNGS-145,Circle central,196,7.98,0.01,False
+test,SNGS-145,Circle left,400,8.17,0.0,False
+test,SNGS-145,Circle right,7,3393.43,0.857,True
+test,SNGS-145,Middle line,125,29.71,0.144,False
+test,SNGS-145,Side line left,398,2.58,0.0,False
+test,SNGS-145,Side line right,6,2239.21,0.833,True
+test,SNGS-145,Side line top,565,3.93,0.016,False
+test,SNGS-145,Small rect. left bottom,214,1.68,0.0,False
+test,SNGS-145,Small rect. left main,365,0.92,0.0,False
+test,SNGS-145,Small rect. left top,366,1.69,0.0,False
+test,SNGS-146,Big rect. left bottom,289,17.14,0.166,False
+test,SNGS-146,Big rect. left main,415,4.3,0.002,False
+test,SNGS-146,Big rect. left top,352,4.85,0.028,False
+test,SNGS-146,Circle central,246,5.29,0.008,False
+test,SNGS-146,Circle left,408,3.91,0.0,False
+test,SNGS-146,Middle line,223,4.25,0.004,False
+test,SNGS-146,Side line left,407,4.04,0.002,False
+test,SNGS-146,Side line top,402,1.91,0.0,False
+test,SNGS-146,Small rect. left bottom,335,4.36,0.03,False
+test,SNGS-146,Small rect. left main,394,3.5,0.0,False
+test,SNGS-146,Small rect. left top,394,3.89,0.066,False
+test,SNGS-147,Big rect. left bottom,357,2.06,0.0,False
+test,SNGS-147,Big rect. left main,426,2.14,0.0,False
+test,SNGS-147,Big rect. left top,426,5.0,0.002,False
+test,SNGS-147,Big rect. right main,51,12.77,0.0,False
+test,SNGS-147,Big rect. right top,51,8.64,0.0,False
+test,SNGS-147,Circle central,191,4.03,0.0,False
+test,SNGS-147,Circle left,411,3.35,0.0,False
+test,SNGS-147,Circle right,30,15.71,0.033,False
+test,SNGS-147,Middle line,157,10.26,0.013,False
+test,SNGS-147,Side line bottom,355,36.38,0.118,False
+test,SNGS-147,Side line left,408,3.33,0.002,False
+test,SNGS-147,Side line right,23,16.16,0.043,False
+test,SNGS-147,Side line top,342,7.47,0.026,False
+test,SNGS-147,Small rect. left bottom,360,2.95,0.0,False
+test,SNGS-147,Small rect. left main,390,2.76,0.005,False
+test,SNGS-147,Small rect. left top,390,2.29,0.018,False
+test,SNGS-147,Small rect. right main,16,4.28,0.0,False
+test,SNGS-147,Small rect. right top,16,4.2,0.0,False
+test,SNGS-148,Big rect. left bottom,130,99.68,0.815,True
+test,SNGS-148,Big rect. left main,390,9.35,0.049,False
+test,SNGS-148,Big rect. left top,384,5.83,0.068,False
+test,SNGS-148,Circle central,561,5.85,0.143,False
+test,SNGS-148,Circle left,267,9.66,0.049,False
+test,SNGS-148,Middle line,228,4.96,0.026,False
+test,SNGS-148,Side line left,262,5.02,0.015,False
+test,SNGS-148,Side line top,625,3.83,0.0,False
+test,SNGS-148,Small rect. left bottom,133,9.93,0.023,False
+test,SNGS-148,Small rect. left main,157,5.0,0.006,False
+test,SNGS-148,Small rect. left top,157,6.46,0.032,False
+test,SNGS-149,Big rect. right main,184,2.9,0.049,False
+test,SNGS-149,Big rect. right top,184,2.3,0.0,False
+test,SNGS-149,Circle central,750,6.94,0.235,False
+test,SNGS-149,Middle line,520,2.99,0.0,False
+test,SNGS-149,Side line right,166,1.95,0.0,False
+test,SNGS-149,Side line top,730,1.44,0.0,False
+test,SNGS-149,Small rect. right bottom,95,18.82,0.074,False
+test,SNGS-149,Small rect. right main,146,2.22,0.0,False
+test,SNGS-149,Small rect. right top,146,1.41,0.0,False
+test,SNGS-150,Big rect. left main,30,17.6,0.067,False
+test,SNGS-150,Big rect. left top,30,12.25,0.033,False
+test,SNGS-150,Big rect. right bottom,501,3.81,0.0,False
+test,SNGS-150,Big rect. right main,609,3.73,0.008,False
+test,SNGS-150,Big rect. right top,609,3.83,0.011,False
+test,SNGS-150,Circle central,1,40.99,0.0,False
+test,SNGS-150,Circle right,459,1.74,0.0,False
+test,SNGS-150,Middle line,245,5.02,0.012,False
+test,SNGS-150,Side line bottom,584,16.99,0.063,False
+test,SNGS-150,Side line right,585,2.55,0.002,False
+test,SNGS-150,Side line top,419,3.06,0.0,False
+test,SNGS-150,Small rect. right bottom,504,3.96,0.0,False
+test,SNGS-150,Small rect. right main,540,3.76,0.0,False
+test,SNGS-150,Small rect. right top,540,5.21,0.0,False
+test,SNGS-187,Big rect. right bottom,288,6.5,0.062,False
+test,SNGS-187,Big rect. right main,750,2.82,0.0,False
+test,SNGS-187,Big rect. right top,750,1.68,0.0,False
+test,SNGS-187,Circle central,176,2.88,0.0,False
+test,SNGS-187,Circle right,669,2.95,0.046,False
+test,SNGS-187,Middle line,70,5.19,0.0,False
+test,SNGS-187,Side line right,637,2.03,0.0,False
+test,SNGS-187,Side line top,658,3.6,0.0,False
+test,SNGS-187,Small rect. right bottom,399,5.33,0.043,False
+test,SNGS-187,Small rect. right main,564,3.12,0.0,False
+test,SNGS-187,Small rect. right top,564,1.1,0.0,False
+test,SNGS-188,Big rect. right bottom,61,5.55,0.0,False
+test,SNGS-188,Big rect. right main,750,2.71,0.0,False
+test,SNGS-188,Big rect. right top,750,3.39,0.0,False
+test,SNGS-188,Circle central,749,6.65,0.063,False
+test,SNGS-188,Circle right,750,3.46,0.0,False
+test,SNGS-188,Middle line,621,1.47,0.0,False
+test,SNGS-188,Side line bottom,623,3.41,0.0,False
+test,SNGS-188,Side line right,750,3.66,0.0,False
+test,SNGS-188,Side line top,750,3.24,0.0,False
+test,SNGS-188,Small rect. right main,617,3.31,0.0,False
+test,SNGS-188,Small rect. right top,594,1.55,0.0,False
+test,SNGS-189,Big rect. left bottom,191,17.38,0.131,False
+test,SNGS-189,Big rect. left main,401,3.98,0.0,False
+test,SNGS-189,Big rect. left top,401,3.15,0.0,False
+test,SNGS-189,Big rect. right bottom,199,7.77,0.0,False
+test,SNGS-189,Big rect. right main,301,2.51,0.0,False
+test,SNGS-189,Big rect. right top,301,1.79,0.0,False
+test,SNGS-189,Circle central,142,3.76,0.211,False
+test,SNGS-189,Circle left,393,5.21,0.0,False
+test,SNGS-189,Circle right,293,3.05,0.0,False
+test,SNGS-189,Middle line,88,2.6,0.011,False
+test,SNGS-189,Side line left,384,5.22,0.01,False
+test,SNGS-189,Side line right,287,3.49,0.0,False
+test,SNGS-189,Side line top,750,3.42,0.0,False
+test,SNGS-189,Small rect. left bottom,170,6.92,0.0,False
+test,SNGS-189,Small rect. left main,365,3.81,0.0,False
+test,SNGS-189,Small rect. left top,365,1.92,0.0,False
+test,SNGS-189,Small rect. right bottom,158,1.74,0.0,False
+test,SNGS-189,Small rect. right main,274,2.4,0.0,False
+test,SNGS-189,Small rect. right top,274,0.79,0.0,False
+test,SNGS-190,Big rect. left main,581,4.06,0.005,False
+test,SNGS-190,Big rect. left top,581,2.18,0.005,False
+test,SNGS-190,Circle central,124,2.8,0.0,False
+test,SNGS-190,Circle left,569,11.1,0.0,False
+test,SNGS-190,Middle line,87,3.3,0.0,False
+test,SNGS-190,Side line bottom,321,39.59,0.436,False
+test,SNGS-190,Side line left,558,5.56,0.0,False
+test,SNGS-190,Side line top,666,1.58,0.0,False
+test,SNGS-190,Small rect. left bottom,456,2.55,0.0,False
+test,SNGS-190,Small rect. left main,529,2.28,0.0,False
+test,SNGS-190,Small rect. left top,529,1.65,0.0,False
+test,SNGS-191,Big rect. right bottom,88,6.35,0.0,False
+test,SNGS-191,Big rect. right main,286,4.16,0.0,False
+test,SNGS-191,Big rect. right top,286,3.06,0.0,False
+test,SNGS-191,Circle central,539,3.92,0.041,False
+test,SNGS-191,Circle right,270,5.67,0.0,False
+test,SNGS-191,Middle line,461,5.19,0.004,False
+test,SNGS-191,Side line right,254,3.8,0.0,False
+test,SNGS-191,Side line top,708,1.32,0.0,False
+test,SNGS-191,Small rect. right bottom,181,3.67,0.0,False
+test,SNGS-191,Small rect. right main,230,2.96,0.0,False
+test,SNGS-191,Small rect. right top,230,1.54,0.0,False
+test,SNGS-192,Big rect. left bottom,257,4.51,0.0,False
+test,SNGS-192,Big rect. left main,501,5.11,0.0,False
+test,SNGS-192,Big rect. left top,501,3.43,0.0,False
+test,SNGS-192,Big rect. right main,201,6.2,0.0,False
+test,SNGS-192,Big rect. right top,201,4.23,0.0,False
+test,SNGS-192,Circle central,380,3.43,0.034,False
+test,SNGS-192,Circle left,487,7.05,0.0,False
+test,SNGS-192,Circle right,182,6.11,0.0,False
+test,SNGS-192,Middle line,332,3.87,0.003,False
+test,SNGS-192,Side line bottom,308,6.04,0.0,False
+test,SNGS-192,Side line left,465,3.9,0.006,False
+test,SNGS-192,Side line right,164,12.22,0.0,False
+test,SNGS-192,Side line top,750,3.74,0.0,False
+test,SNGS-192,Small rect. left bottom,237,2.56,0.0,False
+test,SNGS-192,Small rect. left main,435,3.25,0.007,False
+test,SNGS-192,Small rect. left top,435,2.36,0.007,False
+test,SNGS-192,Small rect. right main,56,3.39,0.0,False
+test,SNGS-192,Small rect. right top,56,2.54,0.0,False
+test,SNGS-193,Big rect. left bottom,421,6.71,0.017,False
+test,SNGS-193,Big rect. left main,459,3.34,0.0,False
+test,SNGS-193,Big rect. left top,459,3.55,0.0,False
+test,SNGS-193,Big rect. right bottom,34,19.76,0.0,False
+test,SNGS-193,Big rect. right main,149,3.96,0.007,False
+test,SNGS-193,Big rect. right top,149,3.6,0.0,False
+test,SNGS-193,Circle central,305,2.55,0.079,False
+test,SNGS-193,Circle left,449,5.83,0.007,False
+test,SNGS-193,Circle right,132,4.58,0.0,False
+test,SNGS-193,Middle line,231,3.38,0.004,False
+test,SNGS-193,Side line bottom,69,16.47,0.014,False
+test,SNGS-193,Side line left,445,4.32,0.0,False
+test,SNGS-193,Side line right,119,8.52,0.042,False
+test,SNGS-193,Side line top,750,4.18,0.0,False
+test,SNGS-193,Small rect. left bottom,418,2.86,0.0,False
+test,SNGS-193,Small rect. left main,434,2.14,0.0,False
+test,SNGS-193,Small rect. left top,434,2.43,0.0,False
+test,SNGS-193,Small rect. right bottom,16,3.24,0.0,False
+test,SNGS-193,Small rect. right main,82,8.09,0.0,False
+test,SNGS-193,Small rect. right top,82,4.01,0.0,False
+test,SNGS-194,Big rect. left main,304,11.38,0.0,False
+test,SNGS-194,Big rect. left top,302,5.88,0.0,False
+test,SNGS-194,Big rect. right bottom,120,10.53,0.0,False
+test,SNGS-194,Big rect. right main,195,4.92,0.0,False
+test,SNGS-194,Big rect. right top,195,1.47,0.0,False
+test,SNGS-194,Circle central,668,1.91,0.0,False
+test,SNGS-194,Circle left,112,12.82,0.0,False
+test,SNGS-194,Circle right,182,4.21,0.0,False
+test,SNGS-194,Middle line,547,2.25,0.0,False
+test,SNGS-194,Side line bottom,144,43.07,0.472,False
+test,SNGS-194,Side line left,20,28.58,0.0,False
+test,SNGS-194,Side line right,171,3.47,0.0,False
+test,SNGS-194,Side line top,669,1.75,0.0,False
+test,SNGS-194,Small rect. right bottom,114,3.57,0.0,False
+test,SNGS-194,Small rect. right main,150,3.36,0.0,False
+test,SNGS-194,Small rect. right top,150,2.32,0.0,False
+test,SNGS-195,Big rect. left bottom,473,4.47,0.0,False
+test,SNGS-195,Big rect. left main,750,3.23,0.0,False
+test,SNGS-195,Big rect. left top,750,2.34,0.0,False
+test,SNGS-195,Circle central,297,3.54,0.0,False
+test,SNGS-195,Circle left,662,4.32,0.002,False
+test,SNGS-195,Middle line,231,7.96,0.009,False
+test,SNGS-195,Side line bottom,397,22.26,0.159,False
+test,SNGS-195,Side line left,598,4.0,0.0,False
+test,SNGS-195,Side line top,750,3.5,0.0,False
+test,SNGS-195,Small rect. left bottom,451,1.52,0.0,False
+test,SNGS-195,Small rect. left main,569,2.07,0.0,False
+test,SNGS-195,Small rect. left top,569,1.43,0.0,False
+test,SNGS-196,Big rect. left bottom,264,17.29,0.023,False
+test,SNGS-196,Big rect. left main,524,6.24,0.004,False
+test,SNGS-196,Big rect. left top,524,2.27,0.0,False
+test,SNGS-196,Circle central,635,4.89,0.145,False
+test,SNGS-196,Circle left,457,4.35,0.004,False
+test,SNGS-196,Middle line,356,9.32,0.0,False
+test,SNGS-196,Side line bottom,165,112.66,0.976,True
+test,SNGS-196,Side line left,391,3.42,0.003,False
+test,SNGS-196,Side line top,750,1.62,0.0,False
+test,SNGS-196,Small rect. left bottom,249,2.16,0.008,False
+test,SNGS-196,Small rect. left main,336,2.03,0.003,False
+test,SNGS-196,Small rect. left top,336,2.45,0.0,False
+test,SNGS-197,Big rect. left main,55,7.59,0.0,False
+test,SNGS-197,Big rect. left top,55,3.09,0.0,False
+test,SNGS-197,Big rect. right bottom,235,3.52,0.004,False
+test,SNGS-197,Big rect. right main,522,4.31,0.0,False
+test,SNGS-197,Big rect. right top,522,2.83,0.0,False
+test,SNGS-197,Circle central,493,3.72,0.103,False
+test,SNGS-197,Circle left,26,10.25,0.0,False
+test,SNGS-197,Circle right,470,6.18,0.0,False
+test,SNGS-197,Middle line,352,4.69,0.0,False
+test,SNGS-197,Side line bottom,374,10.86,0.019,False
+test,SNGS-197,Side line right,456,2.83,0.0,False
+test,SNGS-197,Side line top,750,3.23,0.0,False
+test,SNGS-197,Small rect. right bottom,162,2.29,0.0,False
+test,SNGS-197,Small rect. right main,436,2.43,0.0,False
+test,SNGS-197,Small rect. right top,436,1.57,0.0,False
+test,SNGS-198,Big rect. left bottom,392,4.45,0.0,False
+test,SNGS-198,Big rect. left main,464,3.19,0.0,False
+test,SNGS-198,Big rect. left top,464,2.31,0.0,False
+test,SNGS-198,Big rect. right bottom,246,4.68,0.0,False
+test,SNGS-198,Big rect. right main,281,4.51,0.007,False
+test,SNGS-198,Big rect. right top,281,2.21,0.0,False
+test,SNGS-198,Circle central,188,7.05,0.0,False
+test,SNGS-198,Circle left,460,3.57,0.0,False
+test,SNGS-198,Circle right,277,6.69,0.004,False
+test,SNGS-198,Middle line,106,10.75,0.019,False
+test,SNGS-198,Side line bottom,430,14.29,0.009,False
+test,SNGS-198,Side line left,455,2.53,0.0,False
+test,SNGS-198,Side line right,273,2.82,0.007,False
+test,SNGS-198,Side line top,750,3.18,0.0,False
+test,SNGS-198,Small rect. left bottom,366,2.11,0.0,False
+test,SNGS-198,Small rect. left main,446,1.47,0.0,False
+test,SNGS-198,Small rect. left top,446,1.19,0.0,False
+test,SNGS-198,Small rect. right bottom,241,2.2,0.0,False
+test,SNGS-198,Small rect. right main,263,1.84,0.0,False
+test,SNGS-198,Small rect. right top,263,1.42,0.0,False
+test,SNGS-199,Big rect. left main,32,18.09,0.0,False
+test,SNGS-199,Big rect. left top,32,10.04,0.0,False
+test,SNGS-199,Big rect. right bottom,541,4.33,0.0,False
+test,SNGS-199,Big rect. right main,641,2.85,0.0,False
+test,SNGS-199,Big rect. right top,641,1.82,0.0,False
+test,SNGS-199,Circle central,255,4.0,0.0,False
+test,SNGS-199,Circle right,623,5.62,0.0,False
+test,SNGS-199,Middle line,188,8.95,0.0,False
+test,SNGS-199,Side line bottom,295,12.17,0.024,False
+test,SNGS-199,Side line right,610,1.98,0.0,False
+test,SNGS-199,Side line top,750,3.0,0.0,False
+test,SNGS-199,Small rect. right bottom,506,1.51,0.0,False
+test,SNGS-199,Small rect. right main,590,1.42,0.0,False
+test,SNGS-199,Small rect. right top,590,1.04,0.0,False
+test,SNGS-200,Big rect. left bottom,389,8.89,0.008,False
+test,SNGS-200,Big rect. left main,750,2.87,0.0,False
+test,SNGS-200,Big rect. left top,750,2.0,0.0,False
+test,SNGS-200,Circle central,175,7.6,0.0,False
+test,SNGS-200,Circle left,750,3.85,0.0,False
+test,SNGS-200,Middle line,12,6.59,0.0,False
+test,SNGS-200,Side line left,750,2.82,0.0,False
+test,SNGS-200,Side line top,750,2.68,0.0,False
+test,SNGS-200,Small rect. left bottom,387,2.02,0.0,False
+test,SNGS-200,Small rect. left main,585,1.85,0.0,False
+test,SNGS-200,Small rect. left top,585,1.54,0.0,False

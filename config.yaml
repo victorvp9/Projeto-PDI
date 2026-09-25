@@ -1,0 +1,49 @@
+# Todos os parâmetros do projeto, cada um com a origem.
+# Caminhos relativos à raiz do repositório.
+
+paths:
+  wc14: data/soccer_data_WC14/raw   # layout em docs/02-dados.md
+  gsr: data/SoccerNet-GSR           # layout em docs/02-dados.md
+  outputs: outputs
+  debug: outputs/debug
+
+pitch:
+  sample_step_m: 0.25   # passo de amostragem de toda polilinha, inclusive retas (docs/03-plano.md, Fatia 1)
+
+gsr:
+  person_categories: [1, 2, 3, 7]  # player, goalkeeper, referee, other; bola (4) fora (docs/decisoes.md)
+  min_persons: 4          # mínimo de pessoas para a DLT da H_gt (docs/03-plano.md, Fatia 1)
+  border_margin_px: 2     # pontos anotados a até 2 px da borda são recorte, não linha (docs/decisoes.md)
+  dubious_median_px: 10   # erro mediano do frame acima disso = "gabarito duvidoso" (docs/decisoes.md)
+  label_suspect_px: 50    # classe com mediana acima disso na maioria dos frames = rótulo suspeito (decisão de Victor, docs/decisoes.md)
+  label_suspect_frac: 0.5 # "maioria dos frames" (idem)
+
+# Rótulos de classe trocados na anotação das linhas do GSR, corrigidos na leitura
+# e só nas linhas anotadas. Evidência de cada um em docs/decisoes.md.
+# rótulo errado: certo  |  rótulo errado: [certo, primeiro frame, último frame] (troca só num trecho)
+gsr_label_fixes:
+  SNGS-038: {"Big rect. right bottom": "Small rect. right main"}
+  SNGS-055: {"Big rect. right main": ["Big rect. left main", 442, 750]}
+  SNGS-058: {"Big rect. left top": "Side line right"}
+  SNGS-065: {"Big rect. right bottom": "Big rect. right main"}
+  SNGS-069: {"Side line bottom": "Side line left"}
+  SNGS-073: {"Big rect. left bottom": "Big rect. left top"}
+  SNGS-119: {"Small rect. left top": "Small rect. right main"}
+  SNGS-121: {"Big rect. left top": "Side line right"}
+  SNGS-133: {"Big rect. right main": ["Big rect. left main", 144, 750]}
+  SNGS-148: {"Circle right": "Circle left"}
+  SNGS-149: {"Circle right": "Circle central"}
+  SNGS-187: {"Side line bottom": "Big rect. right bottom"}
+  SNGS-199: {"Big rect. left bottom": "Big rect. left top"}
+
+render:
+  px_per_m: 25       # vista de cima; 25 px/m faz a linha de 0,12 m ter 3 px inteiros (escolha)
+  margin_m: 1        # borda da vista de cima além do campo; basta cobrir meia largura de linha (escolha)
+  supersample: 4     # renderiza 4x maior e reduz por média de área: linha sub-pixel vira cinza em vez de sumir (empírico)
+  grass_bgr: [40, 120, 40]      # cor sintética arbitrária
+  line_bgr: [255, 255, 255]
+
+overlay:
+  model_bgr: [0, 0, 255]        # modelo projetado pela H
+  annotated_bgr: [0, 255, 255]  # pontos das linhas anotadas (GSR)
+  thickness_px: 2
