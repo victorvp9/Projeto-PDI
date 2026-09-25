@@ -1,9 +1,12 @@
+import dataclasses
 import json
 
 import numpy as np
 import pytest
 
 from src.config import CFG, path
+from src.evaluate import image_grid_displacement
+from src.homography import class_distances, fit_point_line
 from src.io import gsr
 from src.pitch_model import POLYLINES
 
@@ -28,19 +31,19 @@ ANNS = [_person(100, 200, 20), _person(900, 250, 25), _person(400, 600, 40), _pe
 
 
 def test_dlt_recovers_h():
-    assert np.allclose(_norm(gsr.estimate_h_gt(ANNS)), H_TRUE, atol=1e-6)
+    assert np.allclose(_norm(gsr.estimate_h_persons(ANNS)), H_TRUE, atol=1e-6)
 
 
 def test_ball_and_null_pitch_ignored():
     ball = _person(500, 400, 10, cat=4)
     ball["bbox_pitch"] = {k: 1e3 for k in ball["bbox_pitch"]}  # bola "no ar", absurda
     null = _person(700, 300, 20) | {"bbox_pitch": None}
-    H = gsr.estimate_h_gt(ANNS + [ball, null])
-    assert np.array_equal(H, gsr.estimate_h_gt(ANNS))
+    H = gsr.estimate_h_persons(ANNS + [ball, null])
+    assert np.array_equal(H, gsr.estimate_h_persons(ANNS))
 
 
 def test_too_few_persons():
-    assert gsr.estimate_h_gt(ANNS[:3]) is None
+    assert gsr.estimate_h_persons(ANNS[:3]) is None
 
 
 needs_clip = pytest.mark.skipif(not CLIP.exists(), reason="SNGS-070 ausente em data/")
@@ -53,18 +56,59 @@ def test_polylines_cover_gsr_plane_classes():
     assert set(POLYLINES) == {n for n in names if not n.startswith("Goal")}
 
 
+def _persons_err(s):
+    """Erro contra as linhas da H pelas pessoas (definição da Fatia 1)."""
+    d = class_distances(s.H_persons, gsr.inner_points(s.lines_uv, s.size))
+    return float(np.median(np.concatenate(list(d.values())))) if d else np.nan
+
+
 @needs_clip
-def test_sngs070_reference_values():
-    """Valores de referência de docs/decisoes.md (frames numerados pelo arquivo)."""
-    samples = gsr.load_clip(CLIP)
-    assert len(samples) == 750 and all(s.H_gt is not None for s in samples)
-    err = np.array([s.line_err for s in samples])
+def test_sngs070_persons_reference_values():
+    """H pelas pessoas contra as linhas: valores da Fatia 1 em docs/decisoes.md.
+    Confere o mapeamento de classes e a leitura do JSON."""
+    samples = gsr.load_clip(CLIP, fit="none")
+    assert len(samples) == 750 and all(s.H_persons is not None for s in samples)
+    err = np.array([_persons_err(s) for s in samples])
     assert abs(np.median(err) - 2.8) <= 0.3
-    assert np.median([s.line_err for s in samples if not s.dubious]) <= 5
-    dubious = {s.frame_idx for s in samples if s.dubious}
-    assert 5 <= len(dubious) <= 10, sorted(dubious)
-    assert set(range(354, 360)) <= dubious, sorted(dubious)
-    assert CFG["gsr"]["dubious_median_px"] == 10
+    bad = {s.frame_idx for s, e in zip(samples, err) if e > CFG["gsr"]["dubious_median_px"]}
+    assert 5 <= len(bad) <= 10 and set(range(354, 360)) <= bad, sorted(bad)
+    assert np.median(err[err <= CFG["gsr"]["dubious_median_px"]]) <= 5
+
+
+@needs_clip
+def test_sngs070_lines_fit_agrees_with_persons():
+    """O ajuste pelas linhas e a H pelas pessoas concordam no SNGS-070 (1 frame a cada 10)."""
+    samples = gsr.load_clip(CLIP, fit="none")[::10]
+    fits = gsr.fit_clip(samples)
+    assert all(f.ok for f in fits)
+    dis = [image_grid_displacement(f.H, s.H_persons, s.size) for f, s in zip(fits, samples)]
+    print(f"\nSNGS-070, discordância linhas x pessoas: mediana {np.median(dis):.2f} px, p90 {np.percentile(dis, 90):.2f} px")
+    assert np.median(dis) <= 5
+
+
+@needs_clip
+def test_chaining_recovers_fit_without_persons():
+    """Sem as pessoas em 100-200, o encadeamento a partir do vizinho chega à mesma H."""
+    samples = gsr.load_clip(CLIP, fit="none")[89:211]
+    direct = gsr.fit_clip(samples)
+    blind = [dataclasses.replace(s, H_persons=None) if 100 <= s.frame_idx <= 200 else s for s in samples]
+    chained = gsr.fit_clip(blind)
+    gap = [image_grid_displacement(a.H, b.H, s.size)
+           for a, b, s in zip(direct, chained, samples) if 100 <= s.frame_idx <= 200]
+    assert all(b.ok for b in chained) and max(gap) < 1.0, max(gap)
+
+
+@pytest.mark.skipif(not (path("gsr") / "valid" / "SNGS-023").exists(), reason="SNGS-023 ausente em data/")
+def test_sngs023_f230_fit_puts_center_circle_on_painted():
+    """A H pelas pessoas põe o círculo central ~660 px longe do pintado/anotado; o
+    ajuste pelas linhas o traz para cima dele (overlay em outputs/debug/)."""
+    s = next(x for x in gsr.load_clip(path("gsr") / "valid" / "SNGS-023", fit="none") if x.frame_idx == 230)
+    pts = gsr.inner_points(s.lines_uv, s.size)
+    before = np.median(class_distances(s.H_persons, pts)["Circle central"])
+    fit = fit_point_line(s.H_persons, pts, s.size)
+    after = np.median(class_distances(fit.H, pts)["Circle central"])
+    print(f"\nSNGS-023 f230, Circle central: {before:.0f} px pelas pessoas -> {after:.1f} px pelo ajuste")
+    assert before > 100 and fit.ok and after <= 10
 
 
 def test_label_fixes_whole_clip_and_range():
@@ -80,6 +124,6 @@ def test_label_fixes_whole_clip_and_range():
 @pytest.mark.skipif(not (path("gsr") / "test" / "SNGS-149").exists(), reason="SNGS-149 ausente em data/")
 def test_sngs149_circle_label_fixed():
     """Círculo central anotado como `Circle right`; corrigido na leitura (docs/decisoes.md)."""
-    samples = gsr.load_clip(path("gsr") / "test" / "SNGS-149")
+    samples = gsr.load_clip(path("gsr") / "test" / "SNGS-149", fit="none")
     assert not any("Circle right" in s.lines_uv for s in samples)
-    assert np.nanmedian([s.line_err for s in samples]) < CFG["gsr"]["dubious_median_px"]  # era 1.815 px
+    assert np.nanmedian([_persons_err(s) for s in samples]) < CFG["gsr"]["dubious_median_px"]  # era 1.815 px

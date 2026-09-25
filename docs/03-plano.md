@@ -52,7 +52,8 @@ homografia, renderizador sintético.
   `(x+w/2, y+h)` e `(x+w, y+h)`. Pessoas com `bbox_pitch` nulo ficam fora.
   Frame com menos de 4 pessoas fica com
   `H_gt = None` e é contado no resumo. O caso apareceu (2.322 frames, ver
-  `decisoes.md`); o recurso pelas linhas entra no começo da Fatia 2.
+  `decisoes.md`). **Superado na Fatia 2:** a `H_gt` do GSR passa a ser o ajuste
+  pelas linhas em todos os frames, e a DLT pelas pessoas vira conferência.
 - **Linhas anotadas do GSR:** coordenadas normalizadas × (1920, 1080). Mapear
   cada classe do JSON para a polilinha correspondente do modelo; **as classes
   `Goal …` ficam fora**, porque não estão no plano. Registrar o mapeamento em
@@ -107,26 +108,42 @@ homografia, renderizador sintético.
 ### Fatia 2 — Avaliação (semana 1)
 `IoU_whole`, `IoU_part`, erro de reprojeção, taxa de cobertura; LocSim no GSR.
 
-**Primeiro: `H_gt` pelas linhas nos frames do GSR sem pessoas suficientes.**
-- Ajuste ponto-linha (`scipy.optimize.least_squares`): minimizar a distância dos
-  pontos anotados às polilinhas do modelo projetadas pela `H`, iniciando pela
-  `H_gt` do vizinho mais próximo com `H` por pessoas. É **a mesma função** do
-  refinamento da Etapa 7 (termo ponto-linha): escreva uma vez só, em
+**Primeiro: `H_gt` do GSR pelas linhas anotadas, em todos os frames** (como o
+AuxFlow, seção 4.1; ver `decisoes.md`).
+- Ajuste ponto-linha (`scipy.optimize.least_squares`, perda `soft_l1` com
+  `f_scale` na casa de 3 px, por causa de anotações ruins): minimizar a distância
+  dos pontos anotados às polilinhas do modelo projetadas pela `H`. É **a mesma
+  função** do refinamento da Etapa 7: escreva uma vez só, em
   `src/homography.py`, e a Fatia 5 reaproveita.
-- **Teste:** em frames com `H` por pessoas, partir da `H` do vizinho e recuperar
-  essa `H`.
-- Esses frames ganham a marca **"gabarito pelas linhas"**, e as métricas saem com
-  e sem eles (como os duvidosos).
-- Risco medido: a distância até o vizinho com `H` chega a 374 frames (mediana
-  69). Se o ajuste não convergir partindo de longe, encadear — cada frame
-  iniciado pela `H` recém-ajustada do frame adjacente — e medir as duas formas.
+- **Início:** a `H` pelas pessoas quando existir; senão, encadeado a partir do
+  frame vizinho já ajustado (a distância até um frame com pessoas chega a 374
+  frames).
+- **Aceite só se bem determinado:** jacobiano devolvido pelo `least_squares`
+  com posto 8 e condicionamento razoável, e resíduo mediano abaixo de um limite.
+  Frame não determinado fica **sem `H_gt`** e é contado no resumo. Nada de `H`
+  inventada.
+- **"Gabarito duvidoso"** passa a ser: resíduo mediano do ajuste > 10 px.
+- **Conferência:** a `H` pelas pessoas continua calculada; a discordância das
+  duas por frame (deslocamento mediano numa grade da imagem) vira coluna no
+  `gsr_gt_quality.csv`.
+- **Cache** em `outputs/cache/` (no `.gitignore`).
+- **Testes:** no SNGS-070, o ajuste pelas linhas e a `H` pelas pessoas concordam
+  (diferença mediana na grade perto dos 2,8 px de hoje); no SNGS-023, frame 230,
+  o ajuste põe o círculo central sobre o pintado (conferir no overlay); com `H`
+  sintética e pontos ruidosos, recupera a `H`.
+
+**Métricas no GSR:** `IoU` e erro de reprojeção contra essa `H_gt` (protocolo do
+AuxFlow); LocSim contra o `bbox_pitch` (oficial, não depende da `H_gt`); e o erro
+da `H` estimada contra os pontos anotados, com acurácia a 5, 10 e 20 px como no
+SN-Calib — a medida que não depende de nenhuma `H_gt`.
 
 - **Teste:** `H_gt` contra `H_gt` dá IoU = 1 e erro = 0.
 - **Teste:** `H_gt` perturbada por translação conhecida degrada de forma monótona.
 - **Teste:** para um mesmo par de homografias, os números batem com o código de
   avaliação de referência (KpSFR) quando se usa o mesmo molde.
 - **Saída:** tabela de métricas a partir de um arquivo de homografias preditas,
-  com e sem os frames de gabarito duvidoso.
+  com e sem os frames de gabarito duvidoso, e com a contagem de frames sem
+  `H_gt`.
 
 ### Fatia 3 — Gramado e marcações (semana 2)
 Etapas 1 e 2 do método.

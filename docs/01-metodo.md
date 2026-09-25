@@ -177,6 +177,9 @@ cobertura** — não invente homografia.
    projetar pontos amostrados ao longo das linhas do modelo e medir sua distância
    às linhas detectadas na imagem.
 
+> A função de ajuste ponto-linha é **a mesma** que produz a `H_gt` do GSR
+> (Fatia 2, `src/homography.py`): escrita uma vez, aqui reaproveitada.
+
 > O termo de linha é a contribuição central do PnLCalib — o módulo PnL otimiza
 > pontos **e** linhas conjuntamente, o que ajuda justamente nas regiões distantes
 > da grande área, onde os keypoints são escassos. Peso dos termos no artigo:
@@ -290,24 +293,39 @@ de 0,5.
 
 ## Etapa 9 — Avaliação
 
-Métricas consolidadas na literatura. Implemente as três.
+Métricas consolidadas na literatura. Implemente as três. Definições do
+protocolo do AuxFlow (seção 4.2), em `src/evaluate.py`; o que o artigo não diz
+está em `decisoes.md`.
 
-- **`IoU_whole`** — projeta o modelo do campo para a vista de cima usando a
-  homografia de gabarito e a estimada, e mede a interseção sobre união na **área
-  inteira do modelo**. Convenção do Homayounfar. **É a métrica principal.**
-- **`IoU_part`** — o mesmo, restrito à **área visível na imagem**. Convenção do
-  Sharma. Reporte também, mas com ressalva: Citraro et al. desaconselham esta
-  versão, porque recortar as duas áreas pela região visível remove justamente o
-  que está desalinhado — num quadro só de grama, qualquer estimativa que cubra o
-  gabarito tira nota perfeita. A divergência entre as duas é informativa.
-- **Erro de reprojeção** — em pixels (normalizado pela altura da imagem) e em
-  metros. No GSR, o BroadTrack tem o maior `IoU_entire` (0,8397 contra 0,8352 do
-  AuxFlow), mas perde no `IoU_part` (0,9224 contra 0,9426) e sobretudo no erro
-  de reprojeção em metros (1,34 contra 0,84 m): otimizar contra as marcações
-  negligencia a superfície como um todo. Uma métrica só nunca basta.
+- **`IoU_whole`** — na vista de cima, IoU entre o molde do campo e o molde
+  levado por `H_est⁻¹·H_gt` (campo → imagem pelo gabarito → campo pela
+  estimativa). **É a métrica principal.**
+- **`IoU_part`** — o molde reprojetado **na imagem** pela `H_gt` e pela `H_est`,
+  com o IoU no espaço da imagem, dentro do quadro. Reporte também, mas com
+  ressalva: Citraro et al. desaconselham esta versão, porque recortar pela região
+  visível remove justamente o que está desalinhado — num quadro só de grama,
+  qualquer estimativa que cubra o gabarito tira nota perfeita. A divergência
+  entre as duas é informativa.
+- **Erro de reprojeção** — sobre a grade do **campo** de 2,5 m em X × 2 m em Y,
+  só os pontos cuja projeção pela `H_gt` cai dentro do quadro e à frente da
+  câmera: **NPE** = ‖`H_est·X − H_gt·X`‖ / altura da imagem; **RE** (m) =
+  ‖`H_est⁻¹(H_gt·X) − X`‖. Média por frame. No GSR, o BroadTrack tem o maior
+  `IoU_entire` (0,8397 contra 0,8352 do AuxFlow), mas perde no `IoU_part`
+  (0,9224 contra 0,9426) e sobretudo no erro de reprojeção em metros (1,34 contra
+  0,84 m): otimizar contra as marcações negligencia a superfície como um todo.
+  Uma métrica só nunca basta.
 
-> No GSR, o gabarito não é perfeito (ver `02-dados.md`): reporte as métricas com
-> e sem os frames marcados como "gabarito duvidoso".
+> **WC14, tabela à parte no "protocolo KpSFR":** as funções de avaliação do
+> KpSFR copiadas sem mudança (`src/eval_kpsfr.py`, licença MIT), para comparar
+> com quem usa esse código. As definições delas diferem das acima (ver
+> `decisoes.md`); declare o protocolo em cada tabela.
+
+> **Gabarito no GSR.** A `H_gt` é o **ajuste ponto-linha às linhas anotadas**
+> (ver `02-dados.md`), no espírito do AuxFlow (seção 4.1: gabarito por RANSAC
+> sobre as linhas anotadas); `IoU` e erro de reprojeção no GSR são medidos
+> contra ela. O gabarito não é perfeito: reporte com e sem os frames de
+> "gabarito duvidoso" (resíduo mediano do ajuste > 10 px) e declare quantos
+> frames ficaram sem `H_gt` (ajuste mal determinado).
 
 Adicionalmente, e específico deste projeto:
 
@@ -320,10 +338,21 @@ Adicionalmente, e específico deste projeto:
   diferença contra a `H_gt`**: o gabarito do GSR tem tremor e desvios locais
   próprios, e comparar contra ele puniria o método por não reproduzi-los.
 - **LocSim** (se o conjunto temporal for o SoccerNet-GSR) — similaridade de
-  localização do GS-HOTA, `exp(ln(0,05)·d²/τ²)` com τ = 5 m, calculada projetando
-  o centro da base das caixas de gabarito com a homografia estimada. É a métrica
-  do AuxFlow, e permite comparar diretamente com a tabela 7 deles. Use só as
-  pessoas: a caixa da bola no ar não está no chão.
+  localização do GS-HOTA, `exp(ln(0,05)·d²/τ²)`: o centro da base da caixa de
+  gabarito (imagem) vai para o campo pela **inversa da homografia estimada** e
+  `d` é a distância ao `bbox_pitch` do dataset. **Não depende da `H_gt`** — é o
+  protocolo oficial. Reporte τ = 5 m, τ = 2 m e o **mAP-LocSim** (média de
+  τ = 1..10 m), como na tabela 7 do AuxFlow, que permite a comparação direta.
+  Use só as pessoas: a caixa da bola no ar não está no chão.
+- **Erro contra as linhas anotadas** (GSR) — distância dos pontos anotados às
+  linhas do modelo projetadas pela homografia **estimada**, e acurácia a 5, 10 e
+  20 px como no SN-Calib. É a única medida geométrica que **não depende de
+  nenhuma `H_gt`**. Contagem do código do SN-Calib (`evaluate_camera.py`),
+  **por classe**, em 960×540: classe anotada e projetada no quadro é TP se todos
+  os seus pontos ficam a menos de γ da polilinha projetada, senão FP; projetada e
+  não anotada, FP; anotada e não projetada, FN. Acurácia do frame =
+  TP/(TP+FP+FN); resultado = média × completude. **Sem espelhamento**
+  esquerda/direita (o código deles fica com o melhor dos dois; nós não).
 
 ### Taxa de inversão de visibilidade
 

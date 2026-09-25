@@ -4,3 +4,4 @@ outputs/debug/
 __pycache__/
 .venv/
 .pytest_cache/
+outputs/cache/

@@ -106,14 +106,23 @@ clipe (`SNGS-XXX/`), com `img1/000001.jpg … 000750.jpg` (consecutivos) e
     das 26 classes visíveis, lista de pontos em coordenadas **normalizadas**
     (multiplicar `x` por 1920 e `y` por 1080).
 - **Não há parâmetros de câmera no arquivo.** A categoria `camera` existe, mas sem
-  nenhuma anotação. `H_gt` é estimada por frame a partir das **pessoas, sem a
-  bola** (ver `decisoes.md`): verificada contra as linhas anotadas com erro
-  mediano de 2,8 px no SNGS-070 (a definição exata está em `decisoes.md`).
-  Algumas pessoas vêm com `bbox_pitch` nulo (9 anotações no SNGS-070) e ficam
-  fora.
-- **Qualidade do gabarito:** em 7 dos 750 frames do SNGS-070 (354–359 e 365) a
-  `H_gt` discorda das linhas anotadas por mais de 10 px (mediana). Esses frames
-  são marcados como "gabarito duvidoso" e as métricas saem com e sem eles.
+  nenhuma anotação. **A `H_gt` de cada frame é o ajuste ponto-linha às linhas
+  anotadas** (`least_squares` com perda robusta, em todos os frames), como no
+  AuxFlow (seção 4.1: gabarito por RANSAC sobre as linhas anotadas). O
+  `bbox_pitch` das pessoas vem da **calibração do próprio dataset**: a DLT sobre
+  as pessoas (sem a bola) só recupera essa calibração, que erra do lado da câmera
+  (14 clipes) e no SNGS-023 197–523. Ela vira **início do ajuste e conferência**
+  (discordância por frame no `gsr_gt_quality.csv`). Algumas pessoas vêm com
+  `bbox_pitch` nulo (9 anotações no SNGS-070) e ficam fora.
+- **Qualidade do gabarito:** frame cujo ajuste não é bem determinado (jacobiano
+  sem posto 8, mal condicionado, ou resíduo mediano acima do limite) fica **sem
+  `H_gt`** e é contado — nada de `H` inventada. Frame com resíduo mediano do
+  ajuste > 10 px é **"gabarito duvidoso"** (linhas que nenhuma homografia
+  explica: anotação ruim ou distorção de lente); as métricas saem com e sem eles.
+  Os números antigos (DLT pelas pessoas; SNGS-070 com 2,8 px e 7 duvidosos) estão
+  em `decisoes.md`.
+- **Cache:** o ajuste em 123 mil frames não é de graça; o resultado fica em
+  `outputs/cache/` (fora do Git).
 
 **Partições:** calibrar no **treino**, escolher variantes na **validação**,
 medir uma vez no **teste**. As comparações com o AuxFlow usam o teste (tabelas 5
@@ -184,9 +193,10 @@ Sample(
 ```
 
 No WC14, o loader também expõe a máscara `grass` (gabarito da Etapa 1). No GSR,
-expõe as posições de atleta do frame (campo, metros), as caixas (imagem, pixels),
-os pontos das linhas anotadas (imagem, pixels) e a marca de "gabarito duvidoso"
-— as caixas servem para excluir jogadores da amostragem de pontos auxiliares
+`H_gt` é o ajuste pelas linhas (ou `None`), e o loader expõe também a `H` pelas
+pessoas e a discordância entre as duas, as posições de atleta do frame (campo,
+metros), as caixas (imagem, pixels), os pontos das linhas anotadas (imagem,
+pixels) e a marca de "gabarito duvidoso" — as caixas servem para excluir jogadores da amostragem de pontos auxiliares
 (Etapa 8c) e para o LocSim; as linhas permitem avaliar as Etapas 3 a 5
 isoladamente.
 
@@ -202,7 +212,9 @@ Não são datasets de treino, mas poupam tempo e dão comparabilidade.
 
 **Código de avaliação.** No WC14, use também o código público do Chu et al.
 (`github.com/ericsujw/KpSFR`) sem modificação — foi o que Maglo et al. usaram. No
-GSR, o `sn-gamestate` traz a avaliação GS-HOTA / LocSim.
+GSR, o `sn-gamestate` traz a avaliação GS-HOTA / LocSim, e o código de avaliação
+do SN-Calib (`github.com/SoccerNet/sn-calibration`) define a acurácia a 5, 10 e
+20 px contra as linhas anotadas.
 
 **Bassek et al. (2025)** liberaram o código de análise estatística, estimativa de
 visibilidade e detecção de formação em
@@ -230,8 +242,10 @@ de visão, `scipy` para otimização.
   em jardas (115 × 74), que não é exatamente 105 × 68 m: converter por afim por
   eixo, não por um fator único de 0,9144. As linhas do GSR vêm normalizadas
   (0–1).
-- **GSR sem câmera** — não procure parâmetros de câmera no JSON; a `H_gt` vem das
-  pessoas anotadas.
+- **GSR sem câmera** — não procure parâmetros de câmera no JSON; a `H_gt` vem do
+  ajuste às linhas anotadas. O `bbox_pitch` vem da calibração do dataset: a DLT
+  pelas pessoas herda os erros dela, então serve de conferência, não de
+  gabarito.
 - **A bola não é correspondência de chão.** Quando está no ar, a base da caixa
   dela não toca o gramado; incluí-la na estimativa da `H_gt` criou um falso
   "corte" de ~104 px no SNGS-070. Vale também para qualquer uso futuro de caixas
@@ -240,7 +254,8 @@ de visão, `scipy` para otimização.
   anotado como `Circle right` no SNGS-149), às vezes só num trecho do clipe.
   Corrigidos na leitura por `gsr_label_fixes`; a varredura que os acha está no
   `--gsr-quality` (`gsr_gt_classes.csv`). Nem toda classe com erro alto é rótulo:
-  a `H_gt` erra do lado da câmera, e há anotação congelada (SNGS-153).
+  a `H` pelas pessoas erra do lado da câmera, e há anotação congelada
+  (SNGS-153, descartada em 479–750).
 - **Traves e travessão também não estão no plano.** As classes `Goal …` das
   linhas anotadas do GSR ficam fora de qualquer ajuste ou erro medido no
   gramado.

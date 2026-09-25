@@ -38,6 +38,26 @@ gsr_label_fixes:
   SNGS-187: {"Side line bottom": "Big rect. right bottom"}
   SNGS-199: {"Big rect. left bottom": "Big rect. left top"}
 
+fit:
+  # Ajuste ponto-linha (src/homography.py): H_gt do GSR e refinamento da Etapa 7
+  loss: soft_l1        # perda robusta, por causa de anotações ruins (decisão de Victor)
+  f_scale_px: 3        # escala da perda robusta, px (decisão de Victor)
+  resid_cap_px: 1000   # distância infinita (classe inteira atrás da câmera) vira isto (escolha)
+  min_points: 8        # menos pontos que parâmetros (8): nem tenta
+  max_cond: .inf       # [EMPÍRICO] condição máxima do jacobiano; calibrar no treino do GSR
+  max_resid_px: .inf   # [EMPÍRICO] resíduo mediano máximo para aceitar; calibrar no treino do GSR
+
+eval:
+  grid_dx_m: 2.5       # grade do campo para NPE e RE (AuxFlow, seção 4.2)
+  grid_dy_m: 2.0       # idem
+  iou_px_per_m: 5      # resolução da vista de cima no IoU_whole (escolha)
+  iou_margin_m: 52.5   # folga do canvas do IoU_whole além do campo (escolha; truncar só afeta desastres)
+  iou_part_scale: 0.5  # IoU_part num raster 2x menor: dif. máx. 0,0007 no SNGS-070, 1/10 do tempo (empírico)
+  locsim_taus_m: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  # mAP-LocSim = média nesses τ (AuxFlow, tabela 7)
+  sncalib_size: [960, 540]         # resolução da acurácia contra as linhas (SN-Calib, evaluate_camera.py)
+  sncalib_thresholds_px: [5, 10, 20]  # idem
+  quality_grid_px: 40  # passo da grade da imagem na discordância pessoas x linhas do GSR (escolha)
+
 render:
   px_per_m: 25       # vista de cima; 25 px/m faz a linha de 0,12 m ter 3 px inteiros (escolha)
   margin_m: 1        # borda da vista de cima além do campo; basta cobrir meia largura de linha (escolha)
