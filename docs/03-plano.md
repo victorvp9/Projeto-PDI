@@ -110,27 +110,29 @@ homografia, renderizador sintético.
 
 **Primeiro: `H_gt` do GSR pelas linhas anotadas, em todos os frames** (como o
 AuxFlow, seção 4.1; ver `decisoes.md`).
-- Ajuste ponto-linha (`scipy.optimize.least_squares`, perda `soft_l1` com
-  `f_scale` na casa de 3 px, por causa de anotações ruins): minimizar a distância
-  dos pontos anotados às polilinhas do modelo projetadas pela `H`. É **a mesma
-  função** do refinamento da Etapa 7: escreva uma vez só, em
+- Ajuste ponto-linha (`scipy.optimize.least_squares`, perda `cauchy` com
+  `f_scale` 3 px, por causa de anotações ruins): minimizar a distância dos pontos
+  anotados às linhas do modelo projetadas pela `H` (objetivo liso: reta infinita
+  e distância de Sampson à cônica; resíduo reportado nas polilinhas). É **a
+  mesma função** do refinamento da Etapa 7: escreva uma vez só, em
   `src/homography.py`, e a Fatia 5 reaproveita.
-- **Início:** a `H` pelas pessoas quando existir; senão, encadeado a partir do
-  frame vizinho já ajustado (a distância até um frame com pessoas chega a 374
-  frames).
-- **Aceite só se bem determinado:** jacobiano devolvido pelo `least_squares`
-  com posto 8 e condicionamento razoável, e resíduo mediano abaixo de um limite.
-  Frame não determinado fica **sem `H_gt`** e é contado no resumo. Nada de `H`
-  inventada.
-- **"Gabarito duvidoso"** passa a ser: resíduo mediano do ajuste > 10 px.
+- **Início:** a `H` pelas pessoas e a última `H` aceita (encadeamento; a
+  distância até um frame com pessoas chega a 374 frames); fica o ajuste aceito
+  de menor custo.
+- **Aceite só se bem determinado:** posto 8, condição ≤ 3000 e resíduo mediano
+  ≤ 10 px (calibrados no treino). Frame não determinado fica **sem `H_gt`** e é
+  contado no resumo. Nada de `H` inventada.
+- **"Gabarito duvidoso"** passa a ser: resíduo mediano do ajuste em (5, 10] px.
 - **Conferência:** a `H` pelas pessoas continua calculada; a discordância das
   duas por frame (deslocamento mediano numa grade da imagem) vira coluna no
   `gsr_gt_quality.csv`.
 - **Cache** em `outputs/cache/` (no `.gitignore`).
-- **Testes:** no SNGS-070, o ajuste pelas linhas e a `H` pelas pessoas concordam
-  (diferença mediana na grade perto dos 2,8 px de hoje); no SNGS-023, frame 230,
-  o ajuste põe o círculo central sobre o pintado (conferir no overlay); com `H`
-  sintética e pontos ruidosos, recupera a `H`.
+- **Testes:** no SNGS-070, deixar-uma-classe-fora — o ajuste sem a classe prevê
+  a classe melhor que a `H` pelas pessoas (a discordância das duas na grade,
+  ~11 px, é só reportada: lado da câmera); no SNGS-023, frame 230, o ajuste põe
+  o círculo central sobre o pintado (conferir no overlay); com `H` sintética e
+  pontos ruidosos, recupera a `H` com < 1 px; o encadeamento reproduz o ajuste
+  iniciado pelas pessoas.
 
 **Métricas no GSR:** `IoU` e erro de reprojeção contra essa `H_gt` (protocolo do
 AuxFlow); LocSim contra o `bbox_pitch` (oficial, não depende da `H_gt`); e o erro

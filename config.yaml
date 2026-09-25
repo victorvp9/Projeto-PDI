@@ -14,7 +14,7 @@ gsr:
   person_categories: [1, 2, 3, 7]  # player, goalkeeper, referee, other; bola (4) fora (docs/decisoes.md)
   min_persons: 4          # mínimo de pessoas para a DLT da H_gt (docs/03-plano.md, Fatia 1)
   border_margin_px: 2     # pontos anotados a até 2 px da borda são recorte, não linha (docs/decisoes.md)
-  dubious_median_px: 10   # erro mediano do frame acima disso = "gabarito duvidoso" (docs/decisoes.md)
+  dubious_median_px: 5    # resíduo do ajuste em (5, 10] px = "gabarito duvidoso": homografia só aproxima (lente); ~2x o p99 do treino (decisão de Victor)
   label_suspect_px: 50    # classe com mediana acima disso na maioria dos frames = rótulo suspeito (decisão de Victor, docs/decisoes.md)
   label_suspect_frac: 0.5 # "maioria dos frames" (idem)
 
@@ -33,19 +33,19 @@ gsr_label_fixes:
   SNGS-121: {"Big rect. left top": "Side line right"}
   SNGS-133: {"Big rect. right main": ["Big rect. left main", 144, 750]}
   SNGS-148: {"Circle right": "Circle left"}
-  SNGS-149: {"Circle right": "Circle central"}
+  SNGS-149: {"Circle right": ["Circle central", 1, 582]}   # em 583-750 é o arco direito de verdade
   SNGS-153: {"Middle line": [null, 479, 750]}
   SNGS-187: {"Side line bottom": "Big rect. right bottom"}
   SNGS-199: {"Big rect. left bottom": "Big rect. left top"}
 
 fit:
   # Ajuste ponto-linha (src/homography.py): H_gt do GSR e refinamento da Etapa 7
-  loss: soft_l1        # perda robusta, por causa de anotações ruins (decisão de Victor)
+  loss: cauchy         # perda robusta; soft_l1 enviesava com outliers grosseiros (sintético: 0,88 -> 0,26 px; decisão de Victor)
   f_scale_px: 3        # escala da perda robusta, px (decisão de Victor)
   resid_cap_px: 1000   # distância infinita (classe inteira atrás da câmera) vira isto (escolha)
   min_points: 8        # menos pontos que parâmetros (8): nem tenta
-  max_cond: .inf       # [EMPÍRICO] condição máxima do jacobiano; calibrar no treino do GSR
-  max_resid_px: .inf   # [EMPÍRICO] resíduo mediano máximo para aceitar; calibrar no treino do GSR
+  max_cond: 3000       # [EMPÍRICO] condição máxima do jacobiano; vão da distribuição no treino do GSR (docs/decisoes.md)
+  max_resid_px: 10     # [EMPÍRICO] resíduo mediano máximo para aceitar; acima disso, só ajustes errados no treino do GSR
 
 eval:
   grid_dx_m: 2.5       # grade do campo para NPE e RE (AuxFlow, seção 4.2)

@@ -62,6 +62,10 @@ def _persons_err(s):
     return float(np.median(np.concatenate(list(d.values())))) if d else np.nan
 
 
+FATIA1_DUBIOUS_PX = 10   # limiar de "duvidoso" da definição da Fatia 1 (docs/decisoes.md)
+MIN_CLASS_POINTS = 3     # classe deixada de fora precisa de pontos para medir o erro nela
+
+
 @needs_clip
 def test_sngs070_persons_reference_values():
     """H pelas pessoas contra as linhas: valores da Fatia 1 em docs/decisoes.md.
@@ -70,20 +74,32 @@ def test_sngs070_persons_reference_values():
     assert len(samples) == 750 and all(s.H_persons is not None for s in samples)
     err = np.array([_persons_err(s) for s in samples])
     assert abs(np.median(err) - 2.8) <= 0.3
-    bad = {s.frame_idx for s, e in zip(samples, err) if e > CFG["gsr"]["dubious_median_px"]}
+    bad = {s.frame_idx for s, e in zip(samples, err) if e > FATIA1_DUBIOUS_PX}
     assert 5 <= len(bad) <= 10 and set(range(354, 360)) <= bad, sorted(bad)
-    assert np.median(err[err <= CFG["gsr"]["dubious_median_px"]]) <= 5
+    assert np.median(err[err <= FATIA1_DUBIOUS_PX]) <= 5
 
 
 @needs_clip
-def test_sngs070_lines_fit_agrees_with_persons():
-    """O ajuste pelas linhas e a H pelas pessoas concordam no SNGS-070 (1 frame a cada 10)."""
-    samples = gsr.load_clip(CLIP, fit="none")[::10]
-    fits = gsr.fit_clip(samples)
-    assert all(f.ok for f in fits)
-    dis = [image_grid_displacement(f.H, s.H_persons, s.size) for f, s in zip(fits, samples)]
-    print(f"\nSNGS-070, discordância linhas x pessoas: mediana {np.median(dis):.2f} px, p90 {np.percentile(dis, 90):.2f} px")
-    assert np.median(dis) <= 5
+def test_sngs070_leave_one_class_out():
+    """Em 1 frame a cada 10, para cada classe com pontos suficientes: ajuste pelas
+    linhas SEM ela (partindo da H pelas pessoas) e erro NELA, contra o erro da H
+    pelas pessoas na mesma classe. O ajuste tem de prever melhor a classe que não viu.
+    A discordância linhas x pessoas na grade da imagem é só reportada (lado da câmera)."""
+    held_fit, held_persons, dis = [], [], []
+    for s in gsr.load_clip(CLIP, fit="none")[::10]:
+        pts = gsr.inner_points(s.lines_uv, s.size)
+        full = fit_point_line(s.H_persons, pts, s.size)
+        if full.ok:
+            dis.append(image_grid_displacement(full.H, s.H_persons, s.size))
+        for k in [k for k, p in pts.items() if len(p) >= MIN_CLASS_POINTS]:
+            fit = fit_point_line(s.H_persons, {c: p for c, p in pts.items() if c != k}, s.size)
+            if fit.ok:
+                held_fit.append(np.median(class_distances(fit.H, {k: pts[k]})[k]))
+                held_persons.append(np.median(class_distances(s.H_persons, {k: pts[k]})[k]))
+    print(f"\nSNGS-070, classe deixada de fora ({len(held_fit)} casos): mediana do erro nela "
+          f"{np.median(held_fit):.2f} px pelo ajuste sem ela x {np.median(held_persons):.2f} px pelas pessoas")
+    print(f"SNGS-070, discordância linhas x pessoas na grade: mediana {np.median(dis):.2f} px (reportada)")
+    assert len(held_fit) >= 50 and np.median(held_fit) < np.median(held_persons)
 
 
 @needs_clip
@@ -113,6 +129,7 @@ def test_sngs023_f230_fit_puts_center_circle_on_painted():
 
 def test_label_fixes_whole_clip_and_range():
     assert gsr.fixed_label("SNGS-149", 5, "Circle right") == "Circle central"
+    assert gsr.fixed_label("SNGS-149", 600, "Circle right") == "Circle right"    # arco verdadeiro em 583-750
     assert gsr.fixed_label("SNGS-070", 5, "Circle right") == "Circle right"      # clipe sem correção
     assert gsr.fixed_label("SNGS-149", 5, "Middle line") == "Middle line"        # classe sem correção
     assert gsr.fixed_label("SNGS-133", 100, "Big rect. right main") == "Big rect. right main"  # antes do trecho
@@ -123,7 +140,9 @@ def test_label_fixes_whole_clip_and_range():
 
 @pytest.mark.skipif(not (path("gsr") / "test" / "SNGS-149").exists(), reason="SNGS-149 ausente em data/")
 def test_sngs149_circle_label_fixed():
-    """Círculo central anotado como `Circle right`; corrigido na leitura (docs/decisoes.md)."""
+    """Círculo central anotado como `Circle right` em 1-582; corrigido na leitura. Em
+    583-750 o `Circle right` é o arco da grande área direita (docs/decisoes.md)."""
     samples = gsr.load_clip(path("gsr") / "test" / "SNGS-149", fit="none")
-    assert not any("Circle right" in s.lines_uv for s in samples)
-    assert np.nanmedian([_persons_err(s) for s in samples]) < CFG["gsr"]["dubious_median_px"]  # era 1.815 px
+    assert not any("Circle right" in s.lines_uv for s in samples if s.frame_idx <= 582)
+    assert all("Circle central" not in s.lines_uv for s in samples if s.frame_idx >= 583)
+    assert np.nanmedian([_persons_err(s) for s in samples]) < FATIA1_DUBIOUS_PX  # era 1.815 px

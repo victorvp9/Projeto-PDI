@@ -170,8 +170,9 @@ def summarize(rows):
             t[f"acc@{th}"] = compl * np.mean(v) if v else np.nan    # completude x acurácia média
         d = np.concatenate([r["locsim_d"] for r in rs if "locsim_d" in r] or [np.array([])])
         if len(d):
-            t["locsim@5"] = locsim(d, 5).mean()
-            t["locsim@2"] = locsim(d, 2).mean()
+            t["locsim@5"] = (locsim(d, 5).mean(), np.median(locsim(d, 5)))
+            t["locsim@2"] = (locsim(d, 2).mean(), np.median(locsim(d, 2)))
             t["mAP-locsim"] = np.mean([locsim(d, tau).mean() for tau in E["locsim_taus_m"]])
+            t["locsim dist (m)"] = (np.mean(d[np.isfinite(d)]), np.median(d))
         table[label] = t
     return table

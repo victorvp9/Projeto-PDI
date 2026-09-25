@@ -5,11 +5,13 @@ modelo da classe deles projetadas pela H. Produz a H_gt do GSR a partir das
 linhas anotadas (Fatia 2) e é o refinamento da Etapa 7 (Fatia 5).
 
 O objetivo otimizado é uma versão lisa da distância às polilinhas: reta infinita
-para as classes retas e círculo completo para os arcos. A distância a um segmento
-finito tem quina na ponta, e anotadores clicam justamente nas pontas (cantos de
-área, fim de arco): o Gauss-Newton se arrastava até o limite de avaliações. O
-resíduo reportado (aceite, "duvidoso") continua sendo a distância às polilinhas
-(docs/decisoes.md).
+para as classes retas e distância de Sampson à cônica projetada do círculo
+completo para os arcos. A distância a um segmento finito tem quina na ponta, e
+anotadores clicam justamente nas pontas (cantos de área, fim de arco): o
+Gauss-Newton se arrastava até o limite de avaliações. E o círculo como polilinha
+quebrava a invariância das configurações degeneradas (círculo + uma reta), que
+passavam no teste de condição. O resíduo reportado (aceite, "duvidoso")
+continua sendo a distância às polilinhas (docs/decisoes.md).
 """
 from dataclasses import dataclass
 
@@ -24,13 +26,12 @@ F = CFG["fit"]
 # normalização fixa do campo (m -> ~[-1, 1]); a da imagem depende do tamanho
 N_FIELD = np.diag([1 / HL, 1 / HW, 1.0])
 
-# geometria lisa do objetivo: círculo completo (campo, m) para as classes circulares,
-# reta homogênea (campo) para as demais
+# geometria lisa do objetivo (campo): cônica (X-cx)² + Y² - r² = 0 do círculo completo
+# para as classes circulares, reta homogênea para as demais
 _CIRCLES = {"Circle central": (0.0, CENTER_CIRCLE_R),
             "Circle left": (-(HL - PENALTY_MARK_DIST), PENALTY_ARC_R),
             "Circle right": (HL - PENALTY_MARK_DIST, PENALTY_ARC_R)}
-_t = np.linspace(0, 2 * np.pi, int(np.ceil(2 * np.pi * PENALTY_ARC_R / CFG["pitch"]["sample_step_m"])) + 1)
-FULL_CIRCLES = {k: np.c_[x + r * np.cos(_t), r * np.sin(_t)] for k, (x, r) in _CIRCLES.items()}
+CONICS = {k: np.array([[1, 0, -cx], [0, 1, 0], [-cx, 0, cx * cx - r * r]]) for k, (cx, r) in _CIRCLES.items()}
 LINE_EQ = {k: np.cross([*p[0], 1.0], [*p[-1], 1.0]) for k, p in POLYLINES.items() if k not in _CIRCLES}
 
 
@@ -42,16 +43,19 @@ def class_distances(H, lines_uv):
 
 
 def smooth_distances(H, lines_uv):
-    """Distância (px) de cada ponto da imagem à reta infinita / círculo completo da
-    sua classe projetados por H (campo -> imagem), concatenada na ordem do dict."""
-    Hit = np.linalg.inv(H).T
+    """Distância (px) de cada ponto da imagem à reta infinita da sua classe, ou
+    distância de Sampson à cônica do círculo completo, projetadas por H (campo ->
+    imagem); concatenada na ordem do dict."""
+    Hi = np.linalg.inv(H)
     out = []
     for k, p in lines_uv.items():
+        q = np.c_[p, np.ones(len(p))]
         if k in LINE_EQ:
-            l = Hit @ LINE_EQ[k]                   # reta na imagem: l = H^-T L
-            out.append(np.abs(p @ l[:2] + l[2]) / np.hypot(l[0], l[1]))
+            l = Hi.T @ LINE_EQ[k]                  # reta na imagem: l = H^-T L
+            out.append(np.abs(q @ l) / np.hypot(l[0], l[1]))
         else:
-            out.append(point_segment_distance(p, project_segments(H, FULL_CIRCLES[k])))
+            Cq = q @ (Hi.T @ CONICS[k] @ Hi)       # cônica na imagem: C' = H^-T C H^-1
+            out.append(np.abs((Cq * q).sum(axis=1)) / (2 * np.hypot(Cq[:, 0], Cq[:, 1])))
     return np.concatenate(out)
 
 
@@ -63,6 +67,7 @@ class Fit:
     cond: float            # condição do jacobiano (parâmetros normalizados)
     n_points: int
     ok: bool               # bem determinado e dentro dos limites do config
+    cost: float = np.inf   # custo robusto na solução (compara ajustes de pontos de partida diferentes)
 
 
 def _img_norm(size):
@@ -97,4 +102,4 @@ def fit_point_line(H0, lines_uv, size) -> Fit:
     cond = float(s[0] / s[-1]) if s[-1] > 0 else np.inf
     med = float(np.median(np.concatenate(list(class_distances(H_of(r.x), lines_uv).values()))))
     ok = rank == 8 and cond <= F["max_cond"] and med <= F["max_resid_px"]
-    return Fit(H_of(r.x), med, rank, cond, n, ok)
+    return Fit(H_of(r.x), med, rank, cond, n, ok, float(r.cost))

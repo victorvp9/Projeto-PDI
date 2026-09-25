@@ -172,13 +172,16 @@ def fit_calibration(splits):
 
 
 def _eval_clip(args):
-    """Linhas de métrica de um clipe do GSR para a predição `name` (arquivo .npz ou "persons")."""
+    """Linhas de métrica de um clipe do GSR para a predição `name`: arquivo .npz,
+    "persons" (H pelas pessoas) ou "gt" (a própria H_gt, conferência do LocSim)."""
     clip, name = args
-    preds = None if name == "persons" else np.load(name)
+    preds = None if name in ("persons", "gt") else np.load(name)
     rows = []
     for s in gsr.load_clip(clip):
-        if preds is None:
+        if name == "persons":
             H = s.H_persons
+        elif name == "gt":
+            H = s.H_gt
         else:
             key = f"gsr/{clip.parent.name}/{clip.name}/{s.frame_idx}"
             H = preds[key] if key in preds else None
@@ -207,7 +210,7 @@ def main():
                     help="wc14:<split>/<N> ou gsr:<split>/<clipe>/<frame>[-<frame>]")
     ap.add_argument("--gsr-quality", action="store_true", help="gera outputs/gsr_gt_quality.csv e gsr_gt_classes.csv")
     ap.add_argument("--fit-calibration", action="store_true", help="figuras para calibrar max_cond e max_resid_px")
-    ap.add_argument("--evaluate", metavar="PREDS", help="arquivo .npz de homografias preditas, ou 'persons'")
+    ap.add_argument("--evaluate", metavar="PREDS", help="arquivo .npz de homografias preditas, 'persons' ou 'gt'")
     ap.add_argument("--splits", nargs="+", default=["train", "valid", "test"], help="partições do GSR")
     args = ap.parse_args()
     if not (args.overlay or args.gsr_quality or args.fit_calibration or args.evaluate):

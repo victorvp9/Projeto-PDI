@@ -107,7 +107,7 @@ clipe (`SNGS-XXX/`), com `img1/000001.jpg … 000750.jpg` (consecutivos) e
     (multiplicar `x` por 1920 e `y` por 1080).
 - **Não há parâmetros de câmera no arquivo.** A categoria `camera` existe, mas sem
   nenhuma anotação. **A `H_gt` de cada frame é o ajuste ponto-linha às linhas
-  anotadas** (`least_squares` com perda robusta, em todos os frames), como no
+  anotadas** (`least_squares` com perda `cauchy`, em todos os frames), como no
   AuxFlow (seção 4.1: gabarito por RANSAC sobre as linhas anotadas). O
   `bbox_pitch` das pessoas vem da **calibração do próprio dataset**: a DLT sobre
   as pessoas (sem a bola) só recupera essa calibração, que erra do lado da câmera
@@ -115,10 +115,10 @@ clipe (`SNGS-XXX/`), com `img1/000001.jpg … 000750.jpg` (consecutivos) e
   (discordância por frame no `gsr_gt_quality.csv`). Algumas pessoas vêm com
   `bbox_pitch` nulo (9 anotações no SNGS-070) e ficam fora.
 - **Qualidade do gabarito:** frame cujo ajuste não é bem determinado (jacobiano
-  sem posto 8, mal condicionado, ou resíduo mediano acima do limite) fica **sem
-  `H_gt`** e é contado — nada de `H` inventada. Frame com resíduo mediano do
-  ajuste > 10 px é **"gabarito duvidoso"** (linhas que nenhuma homografia
-  explica: anotação ruim ou distorção de lente); as métricas saem com e sem eles.
+  sem posto 8, condição > 3000, ou resíduo mediano > 10 px) fica **sem `H_gt`** e
+  é contado — nada de `H` inventada. Frame com resíduo mediano em (5, 10] px é
+  **"gabarito duvidoso"**: o ajuste está certo, mas uma homografia pura só
+  aproxima o campo (distorção de lente); as métricas saem com e sem eles.
   Os números antigos (DLT pelas pessoas; SNGS-070 com 2,8 px e 7 duvidosos) estão
   em `decisoes.md`.
 - **Cache:** o ajuste em 123 mil frames não é de graça; o resultado fica em

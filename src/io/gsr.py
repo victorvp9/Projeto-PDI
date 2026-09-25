@@ -76,18 +76,15 @@ def inner_points(lines_uv, size):
 def fit_clip(samples: list[Sample]) -> list[Fit]:
     """Ajuste pelas linhas de cada frame do clipe (ordenado por frame).
 
-    Início: a H pelas pessoas; se não houver ou o ajuste for recusado, a última H
-    aceita (passada para frente). Frames que sobrarem tentam a partir da próxima H
-    aceita (passada para trás).
+    Pontos de partida: a H pelas pessoas e a última H aceita (passada para frente);
+    fica o ajuste aceito de menor custo robusto — com a perda cauchy, partidas
+    diferentes caem em mínimos locais diferentes (docs/decisoes.md). Frames que
+    sobrarem tentam a partir da próxima H aceita (passada para trás).
     """
     def attempt(s, inits):
-        fit = None
-        for H0 in inits:
-            if H0 is not None:
-                fit = fit_point_line(H0, inner_points(s.lines_uv, s.size), s.size)
-                if fit.ok:
-                    break
-        return fit
+        fits = [fit_point_line(H0, inner_points(s.lines_uv, s.size), s.size) for H0 in inits if H0 is not None]
+        ok = [f for f in fits if f.ok]
+        return min(ok, key=lambda f: f.cost) if ok else (fits[-1] if fits else None)
 
     fits = [None] * len(samples)
     last = None
@@ -126,13 +123,13 @@ def _cached_fits(clip_dir: Path, samples: list[Sample]) -> list[Fit]:
     if f.exists():
         c = np.load(f)
         if str(c["key"]) == key:
-            return [Fit(None if np.isnan(H).any() else H, float(r), int(k), float(cd), int(n), bool(ok))
-                    for H, r, k, cd, n, ok in zip(c["H"], c["resid"], c["rank"], c["cond"], c["n"], c["ok"])]
+            return [Fit(None if np.isnan(H).any() else H, float(r), int(k), float(cd), int(n), bool(ok), float(co))
+                    for H, r, k, cd, n, ok, co in zip(c["H"], c["resid"], c["rank"], c["cond"], c["n"], c["ok"], c["cost"])]
     fits = fit_clip(samples)
     f.parent.mkdir(parents=True, exist_ok=True)
     np.savez(f, key=key, H=np.array([x.H if x.H is not None else np.full((3, 3), np.nan) for x in fits]),
              resid=[x.resid_px for x in fits], rank=[x.rank for x in fits], cond=[x.cond for x in fits],
-             n=[x.n_points for x in fits], ok=[x.ok for x in fits])
+             n=[x.n_points for x in fits], ok=[x.ok for x in fits], cost=[x.cost for x in fits])
     return fits
 
 

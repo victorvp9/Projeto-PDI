@@ -1,0 +1,29 @@
+conjunto,metrica,media,mediana
+todos,frames,42750,
+todos,frames com H_gt,42431,
+todos,cobertura,1.0,
+todos,iou_whole,1.0,1.0
+todos,iou_part,1.0,1.0
+todos,npe,0.0,0.0
+todos,re_m,1.0534601660600187e-13,3.890874567598657e-14
+todos,acc@5,0.8753227411964255,
+todos,acc@10,0.9357555673696023,
+todos,acc@20,0.960058876990456,
+todos,locsim@5,0.9321930205361898,0.9830137146017162
+todos,locsim@2,0.7726225791476766,0.8984571228683097
+todos,mAP-locsim,0.8859304108487743,
+todos,locsim dist (m),0.6002914697771776,0.3781160946976637
+sem duvidosos,frames,42750,
+sem duvidosos,frames com H_gt,42431,
+sem duvidosos,cobertura,1.0,
+sem duvidosos,iou_whole,1.0,1.0
+sem duvidosos,iou_part,1.0,1.0
+sem duvidosos,npe,0.0,0.0
+sem duvidosos,re_m,1.0534601660600187e-13,3.890874567598657e-14
+sem duvidosos,acc@5,0.8753227411964255,
+sem duvidosos,acc@10,0.9357555673696023,
+sem duvidosos,acc@20,0.960058876990456,
+sem duvidosos,locsim@5,0.9321930205361898,0.9830137146017162
+sem duvidosos,locsim@2,0.7726225791476766,0.8984571228683097
+sem duvidosos,mAP-locsim,0.8859304108487743,
+sem duvidosos,locsim dist (m),0.6002914697771776,0.3781160946976637

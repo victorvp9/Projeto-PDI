@@ -324,8 +324,9 @@ está em `decisoes.md`.
 > (ver `02-dados.md`), no espírito do AuxFlow (seção 4.1: gabarito por RANSAC
 > sobre as linhas anotadas); `IoU` e erro de reprojeção no GSR são medidos
 > contra ela. O gabarito não é perfeito: reporte com e sem os frames de
-> "gabarito duvidoso" (resíduo mediano do ajuste > 10 px) e declare quantos
-> frames ficaram sem `H_gt` (ajuste mal determinado).
+> "gabarito duvidoso" (resíduo mediano do ajuste em (5, 10] px: a homografia só
+> aproxima o campo) e declare quantos frames ficaram sem `H_gt` (ajuste mal
+> determinado, ou resíduo > 10 px).
 
 Adicionalmente, e específico deste projeto:
 
