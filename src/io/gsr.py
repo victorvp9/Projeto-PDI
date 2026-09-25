@@ -45,11 +45,12 @@ def estimate_h_gt(anns):
     return H
 
 
-def fixed_label(clip: str, frame_idx: int, name: str) -> str:
-    """Rótulo de classe das linhas anotadas, corrigido por `gsr_label_fixes` (config)."""
-    fix = LABEL_FIXES.get(clip, {}).get(name)
-    if fix is None:
+def fixed_label(clip: str, frame_idx: int, name: str) -> str | None:
+    """Rótulo de classe das linhas anotadas, corrigido por `gsr_label_fixes` (config).
+    None = classe descartada nesse frame."""
+    if name not in (fixes := LABEL_FIXES.get(clip, {})):
         return name
+    fix = fixes[name]
     to, first, last = (fix, 1, float("inf")) if isinstance(fix, str) else fix
     return to if first <= frame_idx <= last else name
 

@@ -73,6 +73,8 @@ def test_label_fixes_whole_clip_and_range():
     assert gsr.fixed_label("SNGS-149", 5, "Middle line") == "Middle line"        # classe sem correção
     assert gsr.fixed_label("SNGS-133", 100, "Big rect. right main") == "Big rect. right main"  # antes do trecho
     assert gsr.fixed_label("SNGS-133", 300, "Big rect. right main") == "Big rect. left main"
+    assert gsr.fixed_label("SNGS-153", 500, "Middle line") is None                # congelada: descartada
+    assert gsr.fixed_label("SNGS-153", 400, "Middle line") == "Middle line"
 
 
 @pytest.mark.skipif(not (path("gsr") / "test" / "SNGS-149").exists(), reason="SNGS-149 ausente em data/")

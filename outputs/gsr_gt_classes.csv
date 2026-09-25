@@ -586,7 +586,7 @@ train,SNGS-153,Big rect. right top,290,3.7,0.0,False
 train,SNGS-153,Circle central,173,2.95,0.029,False
 train,SNGS-153,Circle left,352,8.42,0.0,False
 train,SNGS-153,Circle right,285,3.18,0.0,False
-train,SNGS-153,Middle line,405,1807.88,0.667,True
+train,SNGS-153,Middle line,133,3.94,0.0,False
 train,SNGS-153,Side line bottom,96,34.11,0.302,False
 train,SNGS-153,Side line left,351,2.05,0.0,False
 train,SNGS-153,Side line right,284,1.64,0.0,False

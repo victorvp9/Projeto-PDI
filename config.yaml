@@ -21,6 +21,7 @@ gsr:
 # Rótulos de classe trocados na anotação das linhas do GSR, corrigidos na leitura
 # e só nas linhas anotadas. Evidência de cada um em docs/decisoes.md.
 # rótulo errado: certo  |  rótulo errado: [certo, primeiro frame, último frame] (troca só num trecho)
+# certo = null descarta a classe (anotação congelada)
 gsr_label_fixes:
   SNGS-038: {"Big rect. right bottom": "Small rect. right main"}
   SNGS-055: {"Big rect. right main": ["Big rect. left main", 442, 750]}
@@ -33,6 +34,7 @@ gsr_label_fixes:
   SNGS-133: {"Big rect. right main": ["Big rect. left main", 144, 750]}
   SNGS-148: {"Circle right": "Circle left"}
   SNGS-149: {"Circle right": "Circle central"}
+  SNGS-153: {"Middle line": [null, 479, 750]}
   SNGS-187: {"Side line bottom": "Big rect. right bottom"}
   SNGS-199: {"Big rect. left bottom": "Big rect. left top"}
 
