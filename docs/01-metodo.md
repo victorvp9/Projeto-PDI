@@ -5,14 +5,16 @@ parâmetros e origem**. Parâmetros marcados `[EMPÍRICO]` devem ser calibrados 
 partição de **treino** e nunca na de teste.
 
 Referências: Gutiérrez-Pérez & Agudo (PnLCalib), Ziegler et al. (AuxFlow),
-Citraro et al. (2020), Magera et al. (BroadTrack), Manafifard et al. (survey).
+Citraro et al. (2020), Magera et al. (BroadTrack), Manafifard et al. (survey),
+Maglo et al. (2023), Bassek et al. (2025).
 
 ---
 
 ## Modelo do campo
 
 Sistema de coordenadas *campo*: metros, origem no centro, `X` no sentido do
-comprimento, `Y` no sentido da largura.
+comprimento, `Y` no sentido da largura, **positivo em direção à câmera
+principal** (mesma orientação do WC14 e do GSR; ver `decisoes.md`).
 
 Campo de **105 × 68 m**. Elementos e suas posições vêm das Regras do Jogo:
 linhas laterais, linhas de fundo, linha do meio-campo, círculo central de raio
@@ -25,6 +27,13 @@ constantes nomeadas, cada uma com o valor regulamentar.
 > **Teste obrigatório:** as quatro bandeirinhas de escanteio devem estar em
 > `(±52.5, ±34)`. É o teste que pega inversão de eixo.
 
+> **Atenção — modelo de campo na avaliação.** O modelo interno é 105 × 68 m, mas
+> os números publicados usam outros moldes: PnLCalib avalia WC14/TSWC com
+> **115 × 74 jardas**; Chu et al. (KpSFR) e Maglo et al. com **100 × 60 m**. O
+> `IoU_whole` e o erro em metros **dependem do molde**. Para comparar com a
+> literatura, avalie também com o molde e o código de avaliação dela (ver
+> `02-dados.md`), e declare qual foi usado em cada tabela.
+
 ---
 
 ## Etapa 1 — Segmentação do gramado
@@ -32,7 +41,7 @@ constantes nomeadas, cada uma com o valor regulamentar.
 **Entrada:** frame BGR. **Saída:** máscara binária do gramado.
 
 1. Converter para **HSV** (ou Lab — avaliar os dois e escolher com número, não
-   com opinião).
+   com opinião; no WC14, o número é o IoU contra `N_grass_gt.mat`).
 2. Limiarizar a faixa de verde. Os limites são `[EMPÍRICO]` e variam com
    iluminação de estádio, sombra atravessando o campo e horário do jogo.
    Considere estimar o pico de matiz por histograma em vez de fixar a faixa.
@@ -41,8 +50,9 @@ constantes nomeadas, cada uma com o valor regulamentar.
 4. Manter o **maior componente conexo**. Preencher buracos internos.
 
 > O survey do Manafifard trata detecção de gramado como a primeira etapa
-> canônica, tipicamente por histograma de cor ou mistura de gaussianas. Vale ler
-> a seção antes de implementar.
+> canônica, tipicamente por histograma de cor ou mistura de gaussianas, e relata
+> que a mistura de gaussianas superou o histograma. Vale ler a seção 3 antes de
+> implementar.
 
 **Depuração:** salvar máscara sobreposta ao frame.
 
@@ -102,8 +112,13 @@ O círculo central e os arcos da grande área projetam-se como **elipses**. Ajus
 com `cv2.fitEllipse` sobre os contornos remanescentes, filtrando por área mínima
 e por razão de eixos plausível.
 
-O centro da elipse do círculo central é uma correspondência de altíssimo valor,
+A elipse do círculo central é uma fonte de correspondências de altíssimo valor,
 porque fica no meio do campo, região tipicamente pobre em interseções de linha.
+
+> Cuidado: o centro da **elipse projetada** não é a projeção do **centro do
+> círculo** (a perspectiva desloca um em relação ao outro). Use como
+> correspondência a interseção da linha do meio-campo com a elipse, ou os pontos
+> de tangência (conjunto `p2` do PnLCalib), e não o centro geométrico da elipse.
 
 Parâmetros: área mínima `[EMPÍRICO]`, tolerância de ajuste `[EMPÍRICO]`.
 
@@ -138,10 +153,11 @@ imagem).
 Gerar keypoints por **interseção** dos segmentos classificados — cada par de
 linhas cujo cruzamento é um ponto conhecido no modelo do campo.
 
-> O PnLCalib faz exatamente isso, mas de forma hierárquica e mais rica: constrói
-> conjuntos adicionais de pontos a partir de extração de linhas e ajuste de
-> elipses, porque as interseções anotadas sozinhas são poucas demais. A ablação
-> deles mostra que cada conjunto adicional aumenta a cobertura. Vale imitar a
+> O PnLCalib faz exatamente isso, mas de forma hierárquica e mais rica: além das
+> interseções diretas (`p`), usa interseções de linhas estendidas (`pe`, só
+> dentro da imagem ou até 50% além dela), interseções linha-elipse (`p1`),
+> pontos de tangência (`p2`) e pontos auxiliares no eixo central (`p3`). A
+> ablação deles mostra que cada conjunto aumenta a cobertura. Vale imitar a
 > ideia, sem a rede.
 
 Se houver menos de quatro correspondências, o frame é reportado como **falha de
@@ -163,11 +179,18 @@ cobertura** — não invente homografia.
 
 > O termo de linha é a contribuição central do PnLCalib — o módulo PnL otimiza
 > pontos **e** linhas conjuntamente, o que ajuda justamente nas regiões distantes
-> da grande área, onde os keypoints são escassos. É o que separa uma
-> implementação ingênua de uma boa.
+> da grande área, onde os keypoints são escassos. Peso dos termos no artigo:
+> `α = 0,6` para as linhas (ponto de partida; recalibrar no treino). Na ablação
+> deles, refinar só com pontos quase não muda nada; o ganho vem das linhas.
 
-Parâmetros: limiar de inlier do RANSAC `[EMPÍRICO]`, peso relativo dos termos
-ponto e linha `[EMPÍRICO]`.
+> Nota do Maglo et al.: com keypoints em grade uniforme, o RANSAC tende a
+> escolher pontos do lado distante do campo, que ficam concentrados na imagem, e
+> a homografia piora. Amostragem com espaçamento crescente com a distância à
+> câmera ("perspective-aware") corrigiu isso. Relevante para a grade de pontos
+> auxiliares da Etapa 8c.
+
+Parâmetros: limiar de inlier do RANSAC `[EMPÍRICO]` (Maglo usa 8 px em 1280×720,
+referência), peso relativo dos termos ponto e linha `[EMPÍRICO]`.
 
 ---
 
@@ -183,17 +206,19 @@ combinadas.
 
 Aplicar um filtro **Savitzky–Golay** diretamente sobre a série temporal das
 matrizes de homografia. Bassek et al. usam **janela 31 e polinômio de terceiro
-grau**, e registram um efeito colateral relevante: a suavização **impede que
-jogadores saiam e reentrem no campo de visão em poucos frames** por causa de
-imprecisões do método, e não de movimento real da câmera.
+grau**, com lacunas de até 25 frames preenchidas por interpolação linear antes,
+e registram um efeito colateral relevante: a suavização **impede que jogadores
+saiam e reentrem no campo de visão em poucos frames** por causa de imprecisões
+do método, e não de movimento real da câmera.
 
 Implemente primeiro — é vinte linhas e estabelece a referência contra a qual as
 outras duas precisam justificar sua complexidade.
 
 > Cuidado: a homografia vive num espaço projetivo, não euclidiano. Suavizar as
 > nove entradas da matriz independentemente é o que o artigo faz, mas não é
-> obviamente correto. Uma alternativa é suavizar a posição projetada dos quatro
-> cantos do campo e reestimar a matriz. Compare as duas e registre em
+> obviamente correto (a escala da matriz é arbitrária: normalize antes, por
+> exemplo `H[2,2] = 1`). Uma alternativa é suavizar a posição projetada dos
+> quatro cantos do campo e reestimar a matriz. Compare as duas e registre em
 > `docs/decisoes.md` — essa discussão é boa seção de relatório.
 
 ### 8b — Filtragem por Kalman
@@ -202,10 +227,10 @@ Referência: BHITK (Claasen & de Villiers), que relaciona a homografia de um fra
 à do seguinte por transformação afim, com filtro de Kalman em dois estágios e
 modelagem explícita da incerteza dos keypoints.
 
-> Achado relevante para calibrar expectativa: o BHITK melhorou no TSWC dos
-> próprios autores e **não melhorou nada** no SoccerNet GSR, segundo a tabela do
-> AuxFlow. Ganhos de consistência temporal parecem depender de dataset. Se você
-> observar o mesmo, é resultado, não fracasso.
+> Achado relevante para calibrar expectativa: o BHITK melhorou levemente no TSWC
+> e **não melhorou nada** no SoccerNet GSR, segundo a tabela 7 do AuxFlow
+> (implementação deles sobre o NBJW). Ganhos de consistência temporal parecem
+> depender de dataset. Se você observar o mesmo, é resultado, não fracasso.
 
 ### 8c — Propagação por fluxo óptico (a contribuição principal)
 
@@ -213,19 +238,31 @@ Replica a estratégia do AuxFlow, sem o detector treinado.
 
 1. **Seleção de frames-âncora.** Identificar os frames em que o pipeline
    funcionou bem. O AuxFlow usa uma heurística sobre os keypoints como
-   pré-filtro, mais uma métrica substituta de IoU no espaço da imagem —
-   comparando a máscara do campo projetada com a segmentação. **Aqui isso é
-   quase de graça:** a máscara da Etapa 1 já é a segmentação do gramado. Use-a.
+   pré-filtro (a âncora precisa conter por inteiro o círculo central ou uma das
+   grandes áreas), mais uma métrica substituta de IoU no espaço da imagem —
+   comparando a máscara do campo projetada com a segmentação — e toma os máximos
+   locais. **Aqui isso é quase de graça:** a máscara da Etapa 1 já é a
+   segmentação do gramado. Use-a.
 2. **Amostragem de pontos auxiliares.** A partir da âncora, projetar pontos do
    modelo do campo para a imagem, criando correspondências onde não há marcação
-   nenhuma. **Grade regular** — o AuxFlow mostra que vence com folga a amostragem
-   geométrica (83,67 contra 39,68) e empata na prática com a aleatória (83,39).
-3. **Reidentificação por Lucas–Kanade** nos frames vizinhos.
+   nenhuma. **Grade regular** (2,5 m × 2 m no AuxFlow), excluindo caixas de
+   jogador **e da bola** dilatadas e uma borda da imagem. O AuxFlow mostra que a
+   grade vence com folga a amostragem geométrica (83,67 contra 39,68) e empata
+   na prática com a aleatória (83,39).
+3. **Reidentificação por Lucas–Kanade** nos frames vizinhos, com verificação
+   ida-e-volta (erro ida-e-volta ≤ 1 px no AuxFlow).
 4. **Reestimativa** da homografia usando keypoints **e** pontos propagados.
+   Sem os keypoints do detector, a propagação deriva (AuxFlow: 83,67 → 78,30).
 
-> Sem o passo de fluxo, o desempenho no experimento controlado do AuxFlow cai de
+> Contexto dos números acima: LocSim médio (%), subconjunto HSB do SoccerNet-GSR,
+> **inicializado com a homografia de gabarito**. Sem o passo de fluxo, cai de
 > 83,67 para 23,42 — a reidentificação é o que impede a deriva. Implemente o modo
 > "sem fluxo" como ablação; é a comparação mais informativa do projeto.
+
+> A escolha da âncora é decisiva: no GSR completo, âncoras a cada 150 frames
+> (82,48) ficaram **abaixo** do detector sem propagação (83,48); as heurísticas
+> levaram a 90,65 e a âncora de gabarito a 91,88. Inclua a âncora ingênua como
+> ablação.
 
 Parâmetros: densidade da grade, janela e níveis de pirâmide do Lucas–Kanade,
 critério de seleção de âncora, distância máxima de propagação — `[EMPÍRICO]`.
@@ -234,13 +271,20 @@ critério de seleção de âncora, distância máxima de propagação — `[EMP�
 
 As três estratégias assumem continuidade temporal, e uma transmissão real não é
 contínua. Bassek et al. contaram em média **981 cortes por partida, ou 10,9 por
-minuto**, e reportam que em **41% do material de TV nenhum jogador está visível**,
-por decisão editorial — close-ups, replays, cortes para outras câmeras.
+minuto**, e reportam que em **38% dos frames de TV (resultados; 41% na
+discussão — o artigo se contradiz)** nenhum jogador está visível, por decisão
+editorial — close-ups, replays, cortes para outras câmeras.
 
 Suavizar através de um corte é pior que não suavizar. Detecte descontinuidade
 (diferença de histograma entre frames consecutivos, ou salto grande na
 homografia) e **reinicie a série**. O BroadTrack faz exatamente isso: reinicializa
-quando a confiança cai.
+quando a confiança (IoU entre marcações detectadas e modelo projetado) cai abaixo
+de 0,5.
+
+> Um salto na homografia sozinho não prova corte: pode ser erro da estimativa
+> (no SNGS-070, um salto de ~104 px na `H_gt` vinha da bola no ar entrando no
+> ajuste — ver `decisoes.md`). Confirme com a diferença de histograma antes de
+> reiniciar.
 
 ---
 
@@ -250,14 +294,20 @@ Métricas consolidadas na literatura. Implemente as três.
 
 - **`IoU_whole`** — projeta o modelo do campo para a vista de cima usando a
   homografia de gabarito e a estimada, e mede a interseção sobre união na **área
-  inteira do modelo**. Convenção do Homayounfar.
+  inteira do modelo**. Convenção do Homayounfar. **É a métrica principal.**
 - **`IoU_part`** — o mesmo, restrito à **área visível na imagem**. Convenção do
-  Sharma. Reporte as duas: um método pode ser bom numa e ruim na outra, e a
-  divergência é informativa.
-- **Erro de reprojeção** — em pixels e em metros. O AuxFlow mostra que o
-  BroadTrack vence em IoU mas perde feio em erro de reprojeção em metros, porque
-  otimizar contra as marcações negligencia a superfície como um todo. Uma métrica
-  só nunca basta.
+  Sharma. Reporte também, mas com ressalva: Citraro et al. desaconselham esta
+  versão, porque recortar as duas áreas pela região visível remove justamente o
+  que está desalinhado — num quadro só de grama, qualquer estimativa que cubra o
+  gabarito tira nota perfeita. A divergência entre as duas é informativa.
+- **Erro de reprojeção** — em pixels (normalizado pela altura da imagem) e em
+  metros. No GSR, o BroadTrack tem o maior `IoU_entire` (0,8397 contra 0,8352 do
+  AuxFlow), mas perde no `IoU_part` (0,9224 contra 0,9426) e sobretudo no erro
+  de reprojeção em metros (1,34 contra 0,84 m): otimizar contra as marcações
+  negligencia a superfície como um todo. Uma métrica só nunca basta.
+
+> No GSR, o gabarito não é perfeito (ver `02-dados.md`): reporte as métricas com
+> e sem os frames marcados como "gabarito duvidoso".
 
 Adicionalmente, e específico deste projeto:
 
@@ -265,7 +315,15 @@ Adicionalmente, e específico deste projeto:
   homografia. Um método que acerta muito em poucos frames não serve.
 - **Estabilidade temporal** — variação da homografia entre frames consecutivos,
   medida pelo deslocamento dos quatro cantos do campo projetados. É onde a
-  propagação deve aparecer.
+  propagação deve aparecer. Medida **na série estimada** (e, quando útil,
+  comparada ao movimento real da imagem medido por Lucas–Kanade), **nunca como
+  diferença contra a `H_gt`**: o gabarito do GSR tem tremor e desvios locais
+  próprios, e comparar contra ele puniria o método por não reproduzi-los.
+- **LocSim** (se o conjunto temporal for o SoccerNet-GSR) — similaridade de
+  localização do GS-HOTA, `exp(ln(0,05)·d²/τ²)` com τ = 5 m, calculada projetando
+  o centro da base das caixas de gabarito com a homografia estimada. É a métrica
+  do AuxFlow, e permite comparar diretamente com a tabela 7 deles. Use só as
+  pessoas: a caixa da bola no ar não está no chão.
 
 ### Taxa de inversão de visibilidade
 
@@ -276,18 +334,21 @@ procedimento de Bassek et al.
    polígono de campo de visão no espaço do gramado. Use `shapely` para a
    geometria — é o que eles usam.
 2. Fazer isso duas vezes: com a homografia de gabarito e com a estimada.
-3. Para um conjunto de pontos de teste no campo, comparar o rótulo
+3. Para um conjunto de pontos de teste no campo (grade densa), comparar o rótulo
    dentro/fora dos dois polígonos. A fração que diverge é a **taxa de inversão**.
 
-Se você tiver posições reais de jogador — e no TSWC não tem, mas o material
-suplementar do Bassek et al. traz dados intermediários pré-processados — use as
-posições reais em vez de pontos de teste. O número fica diretamente comparável ao
-deles.
+Se o conjunto temporal for o SoccerNet-GSR, repita com as **posições reais dos
+jogadores**. Ressalva: o GSR só anota quem está no quadro, então todo jogador de
+gabarito está "dentro" por construção — a medida com jogadores reais é
+**unilateral** (só captura quem o registro jogaria para fora). A grade de pontos
+de teste continua necessária para o lado oposto.
 
-> Referência de ordem de grandeza: no pipeline com TVCalib, falhas de registro
-> produziram material em que apenas um jogador aparecia visível em 1% do tempo, e
-> nenhum em 3% — artefatos do método, não da edição. Esses são os números que um
-> pipeline clássico precisa perseguir.
+> Referência de ordem de grandeza: no pipeline do Bassek et al. com TVCalib, no
+> **feed de scouting**, falhas de registro produziram material em que apenas um
+> jogador aparecia visível em 1% do tempo, e nenhum em 3% — artefatos do método,
+> não da edição. Não é a mesma grandeza que a taxa de inversão (é contagem por
+> frame, não fração de pontos), então sirva-se dela como ordem de grandeza, não
+> como comparação direta.
 
 Reportar **média e mediana** de cada métrica. A mediana esconde os desastres e a
 média os revela; a diferença entre as duas é diagnóstico.

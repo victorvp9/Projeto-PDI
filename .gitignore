@@ -1,0 +1,6 @@
+data/
+sports_soccer_code_WC14/
+outputs/debug/
+__pycache__/
+.venv/
+.pytest_cache/

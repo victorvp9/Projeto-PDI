@@ -35,13 +35,23 @@ frames-âncora.
 Três observações desse conjunto motivam este projeto.
 
 A primeira: o **AuxFlow mostrou que a propagação temporal é decisiva**. No
-experimento controlado deles, remover o fluxo óptico derruba o desempenho de
-83,67 para 23,42. E, mais interessante, o método clássico **Lucas–Kanade venceu o
-aprendido RAFT** (83,67 contra 78,71), o que sugere que estado da arte genérico
-nem sempre transfere para o domínio.
+experimento controlado deles — LocSim médio (%), no subconjunto HSB de 10
+sequências difíceis do SoccerNet-GSR, **partindo da homografia de gabarito** —
+remover o fluxo óptico derruba o desempenho de 83,67 para 23,42. E, mais
+interessante, o método clássico **Lucas–Kanade venceu o aprendido RAFT** (83,67
+contra 78,71): o RAFT é mais preciso por ponto, mas o Lucas–Kanade retém mais
+que o dobro de pontos, e a homografia ganha mais com quantidade do que com
+precisão individual.
 
-A segunda: a propagação foi sempre avaliada acoplada a um detector *forte*.
-Ninguém mediu quanto ela recupera de um detector *fraco*.
+A segunda: a propagação foi sempre avaliada acoplada a um detector *forte* (o
+NBJW, uma rede treinada). O AuxFlow chega perto da nossa pergunta, mas não a
+responde: mostra que a propagação se recupera de uma inicialização ruim (54,74
+contra 43,15 do detector sozinho, com a homografia inicial perturbada em até
+10%) e escolhe justamente sequências onde o detector falha. Também mostra o
+risco: âncoras escolhidas ingenuamente, a cada 150 frames, ficam **abaixo** do
+detector sem propagação (82,48 contra 83,48 no GSR completo). O que ninguém
+mediu é o ganho da propagação quando o **detector inteiro** é fraco — não só a
+âncora inicial.
 
 A terceira vem de fora da literatura de calibração. Bassek et al. (2025) usaram o
 TVCalib para estimar a região visível do campo em transmissões reais, e
@@ -60,9 +70,10 @@ validação deles foi qualitativa, por inspeção visual de sequências de amost
 
 A hipótese é que a propagação tenha **ganho marginal maior sobre um detector
 fraco** do que sobre um forte: se o detector acerta 90% dos frames, sobra pouco a
-recuperar; se acerta 50%, os frames bons podem sustentar os ruins. Se isso se
-confirmar, é um resultado útil — significa que um sistema leve e sem GPU pode ser
-viável para aplicações offline.
+recuperar; se acerta 50%, os frames bons podem sustentar os ruins. O resultado
+das âncoras ingênuas do AuxFlow indica a condição: isso só vale se as âncoras
+forem bem escolhidas. Se a hipótese se confirmar, é um resultado útil —
+significa que um sistema leve e sem GPU pode ser viável para aplicações offline.
 
 E uma segunda pergunta, derivada do Bassek et al.:
 
@@ -76,9 +87,10 @@ E uma segunda pergunta, derivada do Bassek et al.:
 *provoca*. Bassek et al. dão o elo que faltava: eles projetam a região visível do
 frame sobre o modelo do campo e marcam como **não observado** todo jogador que
 cai fora desse polígono. O erro de registro, portanto, vira **erro de rótulo de
-visibilidade** — e eles reportam a taxa de artefato do próprio pipeline: em 1% do
-material apenas um jogador aparecia visível, em 3% nenhum, ambos causados por
-falhas do registro e não pela edição.
+visibilidade** — e eles reportam a taxa de artefato do próprio pipeline no
+**feed de scouting** (câmera aberta): em 1% do material apenas um jogador
+aparecia visível, em 3% nenhum, ambos causados por falhas do registro e não pela
+edição.
 
 Isso dá a este projeto uma métrica com significado prático, e é o argumento mais
 forte que ele pode apresentar: não "meu IoU foi 0,85", mas "meu registro
@@ -96,29 +108,38 @@ que fecha assim vale mais que um que para na geometria.
 3. **Propagação temporal.** Seleção de frames-âncora, amostragem de pontos
    auxiliares em grade regular sobre o modelo do campo, reidentificação por
    Lucas–Kanade, reestimativa conjunta.
-4. **Medir no TS-WorldCup.** É o dataset com sequências temporais, único onde a
-   propagação pode ser avaliada.
+4. **Medir no SoccerNet-GSR.** Clipes de 750 frames consecutivos a 25 fps, com
+   posição dos jogadores no campo e linhas anotadas na imagem (a homografia de
+   gabarito é derivada delas; o arquivo não traz câmera — ver `decisoes.md`). Só
+   em sequências a propagação pode ser avaliada, e é o mesmo teste em que o
+   AuxFlow reporta seus números.
 5. **Comparar o ganho** com o que o AuxFlow reporta sobre um detector treinado.
 
 ## Escopo
 
-**Dentro:** vistas da câmera principal, com zoom moderado. É o que o WC14 já
-contém por construção.
+**Dentro:** vistas da câmera principal, com zoom moderado. É o que o WC14 e o GSR
+contêm por construção.
 
 **Fora:** câmeras atrás do gol, lentes olho-de-peixe, close-ups sem marcação
 visível, e calibração 3D completa (parâmetros intrínsecos e extrínsecos). Este
 projeto para na homografia planar — traves e bola no ar ficam fora.
+
+> Sobre a distorção de lente: o BroadTrack encontrou nela o maior ganho da sua
+> ablação no GSR; o AuxFlow, no mesmo dataset, mediu que uma homografia pura
+> derivada das marcações de gabarito já dá LocSim de 0,9928. Para localizar
+> jogadores com tolerância de metros, a homografia basta; para reprojeção em
+> pixels, a distorção pode aparecer como erro residual. Registre se observar.
 
 ## Critério de sucesso
 
 O projeto está pronto quando `python -m src.run --all` produz, do zero:
 
 - `IoU_whole`, `IoU_part` e erro de reprojeção no WC14, com média e mediana;
-- as mesmas métricas no TS-WorldCup, com e sem propagação;
+- as mesmas métricas e o LocSim no GSR, com e sem propagação;
 - uma medida de **estabilidade temporal** — variação da homografia entre frames
   consecutivos — que é onde a propagação deve aparecer mais forte;
 - a **taxa de inversão de visibilidade**: com que frequência o erro de registro
-  muda o rótulo dentro/fora do quadro de um jogador, comparado ao gabarito;
+  muda o rótulo dentro/fora do quadro, comparado ao gabarito;
 - taxa de cobertura: em quantas imagens o pipeline conseguiu produzir alguma
   homografia;
 - imagens de depuração de cada etapa, para um punhado de casos bons e ruins.
