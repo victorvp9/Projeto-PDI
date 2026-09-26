@@ -332,7 +332,9 @@ está em `decisoes.md`.
 > imagem ↔ campo anotados no JSON são as pessoas. `H_gt_auxflow` = RANSAC (3 px)
 > sobre as bases-meio das pessoas ↔ `bbox_pitch` reproduz a mediana e a
 > distância da tabela 2 deles (a média não; ver `decisoes.md`). `IoU`, NPE e RE
-> contra ela servem só para comparar com a tabela 7 deles. O **LocSim** não
+> contra ela servem só para comparar com a tabela 7 deles, **pelas medianas**, sem
+> filtrar frames (um filtro nosso quebraria a comparabilidade); as médias
+> aparecem com a ressalva da cauda de consensos ruins do RANSAC. O **LocSim** não
 > depende de gabarito e é a métrica da comparação central (tabela 7 e HSB).
 
 Adicionalmente, e específico deste projeto:
