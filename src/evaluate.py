@@ -139,10 +139,11 @@ def frame_metrics(H_est, s):
                has_lines=bool(s.lines_uv))
     if H_est is None:
         return row
-    if s.H_gt is not None:
-        row["iou_whole"] = iou_whole(H_est, s.H_gt)
-        row["iou_part"] = iou_part(H_est, s.H_gt, s.size)
-        row["npe"], row["re_m"] = npe_re(H_est, s.H_gt, s.size)
+    for prefix, H_gt in (("", s.H_gt), ("auxflow_", getattr(s, "H_gt_auxflow", None))):
+        if H_gt is not None:     # auxflow_: tabela à parte, "protocolo AuxFlow"
+            row[f"{prefix}iou_whole"] = iou_whole(H_est, H_gt)
+            row[f"{prefix}iou_part"] = iou_part(H_est, H_gt, s.size)
+            row[f"{prefix}npe"], row[f"{prefix}re_m"] = npe_re(H_est, H_gt, s.size)
     if s.lines_uv:
         for t, acc in zip(E["sncalib_thresholds_px"], sncalib_accuracy(H_est, s.lines_uv, s.size, E["sncalib_thresholds_px"])):
             row[f"acc@{t}"] = acc
@@ -163,6 +164,10 @@ def summarize(rows):
         for m in ("iou_whole", "iou_part", "npe", "re_m"):
             v = np.array([r[m] for r in pred_gt if m in r], float)
             t[m] = (np.nanmean(v), np.nanmedian(v)) if len(v) else (np.nan, np.nan)
+        for m in ("iou_whole", "iou_part", "npe", "re_m"):   # protocolo AuxFlow: contra H_gt_auxflow
+            v = np.array([r[f"auxflow_{m}"] for r in rs if f"auxflow_{m}" in r], float)
+            if len(v):
+                t[f"auxflow {m}"] = (np.nanmean(v), np.nanmedian(v))
         lines = [r for r in rs if r["has_lines"]]
         compl = np.mean([r["has_pred"] for r in lines]) if lines else np.nan
         for th in E["sncalib_thresholds_px"]:

@@ -42,6 +42,13 @@ def test_ball_and_null_pitch_ignored():
     assert np.array_equal(H, gsr.estimate_h_persons(ANNS))
 
 
+def test_auxflow_ransac_ignores_outlier_person():
+    bad = _person(700, 300, 20)
+    bad["bbox_pitch"] = {k: v + 5 for k, v in bad["bbox_pitch"].items()}   # 5 m fora do lugar
+    H = gsr.estimate_h_auxflow(ANNS + [_person(500, 400, 30), bad])
+    assert np.allclose(_norm(H), H_TRUE, atol=1e-6)
+
+
 def test_too_few_persons():
     assert gsr.estimate_h_persons(ANNS[:3]) is None
 

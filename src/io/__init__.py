@@ -16,6 +16,7 @@ class Sample:
     size: tuple | None = None             # (largura, altura) da imagem, px
     grass: np.ndarray | None = None       # WC14: máscara de gramado de gabarito (imagem, bool)
     H_persons: np.ndarray | None = None   # GSR: H por DLT nas pessoas (calibração do dataset); conferência
+    H_gt_auxflow: np.ndarray | None = None  # GSR: H_gt do "protocolo AuxFlow" (RANSAC nas bases-meio das pessoas)
     fit: object = None                    # GSR: homography.Fit do ajuste pelas linhas (H_gt se fit.ok)
     gt_disagree_px: float = np.nan        # GSR: deslocamento mediano H_gt x H_persons numa grade da imagem
     persons_XY: np.ndarray | None = None  # GSR: base-meio das pessoas (campo, m), (N,2)

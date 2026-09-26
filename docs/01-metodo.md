@@ -320,13 +320,20 @@ está em `decisoes.md`.
 > com quem usa esse código. As definições delas diferem das acima (ver
 > `decisoes.md`); declare o protocolo em cada tabela.
 
-> **Gabarito no GSR.** A `H_gt` é o **ajuste ponto-linha às linhas anotadas**
-> (ver `02-dados.md`), no espírito do AuxFlow (seção 4.1: gabarito por RANSAC
-> sobre as linhas anotadas); `IoU` e erro de reprojeção no GSR são medidos
-> contra ela. O gabarito não é perfeito: reporte com e sem os frames de
-> "gabarito duvidoso" (resíduo mediano do ajuste em (5, 10] px: a homografia só
-> aproxima o campo) e declare quantos frames ficaram sem `H_gt` (ajuste mal
-> determinado, ou resíduo > 10 px).
+> **Gabarito no GSR.** A `H_gt` principal é o **ajuste ponto-linha às linhas
+> anotadas** (ver `02-dados.md`): acerta a geometria pintada, e `IoU` e erro de
+> reprojeção no GSR são medidos contra ela. O gabarito não é perfeito: reporte
+> com e sem os frames de "gabarito duvidoso" (resíduo mediano do ajuste em
+> (5, 10] px: a homografia só aproxima o campo) e declare quantos frames ficaram
+> sem `H_gt` (ajuste mal determinado, ou resíduo > 10 px).
+
+> **Tabela à parte, "protocolo AuxFlow".** O AuxFlow (seção 4.1) tira o
+> gabarito de "RANSAC over all annotated correspondences", e os únicos pares
+> imagem ↔ campo anotados no JSON são as pessoas. `H_gt_auxflow` = RANSAC (3 px)
+> sobre as bases-meio das pessoas ↔ `bbox_pitch` reproduz a mediana e a
+> distância da tabela 2 deles (a média não; ver `decisoes.md`). `IoU`, NPE e RE
+> contra ela servem só para comparar com a tabela 7 deles. O **LocSim** não
+> depende de gabarito e é a métrica da comparação central (tabela 7 e HSB).
 
 Adicionalmente, e específico deste projeto:
 

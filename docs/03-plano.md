@@ -108,17 +108,20 @@ homografia, renderizador sintético.
 ### Fatia 2 — Avaliação (semana 1)
 `IoU_whole`, `IoU_part`, erro de reprojeção, taxa de cobertura; LocSim no GSR.
 
-**Primeiro: `H_gt` do GSR pelas linhas anotadas, em todos os frames** (como o
-AuxFlow, seção 4.1; ver `decisoes.md`).
-- Ajuste ponto-linha (`scipy.optimize.least_squares`, perda `cauchy` com
+**Primeiro: `H_gt` do GSR pelas linhas anotadas, em todos os frames** (ver
+`decisoes.md`).
+- Ajuste ponto-linha (`scipy.optimize.least_squares`, perda `soft_l1` com
   `f_scale` 3 px, por causa de anotações ruins): minimizar a distância dos pontos
-  anotados às linhas do modelo projetadas pela `H` (objetivo liso: reta infinita
-  e distância de Sampson à cônica; resíduo reportado nas polilinhas). É **a
-  mesma função** do refinamento da Etapa 7: escreva uma vez só, em
-  `src/homography.py`, e a Fatia 5 reaproveita.
-- **Início:** a `H` pelas pessoas e a última `H` aceita (encadeamento; a
-  distância até um frame com pessoas chega a 374 frames); fica o ajuste aceito
-  de menor custo.
+  anotados às linhas do modelo projetadas pela `H` (objetivo liso: reta infinita;
+  círculo por polilinha densa e depois refino por Sampson à cônica; resíduo
+  reportado nas polilinhas). É **a mesma função** do refinamento da Etapa 7:
+  escreva uma vez só, em `src/homography.py`, e a Fatia 5 reaproveita.
+- **Início:** a `H` pelas pessoas; se não houver ou o ajuste for recusado, a
+  última `H` aceita (encadeamento; a distância até um frame com pessoas chega a
+  374 frames).
+- **Tabela à parte, "protocolo AuxFlow":** `H_gt_auxflow` = RANSAC (3 px) nas
+  bases-meio das pessoas; IoU/NPE/RE contra ela só para comparar com a tabela 7
+  do AuxFlow. LocSim é a métrica da comparação central.
 - **Aceite só se bem determinado:** posto 8, condição ≤ 3000 e resíduo mediano
   ≤ 10 px (calibrados no treino). Frame não determinado fica **sem `H_gt`** e é
   contado no resumo. Nada de `H` inventada.

@@ -106,9 +106,12 @@ clipe (`SNGS-XXX/`), com `img1/000001.jpg … 000750.jpg` (consecutivos) e
     das 26 classes visíveis, lista de pontos em coordenadas **normalizadas**
     (multiplicar `x` por 1920 e `y` por 1080).
 - **Não há parâmetros de câmera no arquivo.** A categoria `camera` existe, mas sem
-  nenhuma anotação. **A `H_gt` de cada frame é o ajuste ponto-linha às linhas
-  anotadas** (`least_squares` com perda `cauchy`, em todos os frames), como no
-  AuxFlow (seção 4.1: gabarito por RANSAC sobre as linhas anotadas). O
+  nenhuma anotação. **A `H_gt` principal de cada frame é o ajuste ponto-linha às
+  linhas anotadas** (`least_squares` com perda `soft_l1`, em todos os frames):
+  acerta a geometria pintada. Para comparar com o AuxFlow há também a
+  `H_gt_auxflow`, RANSAC (3 px) sobre as bases-meio das pessoas ↔ `bbox_pitch` —
+  a leitura de "RANSAC over all annotated correspondences" (seção 4.1) que
+  reproduz a mediana e a distância da tabela 2 deles (ver `decisoes.md`). O
   `bbox_pitch` das pessoas vem da **calibração do próprio dataset**: a DLT sobre
   as pessoas (sem a bola) só recupera essa calibração, que erra do lado da câmera
   (14 clipes) e no SNGS-023 197–523. Ela vira **início do ajuste e conferência**
