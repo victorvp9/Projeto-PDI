@@ -46,6 +46,15 @@ def pitch_mask(H, size):
     return _warp(top, H, size, cv2.INTER_NEAREST, 0).astype(bool)
 
 
+def lines_mask(H, size):
+    """Máscara bool (imagem) das marcações com a largura projetada de 0,12 m: pixel
+    tocado por qualquer fração de linha na vista de cima deformada por H."""
+    top = np.zeros(TOP_SIZE[::-1], np.uint8)
+    for poly in POLYLINES.values():
+        cv2.polylines(top, [_to_top(poly)], False, 255, int(round(LINE_WIDTH * PPM)))
+    return _warp(top, H, size, cv2.INTER_LINEAR, 0) > 0
+
+
 def render_synthetic(H, size):
     """Imagem BGR sintética (w, h): gramado uniforme e marcações de 0,12 m, vistas por H.
 

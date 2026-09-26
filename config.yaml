@@ -59,6 +59,49 @@ eval:
   sncalib_thresholds_px: [5, 10, 20]  # idem
   quality_grid_px: 40  # passo da grade da imagem na discordância pessoas x linhas do GSR (escolha)
 
+segment:
+  # Etapas 1 e 2 (src/segment.py). Tamanhos em fração da altura da imagem.
+  common:
+    grass_method: lab          # [EMPÍRICO] hsv | lab | lab_hue | kmeans; a varrer no WC14 treino
+    hsv_green_band: [25, 95]   # faixa larga de matiz (OpenCV, 0-179) onde se procura o pico do verde (escolha)
+    hsv_dh: 12                 # [EMPÍRICO] meia-largura em torno do pico de matiz; a varrer
+    hsv_s_min: 40              # [EMPÍRICO] saturação mínima; a varrer
+    hsv_v_min: 30              # [EMPÍRICO] valor mínimo; a varrer
+    lab_l_min: 20              # [EMPÍRICO] L* mínimo (abaixo, a cromaticidade é ruído); a varrer
+    lab_r: 12                  # [EMPÍRICO] raio cromático em (a*, b*) em torno do pico; a varrer
+    lab_dhue_deg: 15           # [EMPÍRICO] lab_hue: meia-largura do ângulo de matiz em (a*, b*) em torno do pico; a varrer
+    lab_c_min: 6               # [EMPÍRICO] lab_hue: croma mínimo (abaixo, o ângulo é ruído); a varrer
+    open_frac: 0.005           # [EMPÍRICO] abertura, fração da altura; a varrer
+    close_frac: 0.02           # [EMPÍRICO] fechamento, fração da altura; a varrer
+    grass_steps: [open, close, largest, fill]   # [EMPÍRICO] ordem do pós-processamento; ablação
+    component_min_frac: 0.05   # [EMPÍRICO] área mínima de componente, fração da imagem ("components"); a varrer
+    line_method: tophat        # [EMPÍRICO] tophat | filter; decisão pelo F1 a 3 px no WC14 treino
+    line_bands: 3              # faixas horizontais com escala própria (escolha)
+    line_k: 2.0                # [EMPÍRICO] escala = k·w(v); a varrer
+    line_scales: [1.0]         # [EMPÍRICO] top-hat multiescala (máximo das escalas); variante se o zoom pedir
+    line_thr: 10               # [EMPÍRICO] contraste mínimo em L* (0-255); a varrer
+    grass_dilate_w: 1.0        # gramado dilatado em larguras de linha antes de restringir as marcações (escolha)
+  wc14:
+    width_ab: [0.00158, 0.00447]  # w(v)/h = a + b·v/h: larguras de 0,12 m projetadas pela H_gt no WC14 train_val (ajuste linear das medianas por faixa)
+  gsr:
+    width_ab: [0.00109, 0.00780]  # idem, GSR train (1 frame a cada 50)
+
+shadow:
+  dL_min: null        # [EMPÍRICO] distância mínima entre as médias das classes de Otsu do L* no gramado; fixada pela folha de contato, confirmada por Victor
+  f_dark_min: 0.10    # maior componente escuro >= 10% do gramado: separa sombra (região) de faixas de corte (bandas) (plano da Fatia 3)
+  f_light_min: 0.02   # maior componente claro >= 2% do gramado: faixa de sol estreita (0,022-0,057) x campo todo na sombra com pontos claros soltos (0,003-0,013) (folha do WC14)
+  hue_deg: 30         # só pixels de grama pelo ângulo de matiz em (a*, b*): +-30 graus do pico (sol x sombra diferem 10-17 graus nas imagens 201, 206, 150)
+  c_min: 10           # croma mínimo: tira as linhas brancas (a grama na sombra tem croma 17-33 nas mesmas imagens)
+
+eval_segment:
+  gsr_frame_step: 25        # amostra do GSR: 1 frame a cada 25 (plano da Fatia 3)
+  wc14_gamma_px: [2, 3, 5]  # tolerâncias das marcações no WC14 (plano da Fatia 3)
+  decision_gamma_px: 3      # F1 a 3 px decide top-hat x filtro (decisão de Victor)
+  gsr_coverage_px: 2        # cobertura dos pontos anotados (decisão de Victor)
+  gsr_precision_px: 3       # precisão contra as linhas da H_gt; a lente desloca alguns px nas bordas (decisão de Victor)
+  leak_m: 4.1               # vazamento: além disso fora das linhas; p99 da grass do WC14 train_val além das linhas
+  border_px: 5              # margem de borda excluída do alvo das marcações (escolha)
+
 render:
   px_per_m: 25       # vista de cima; 25 px/m faz a linha de 0,12 m ter 3 px inteiros (escolha)
   margin_m: 1        # borda da vista de cima além do campo; basta cobrir meia largura de linha (escolha)

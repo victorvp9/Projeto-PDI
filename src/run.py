@@ -171,6 +171,83 @@ def fit_calibration(splits):
     print(out / "fit_calibration_scatter.png", out / "fit_calibration_hist.png", sep="\n")
 
 
+def _sheet(tiles, labels, path_out, cols=6, tw=320):
+    """Folha de contato: miniaturas com rótulo, em grade."""
+    th = tw * 9 // 16
+    rows = []
+    for i in range(0, len(tiles), cols):
+        row = []
+        for img, lab in zip(tiles[i:i + cols], labels[i:i + cols]):
+            t = cv2.resize(img, (tw, th), interpolation=cv2.INTER_AREA)
+            cv2.rectangle(t, (0, 0), (tw, 20), (0, 0, 0), -1)
+            cv2.putText(t, lab, (4, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1, cv2.LINE_AA)
+            row.append(t)
+        row += [np.zeros((th, tw, 3), np.uint8)] * (cols - len(row))
+        rows.append(np.hstack(row))
+    cv2.imwrite(str(path_out), np.vstack(rows))
+    print(path_out)
+
+
+def _tint_dark(frame, dark):
+    """Depuração da sombra: classe escura do Otsu em azul translúcido."""
+    out = frame.copy()
+    if dark is not None:
+        out[dark] = (0.5 * out[dark] + [120, 40, 0]).astype(np.uint8)
+    return out
+
+
+def _shadow_of_clip(clip):
+    """GSR: pontuação de sombra em 1 frame a cada `gsr_frame_step`, com o campo
+    projetado pela H_gt como região; devolve linhas por frame e o frame mediano."""
+    from src.evaluate import shadow_score
+    from src.render import pitch_mask
+    rows = []
+    for s in gsr.load_clip(clip)[::CFG["eval_segment"]["gsr_frame_step"]]:
+        if s.H_gt is None:
+            continue
+        dl, f, w = shadow_score(s.image, pitch_mask(s.H_gt, s.size))
+        rows.append(dict(split=clip.parent.name, clip=clip.name, frame=s.frame_idx, dL=round(dl, 2),
+                         f_escuro=round(f, 3), f_claro=round(w, 3)))
+    return rows
+
+
+def shadow_sheet():
+    """Folhas de contato para fixar dL_min: WC14 train_val (região = grass) e GSR
+    train (região = campo projetado), ordenadas por dL; CSVs com as pontuações."""
+    from src.evaluate import shadow_score
+    from src.render import pitch_mask
+    out = path("debug") / "sombra"
+    out.mkdir(parents=True, exist_ok=True)
+    rows, tiles = [], []
+    for s in wc14.load_split("train_val"):
+        img = s.image
+        dl, f, w, dark = shadow_score(img, s.grass, dark_mask=True)
+        rows.append(dict(image_id=s.image_id, dL=round(dl, 2), f_escuro=round(f, 3), f_claro=round(w, 3)))
+        tiles.append((dl, f, w, s.image_id, _tint_dark(img, dark)))
+    _write_csv(path("outputs") / "shadow_wc14.csv", rows)
+    tiles.sort(key=lambda t: -t[0])
+    per = 48
+    for k in range(0, len(tiles), per):
+        chunk = tiles[k:k + per]
+        _sheet([t[4] for t in chunk], [f"{t[3]} dL {t[0]:.0f} fe {t[1]:.2f} fc {t[2]:.3f}" for t in chunk],
+               out / f"wc14_{k // per + 1}.jpg")
+    with _pool() as ex:
+        frames = [r for rs in ex.map(_shadow_of_clip, _clips(["train"])) for r in rs]
+    _write_csv(path("outputs") / "shadow_gsr.csv", frames)
+    clips = defaultdict(list)
+    for r in frames:
+        clips[r["clip"]].append(r)
+    tiles = []
+    for clip, rs in clips.items():
+        med = {k: np.median([r[k] for r in rs]) for k in ("dL", "f_escuro", "f_claro")}
+        rep = min(rs, key=lambda r: abs(r["dL"] - med["dL"]))
+        s = next(x for x in gsr.load_clip(path("gsr") / "train" / clip) if x.frame_idx == rep["frame"])
+        *_, dark = shadow_score(s.image, pitch_mask(s.H_gt, s.size), dark_mask=True)
+        tiles.append((med["dL"], med["f_escuro"], med["f_claro"], f"{clip} f{s.frame_idx}", _tint_dark(s.image, dark)))
+    tiles.sort(key=lambda t: -t[0])
+    _sheet([t[4] for t in tiles], [f"{t[3]} dL {t[0]:.0f} fe {t[1]:.2f} fc {t[2]:.3f}" for t in tiles], out / "gsr_train.jpg")
+
+
 def _eval_clip(args):
     """Linhas de métrica de um clipe do GSR para a predição `name`: arquivo .npz,
     "persons" (H pelas pessoas) ou "gt" (a própria H_gt, conferência do LocSim)."""
@@ -211,9 +288,10 @@ def main():
     ap.add_argument("--gsr-quality", action="store_true", help="gera outputs/gsr_gt_quality.csv e gsr_gt_classes.csv")
     ap.add_argument("--fit-calibration", action="store_true", help="figuras para calibrar max_cond e max_resid_px")
     ap.add_argument("--evaluate", metavar="PREDS", help="arquivo .npz de homografias preditas, 'persons' ou 'gt'")
+    ap.add_argument("--shadow-sheet", action="store_true", help="folhas de contato da sombra (fixar dL_min)")
     ap.add_argument("--splits", nargs="+", default=["train", "valid", "test"], help="partições do GSR")
     args = ap.parse_args()
-    if not (args.overlay or args.gsr_quality or args.fit_calibration or args.evaluate):
+    if not (args.overlay or args.gsr_quality or args.fit_calibration or args.evaluate or args.shadow_sheet):
         ap.print_help()
     for spec in args.overlay or []:
         overlay(spec)
@@ -223,6 +301,8 @@ def main():
         fit_calibration(args.splits)
     if args.evaluate:
         evaluate(args.evaluate, args.splits)
+    if args.shadow_sheet:
+        shadow_sheet()
 
 
 if __name__ == "__main__":

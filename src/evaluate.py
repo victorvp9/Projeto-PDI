@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 
 from src.config import CFG
-from src.geometry import point_segment_distance, project
+from src.geometry import point_segment_distance, project, project_segments
 from src.pitch_model import CORNERS, HL, HW, POLYLINES
 from src.render import pitch_mask
 
@@ -181,3 +181,94 @@ def summarize(rows):
             t["locsim dist (m)"] = (np.mean(d[np.isfinite(d)]), np.median(d))
         table[label] = t
     return table
+
+
+# ============================ segmentação (Fatia 3) ===========================
+ES = CFG["eval_segment"]
+
+
+def shadow_score(frame_bgr, region, dark_mask=False):
+    """Bimodalidade do L* dentro do gramado (imagem, bool): limiar de Otsu separa
+    duas classes; devolve (ΔL entre as médias, fração do gramado ocupada pelo maior
+    componente conexo da classe escura, idem da classe clara), em fração do gramado.
+    Sombra atravessando o campo = ΔL grande, região escura grande e um pedaço
+    contínuo de sol; faixas de corte dão ΔL menor; campo todo na sombra dá classe
+    clara só em pontos soltos.
+    Com dark_mask=True, devolve também a máscara da classe escura (depuração)."""
+    from src.segment import green_hue
+    frame_lab = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2LAB)
+    L = frame_lab[:, :, 0]
+    # só grama pelo ângulo de matiz (sol e sombra juntos) e croma (sem linhas brancas)
+    region = region & green_hue(frame_lab, CFG["shadow"]["hue_deg"], CFG["shadow"]["c_min"], where=region)
+    vals = L[region]
+    if len(vals) < 100:
+        return (np.nan, np.nan, np.nan, None) if dark_mask else (np.nan, np.nan, np.nan)
+    t, _ = cv2.threshold(vals.reshape(1, -1), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    dark, light = vals[vals <= t], vals[vals > t]
+    if not len(dark) or not len(light):
+        return (0.0, 0.0, 0.0, None) if dark_mask else (0.0, 0.0, 0.0)
+    dark_px = region & (L <= t)
+
+    def biggest(m):
+        n, _, stats, _ = cv2.connectedComponentsWithStats(m.astype(np.uint8))
+        return stats[1:, cv2.CC_STAT_AREA].max() / region.sum() if n > 1 else 0.0
+    out = (float(light.mean() - dark.mean()), float(biggest(dark_px)), float(biggest(region & (L > t))))
+    return (*out, dark_px) if dark_mask else out
+
+
+def lines_target(H, size, region=None):
+    """Alvo das marcações (imagem, bool): polilinhas do modelo desenhadas por H com
+    1 px, fora de `border_px` da borda e, se dada, dentro de `region`."""
+    w, h = size
+    t = np.zeros((h, w), np.uint8)
+    for poly in POLYLINES.values():
+        segs = np.clip(project_segments(H, poly), -1e6, 1e6).astype(np.int32)
+        cv2.polylines(t, list(segs), False, 1, 1)
+    b = ES["border_px"]
+    t[:b], t[-b:], t[:, :b], t[:, -b:] = 0, 0, 0, 0
+    t = t.astype(bool)
+    return t & region if region is not None else t
+
+
+def _dist_to(mask):
+    """Distância (px) de cada pixel ao pixel verdadeiro mais próximo de `mask`."""
+    if not mask.any():
+        return np.full(mask.shape, np.inf, np.float32)
+    return cv2.distanceTransform((~mask).astype(np.uint8), cv2.DIST_L2, 5)
+
+
+def coverage_precision(pred, target, gammas, width_target=None):
+    """Cobertura (eixo de 1 px `target` a <= γ da predição) e precisão (predição a <= γ
+    de `width_target`, a linha com a largura projetada; sem ela, do eixo). Contra o
+    eixo, a precisão puniria a própria largura da linha (até 8-10 px no GSR)."""
+    d_pred = _dist_to(pred)
+    d_target = _dist_to(target if width_target is None else width_target)
+    out = {}
+    for g in gammas:
+        out[f"cobertura@{g}"] = float((d_pred[target] <= g).mean()) if target.any() else np.nan
+        out[f"precisao@{g}"] = float((d_target[pred] <= g).mean()) if pred.any() else np.nan
+    return out
+
+
+def point_coverage(pred, pts, gamma):
+    """Fração dos pontos (imagem, px) a <= γ de algum pixel da predição."""
+    if not len(pts):
+        return np.nan
+    d = _dist_to(pred)
+    u = np.clip(np.round(pts[:, 0]).astype(int), 0, pred.shape[1] - 1)
+    v = np.clip(np.round(pts[:, 1]).astype(int), 0, pred.shape[0] - 1)
+    return float((d[v, u] <= gamma).mean())
+
+
+def field_grass_and_leak(grass, H_gt, size, step=4):
+    """GSR: fração do campo projetado pela H_gt classificada como grama, e vazamento =
+    fração da máscara (numa grade de `step` px) a mais de `leak_m` metros fora das
+    linhas pela H_gt (ou acima do horizonte)."""
+    field = pitch_mask(H_gt, size)
+    frac = float((grass & field).sum() / field.sum()) if field.any() else np.nan
+    v, u = np.nonzero(grass[::step, ::step])
+    if not len(u):
+        return frac, np.nan
+    XY, front = _back(H_gt, np.c_[u * step, v * step].astype(float))
+    out = np.hypot(np.maximum(np.abs(XY[:, 0]) - HL, 0), np.maximum(np.abs(XY[:, 1]) - HW, 0))
+    return frac, float(np.mean(~front | (out > ES["leak_m"])))

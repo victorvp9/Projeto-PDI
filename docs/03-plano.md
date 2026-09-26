@@ -153,13 +153,52 @@ SN-Calib — a medida que não depende de nenhuma `H_gt`.
 ### Fatia 3 — Gramado e marcações (semana 2)
 Etapas 1 e 2 do método.
 
-- Comparar HSV e Lab com número: **IoU contra `N_grass_gt.mat` do treino do
-  WC14**. Comparar top-hat e filtro de linha.
-- **Tratar a sombra atravessando o campo** — é a falha mais comum e vale
-  enfrentá-la já.
-- **Teste:** IoU médio da máscara de gramado contra o gabarito acima de um
-  limiar fixado no treino; a máscara de marcações é esparsa.
-- **Saída:** `outputs/debug/` com as máscaras de uma amostra.
+Tamanhos em fração da altura da imagem; os que dependem da largura da linha são
+função da linha da imagem, `w(v) = a + b·v/h`, ajustada às larguras projetadas
+pela `H_gt` do treino (regra geral: no pipeline não há `H_gt`, e a largura real
+depende do zoom).
+
+- **Gramado** (`src/segment.py`): HSV (pico de matiz por quadro) × Lab (pico em
+  a\*, b\*; L\* fora do critério). `cv2.kmeans` em Lab, K = 3, gramado = grupo
+  do pico, **só se HSV e Lab ficarem fracos no subconjunto com sombra**.
+  Ablação: limiar → abertura → fechamento → maior componente (ou componentes
+  com área ≥ `f_min`) → preencher buracos; um passo fica se o IoU médio no WC14
+  treino sobe ≥ 0,005, ou o do subconjunto com sombra sobe ≥ 0,02, sem o outro
+  cair mais de 0,002.
+  - **Métricas:** WC14 — IoU contra `grass` (média e mediana, 209 imagens).
+    GSR (1 frame a cada 25 do treino) — fração do campo projetado pela `H_gt`
+    classificada como grama (reportada, sem limiar; jogadores e linhas a
+    baixam) e **vazamento**: fração da máscara a mais de `m` metros fora das
+    linhas pela `H_gt`, com `m` = p99 da distância além das linhas da `grass`
+    do WC14.
+- **Marcações:** top-hat branco × filtro de linha, sobre L\*, dentro do gramado
+  dilatado, com escala `k·w(v)` e limiar de contraste varrido.
+  - **Métricas:** WC14 — alvo = polilinhas do modelo desenhadas pela `H_gt`
+    (1 px) dentro da `grass`: cobertura e precisão a γ = 2, 3, 5 px. GSR —
+    cobertura = fração dos pontos anotados a ≤ 2 px da máscara; precisão a
+    γ = 3 px contra as linhas desenhadas pela `H_gt` (a lente desloca as
+    linhas alguns px nas bordas dos planos abertos). Cobertura também por faixa
+    de largura projetada `w` (medida pela `H_gt`, só para análise).
+  - **Decisão top-hat × filtro:** cada um no limiar de F1 máximo a γ = 3 px no
+    WC14 treino, conferido pela cobertura no GSR treino. Se os frames de linha
+    larga (zoom) ficarem muito abaixo, top-hat em 2–3 escalas (máximo delas)
+    entra como variante na mesma varredura.
+- **Sombra:** subconjunto por bimodalidade do L\* dentro do gramado (Otsu:
+  `ΔL` entre as classes e fração `f_esc` do maior componente escuro ≥ 0,10),
+  com `ΔL_min` fixado por folha de contato e confirmado por Victor; lista no
+  config (por imagem no WC14, por clipe no GSR). Todas as métricas também nele
+  e no complemento.
+- **Partições:** ajuste e escolha de variante só no treino (WC14 `train_val`,
+  GSR `train`). Medição única, ao fim da fatia, **só na GSR `valid`**. **O WC14
+  `test` fica intocado até a rodada final (Fatia 8)**: sem validação no WC14,
+  o test é o único número limpo dele, e a Fatia 7 ainda pode recalibrar a
+  segmentação.
+- **Testes:** sintéticos (gramado com e sem meia sombra; marcações; pontuação
+  de sombra) e de regressão com dados (IoU no WC14 treino e cobertura no GSR
+  treino ≥ valor calibrado − 0,01, fixados com aprovação).
+- **Saídas:** `outputs/segment_wc14.csv`, `outputs/segment_gsr.csv`, tabelas
+  da varredura e da ablação, curvas precisão × cobertura, e
+  `outputs/debug/segment/` (melhores, piores e com sombra).
 
 ### Fatia 4 — Linhas e cônicas (semana 3)
 Etapas 3 e 4.
