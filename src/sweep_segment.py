@@ -359,13 +359,13 @@ def _eval_wc14_image(image_id):
     return dict(image_id=image_id, sombra=is_shadow(*shadow_score(img, s.grass)), iou=_iou(grass, s.grass), **m)
 
 
-def _eval_gsr_clip(clip):
-    """GSR, 1 frame a cada `gsr_frame_step`: gramado no campo projetado, vazamento,
-    cobertura dos pontos anotados (2 px) e precisão contra a linha com largura (3 px)."""
+def _eval_gsr_clip(clip, step=None):
+    """GSR, 1 frame a cada `step` (padrão `gsr_frame_step`): gramado no campo projetado,
+    vazamento, cobertura dos pontos anotados (2 px) e precisão contra a linha com largura (3 px)."""
     from src.evaluate import coverage_precision, point_coverage
     cv2.setNumThreads(1)
     P, rows = params("gsr"), []
-    for s in gsr.load_clip(clip)[::ES["gsr_frame_step"]]:
+    for s in gsr.load_clip(clip)[::step or ES["gsr_frame_step"]]:
         if s.H_gt is None:
             continue
         img = s.image
