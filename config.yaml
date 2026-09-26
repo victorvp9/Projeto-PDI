@@ -87,7 +87,7 @@ segment:
     width_ab: [0.00109, 0.00780]  # idem, GSR train (1 frame a cada 50)
 
 shadow:
-  dL_min: null        # [EMPÍRICO] distância mínima entre as médias das classes de Otsu do L* no gramado; fixada pela folha de contato, confirmada por Victor
+  dL_min: 48          # [EMPÍRICO] ΔL mínimo entre as classes de Otsu do L* no gramado: 158 (faixa de corte, 46) x 184 (sombra, 51); folha de contato, aprovado por Victor
   f_dark_min: 0.10    # maior componente escuro >= 10% do gramado: separa sombra (região) de faixas de corte (bandas) (plano da Fatia 3)
   f_light_min: 0.02   # maior componente claro >= 2% do gramado: faixa de sol estreita (0,022-0,057) x campo todo na sombra com pontos claros soltos (0,003-0,013) (folha do WC14)
   hue_deg: 30         # só pixels de grama pelo ângulo de matiz em (a*, b*): +-30 graus do pico (sol x sombra diferem 10-17 graus nas imagens 201, 206, 150)
@@ -101,6 +101,20 @@ eval_segment:
   gsr_precision_px: 3       # precisão contra as linhas da H_gt; a lente desloca alguns px nas bordas (decisão de Victor)
   leak_m: 4.1               # vazamento: além disso fora das linhas; p99 da grass do WC14 train_val além das linhas
   border_px: 5              # margem de borda excluída do alvo das marcações (escolha)
+
+sweep_segment:
+  # grades da calibração da Fatia 3 (só no treino); os valores escolhidos vão para segment
+  hsv: {hsv_dh: [8, 12, 16, 20], hsv_s_min: [20, 40, 60], hsv_v_min: [20, 40]}
+  lab: {lab_r: [8, 12, 16, 20, 25], lab_l_min: [10, 20, 40]}
+  lab_hue: {lab_dhue_deg: [10, 15, 20, 25, 30], lab_c_min: [4, 6, 10, 15], lab_l_min: [10, 20]}
+  open_frac: [0.002, 0.005, 0.01, 0.015, 0.02, 0.03]   # estendida: o ótimo caiu em 0,01, borda da grade inicial
+  close_frac: [0.005, 0.0075, 0.01, 0.02, 0.04]       # estendida: o ótimo caiu em 0,01, borda da grade inicial
+  component_min_frac: [0.01, 0.02, 0.05]
+  line_k: [1.0, 1.25, 1.5, 2.0]   # estendida para baixo: o ótimo caiu em 1,5, borda da grade inicial
+  line_thr: [5, 10, 15, 20, 30, 40]
+  line_scales: [[1.0], [1.0, 2.0], [1.0, 2.0, 3.0]]   # multiescala (máximo das escalas): linhas largas no WC14 caíram (0,50 em 6-8 px)
+  width_bins_px: [0, 2, 4, 6, 8, 1000]   # faixas de largura projetada para a cobertura (análise)
+  wc14_model_step_m: 1.0                  # amostragem das linhas do modelo para a cobertura por largura no WC14
 
 render:
   px_per_m: 25       # vista de cima; 25 px/m faz a linha de 0,12 m ter 3 px inteiros (escolha)

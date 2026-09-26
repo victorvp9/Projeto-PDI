@@ -1,0 +1,9 @@
+passo,fica,media,mediana,media_sombra,media_sem_sombra
+cru,True,0.9441,0.9565,0.9473,0.943
++ open,True,0.9492,0.9597,0.9516,0.9483
++ close,True,0.9548,0.9684,0.9576,0.9539
++ largest,True,0.9763,0.9822,0.9702,0.9783
++ fill,True,0.9838,0.9901,0.9797,0.9852
+maior componente -> componentes >= 0.01,False,0.9787,0.9892,0.9771,0.9793
+maior componente -> componentes >= 0.02,False,0.9801,0.9897,0.9782,0.9807
+maior componente -> componentes >= 0.05,False,0.9833,0.9901,0.9797,0.9845

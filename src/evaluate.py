@@ -272,3 +272,27 @@ def field_grass_and_leak(grass, H_gt, size, step=4):
     XY, front = _back(H_gt, np.c_[u * step, v * step].astype(float))
     out = np.hypot(np.maximum(np.abs(XY[:, 0]) - HL, 0), np.maximum(np.abs(XY[:, 1]) - HW, 0))
     return frac, float(np.mean(~front | (out > ES["leak_m"])))
+
+
+def is_shadow(dL, f_dark, f_light):
+    """Regra do subconjunto com sombra (docs/decisoes.md)."""
+    S = CFG["shadow"]
+    return bool(dL >= S["dL_min"] and f_dark >= S["f_dark_min"] and f_light >= S["f_light_min"])
+
+
+def point_widths(H, lines_uv):
+    """Largura projetada (px) de uma linha de 0,12 m em cada ponto (imagem) das
+    classes: o ponto vai ao campo por H⁻¹ e mede-se |H(X + n·0,06) − H(X − n·0,06)|,
+    com n a normal da classe (reta) ou radial (círculo). Só para análise."""
+    from src.homography import _CIRCLES, LINE_EQ
+    from src.pitch_model import LINE_WIDTH
+    out = {}
+    for k, p in lines_uv.items():
+        XY, _ = _back(H, p)
+        if k in LINE_EQ:
+            n = np.tile(LINE_EQ[k][:2] / np.hypot(*LINE_EQ[k][:2]), (len(p), 1))
+        else:
+            n = XY - [_CIRCLES[k][0], 0.0]
+            n /= np.linalg.norm(n, axis=1, keepdims=True)
+        out[k] = np.linalg.norm(_apply(H, XY + n * LINE_WIDTH / 2) - _apply(H, XY - n * LINE_WIDTH / 2), axis=1)
+    return out

@@ -49,7 +49,7 @@ def overlay(spec: str):
 def _write_csv(out, rows):
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+        writer = csv.DictWriter(f, fieldnames=list(dict.fromkeys(k for r in rows for k in r)))
         writer.writeheader()
         writer.writerows(rows)
     print(out)
@@ -289,9 +289,11 @@ def main():
     ap.add_argument("--fit-calibration", action="store_true", help="figuras para calibrar max_cond e max_resid_px")
     ap.add_argument("--evaluate", metavar="PREDS", help="arquivo .npz de homografias preditas, 'persons' ou 'gt'")
     ap.add_argument("--shadow-sheet", action="store_true", help="folhas de contato da sombra (fixar dL_min)")
+    ap.add_argument("--segment-sweep", action="store_true", help="calibração da Fatia 3 no treino (tabelas e curvas)")
     ap.add_argument("--splits", nargs="+", default=["train", "valid", "test"], help="partições do GSR")
     args = ap.parse_args()
-    if not (args.overlay or args.gsr_quality or args.fit_calibration or args.evaluate or args.shadow_sheet):
+    if not (args.overlay or args.gsr_quality or args.fit_calibration or args.evaluate or args.shadow_sheet
+            or args.segment_sweep):
         ap.print_help()
     for spec in args.overlay or []:
         overlay(spec)
@@ -303,6 +305,9 @@ def main():
         evaluate(args.evaluate, args.splits)
     if args.shadow_sheet:
         shadow_sheet()
+    if args.segment_sweep:
+        from src import sweep_segment
+        sweep_segment.report(sweep_segment.run(_pool))
 
 
 if __name__ == "__main__":
