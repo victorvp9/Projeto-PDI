@@ -33,7 +33,9 @@ def test_lines_on_synthetic():
     img = render_synthetic(H_ZOOM, SIZE)
     target = lines_target(H_ZOOM, SIZE)
     for method in ("tophat", "filter"):
-        Q = {**P, "line_method": method}
+        # parâmetros do operador fixos no teste (não os calibrados): as linhas sintéticas
+        # vão até 5,5 px, 1,6 x a largura típica; com k = 1 o top-hat não pega o miolo
+        Q = {**P, "line_method": method, "line_k": 2.0, "line_thr": 10}
         pred = line_mask(img, np.ones(img.shape[:2], bool), Q)
         s = coverage_precision(pred, target, [1, 3], width_target=lines_mask(H_ZOOM, SIZE))
         assert s["cobertura@1"] >= 0.90 and s["precisao@3"] >= 0.95, (method, s)
