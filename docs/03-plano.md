@@ -203,6 +203,11 @@ depende do zoom).
 ### Fatia 4 — Linhas e cônicas (semana 3)
 Etapas 3 e 4.
 
+- **Antes de filtrar a máscara de marcações** (precisão ~0,5 na Fatia 3):
+  classificar uma amostra dos falsos positivos — jogadores de branco,
+  publicidade pintada no gramado, faixas de corte, bola, outros. O candidato
+  clássico é filtrar componentes pela forma (fino e alongado × compacto), já que
+  não há detector de jogador; entra se o número justificar.
 - Hough probabilística e, sobretudo, **fusão de colineares**. Sem fusão, o resto
   quebra.
 - Ajuste de elipse no círculo central.
@@ -216,6 +221,11 @@ Etapas 5, 6 e 7. É a semana mais difícil.
 - Classificação semântica dos segmentos, correspondências, RANSAC + DLT.
 - Refinamento não-linear com termo ponto-linha — reaproveita a função escrita na
   Fatia 2 para a `H_gt` pelas linhas.
+- **Decisão pendente da Fatia 3: marcações em escala única × multiescala "1+2".**
+  A escala única ficou pelo F1 por pixel, que é só uma aproximação; a "1+2"
+  recupera as linhas largas (WC14, 6–8 px: 0,32 → 0,57), que são as do lado da
+  câmera, ao custo de F1 −0,024. Decidir aqui pelo erro da homografia (as duas
+  estão no config: `line_scales`).
 - **Teste:** na imagem sintética, a homografia recuperada bate com a usada para
   renderizar.
 - **Marco:** primeiro número real no WC14, com taxa de cobertura, e o mesmo

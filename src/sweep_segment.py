@@ -214,13 +214,12 @@ def run(pool):
         final = {**step_cfgs[cur]}
         out_rows["ablacao"] = log
 
-        # 3. tamanhos da abertura e do fechamento, se ficaram
+        # 3. tamanhos da abertura e do fechamento (tabela; a escolha é a do config)
         if "open" in steps or "close" in steps:
             sizes = [{**final, "open_frac": o, "close_frac": c} for o in W["open_frac"] for c in W["close_frac"]]
             _, z = _wc14_table(ex, sizes)
-            i = int(np.argmax([s["media"] for s in z]))
-            final = sizes[i]
             out_rows["tamanhos"] = list(zip(sizes, z))
+        final = grass_config()
         _, (final_summ,) = _wc14_table(ex, [final])
         out_rows["final"] = (final, final_summ)
 
@@ -229,6 +228,12 @@ def run(pool):
         gcfgs = [(m, {**{k: best[m][k] for k in ["grass_method", *W[m]]}, **post}) for m in best]
         lines = run_lines(ex, final, gcfgs)
     return dict(rows=out_rows, final=final, **lines)
+
+
+def grass_config():
+    """Gramado aprovado (config), para a varredura das marcações."""
+    keys = ("grass_method", "lab_dhue_deg", "lab_c_min", "lab_l_min", "grass_steps", "open_frac", "close_frac")
+    return {k: CFG["segment"]["common"][k] for k in keys}
 
 
 def run_lines(ex, final, gcfgs):
@@ -247,6 +252,8 @@ def report(r):
     import matplotlib.pyplot as plt
     from src.run import _write_csv
     f4 = lambda x: f"{x:.4f}"
+    if "rows" not in r:
+        return report_lines(r)
     print("\n== 1. Espaço de cor (melhor de cada, pós-processamento padrão), IoU no WC14 train_val")
     print("método    média   mediana  sombra  sem sombra  parâmetros")
     for m, row in r["rows"]["cor"].items():
@@ -263,7 +270,7 @@ def report(r):
         for c, s in r["rows"]["tamanhos"]:
             print(f"   abertura {c['open_frac']:<6} fechamento {c['close_frac']:<5} {f4(s['media'])} / {f4(s['media_sombra'])}")
     final, fs = r["rows"]["final"]
-    print(f"\n   FINAL: {final}\n   IoU média {f4(fs['media'])} mediana {f4(fs['mediana'])} sombra {f4(fs['media_sombra'])} sem sombra {f4(fs['media_sem_sombra'])}")
+    print(f"\n   FINAL (config): {final}\n   IoU média {f4(fs['media'])} mediana {f4(fs['mediana'])} sombra {f4(fs['media_sombra'])} sem sombra {f4(fs['media_sem_sombra'])}")
 
     print("\n== 3. Gramado no GSR train (1 a cada 25 frames): fração do campo projetado como grama; vazamento (> 4,1 m fora das linhas)")
     g = r["grass_gsr"]
@@ -272,6 +279,15 @@ def report(r):
         print(f"   {m:8} campo como grama: média {np.nanmean(fr):.4f} mediana {np.nanmedian(fr):.4f}   vazamento: média {np.nanmean(lk):.4f} mediana {np.nanmedian(lk):.4f}")
     _write_csv(path("outputs") / "segment_gramado_gsr.csv", g)
 
+    report_lines(r)
+
+
+def report_lines(r):
+    """Seções 4 e 5 do relatório (marcações)."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from src.run import _write_csv
     print("\n== 4. Marcações: top-hat x filtro de linha")
     g3, gc, gp = ES["decision_gamma_px"], ES["gsr_coverage_px"], ES["gsr_precision_px"]
     rows, best = [], {}
@@ -327,4 +343,68 @@ def report(r):
     fig.tight_layout()
     out = path("outputs") / "figures" / "segment_pr_linhas.png"
     fig.savefig(out, dpi=110)
+    print(out)
+
+
+# ======================= avaliação da configuração do config =======================
+def _eval_wc14_image(image_id):
+    """WC14: IoU do gramado, sombra e cobertura/precisão das marcações (config)."""
+    from src.evaluate import coverage_precision
+    cv2.setNumThreads(1)
+    s = wc14.load_sample("train_val", image_id)
+    img, H, size, P = s.image, s.H_gt, (s.grass.shape[1], s.grass.shape[0]), params("wc14")
+    grass = grass_mask(img, P)
+    lines = line_mask(img, grass, P)
+    m = coverage_precision(lines, lines_target(H, size, region=s.grass), ES["wc14_gamma_px"], width_target=lines_mask(H, size))
+    return dict(image_id=image_id, sombra=is_shadow(*shadow_score(img, s.grass)), iou=_iou(grass, s.grass), **m)
+
+
+def _eval_gsr_clip(clip):
+    """GSR, 1 frame a cada `gsr_frame_step`: gramado no campo projetado, vazamento,
+    cobertura dos pontos anotados (2 px) e precisão contra a linha com largura (3 px)."""
+    from src.evaluate import coverage_precision, point_coverage
+    cv2.setNumThreads(1)
+    P, rows = params("gsr"), []
+    for s in gsr.load_clip(clip)[::ES["gsr_frame_step"]]:
+        if s.H_gt is None:
+            continue
+        img = s.image
+        grass = grass_mask(img, P)
+        lines = line_mask(img, grass, P)
+        frac, leak = field_grass_and_leak(grass, s.H_gt, s.size)
+        pts = gsr.inner_points(s.lines_uv, s.size)
+        allp = np.concatenate(list(pts.values())) if pts else np.zeros((0, 2))
+        prec = coverage_precision(lines, lines_mask(s.H_gt, s.size), [ES["gsr_precision_px"]],
+                                  width_target=lines_mask(s.H_gt, s.size))[f"precisao@{ES['gsr_precision_px']}"]
+        rows.append(dict(split=clip.parent.name, clip=clip.name, frame=s.frame_idx, campo_grama=frac, vazamento=leak,
+                         cobertura=point_coverage(lines, allp, ES["gsr_coverage_px"]), n_pontos=len(allp), precisao=prec))
+    return rows
+
+
+def evaluate_final(pool, gsr_splits):
+    """Métricas da configuração do config: WC14 train_val e GSR `gsr_splits`, com
+    depuração (melhores, piores, sombra) em outputs/debug/segment/."""
+    from src.run import _write_csv
+    from src.segment import debug_overlay
+    with pool() as ex:
+        w = list(ex.map(_eval_wc14_image, wc14.split_ids("train_val")))
+        g = [r for rs in ex.map(_eval_gsr_clip, [c for sp in gsr_splits for c in sorted((path("gsr") / sp).glob("SNGS-*"))]) for r in rs]
+    _write_csv(path("outputs") / "segment_wc14.csv", w)
+    _write_csv(path("outputs") / f"segment_gsr_{'+'.join(gsr_splits)}.csv", g)
+    iou = np.array([r["iou"] for r in w]); sh = np.array([r["sombra"] for r in w])
+    print(f"WC14 train_val: gramado IoU média {iou.mean():.4f} mediana {np.median(iou):.4f} sombra {iou[sh].mean():.4f} sem sombra {iou[~sh].mean():.4f}")
+    for g_ in ES["wc14_gamma_px"]:
+        c = np.nanmean([r[f"cobertura@{g_}"] for r in w]); p_ = np.nanmean([r[f"precisao@{g_}"] for r in w])
+        print(f"   marcações a {g_} px: cobertura {c:.4f}  precisão {p_:.4f}  (média por imagem)")
+    for key, lab in (("campo_grama", "campo projetado como grama"), ("vazamento", "vazamento"), ("cobertura", "cobertura a 2 px"), ("precisao", "precisão a 3 px")):
+        v = np.array([r[key] for r in g], float)
+        print(f"GSR {'+'.join(gsr_splits)} ({len(g)} frames): {lab}: média {np.nanmean(v):.4f} mediana {np.nanmedian(v):.4f}")
+    out = path("debug") / "segment"
+    out.mkdir(parents=True, exist_ok=True)
+    order = np.argsort(iou)
+    picks = [("pior", i) for i in order[:5]] + [("melhor", i) for i in order[-5:]] + [("sombra", i) for i in np.nonzero(sh)[0][:5]]
+    for tag, i in picks:
+        s = wc14.load_sample("train_val", w[i]["image_id"]); img, P = s.image, params("wc14")
+        grass = grass_mask(img, P)
+        cv2.imwrite(str(out / f"wc14_{tag}_{s.image_id}_iou{iou[i]:.3f}.jpg"), debug_overlay(img, grass, line_mask(img, grass, P)))
     print(out)

@@ -290,10 +290,12 @@ def main():
     ap.add_argument("--evaluate", metavar="PREDS", help="arquivo .npz de homografias preditas, 'persons' ou 'gt'")
     ap.add_argument("--shadow-sheet", action="store_true", help="folhas de contato da sombra (fixar dL_min)")
     ap.add_argument("--segment-sweep", action="store_true", help="calibração da Fatia 3 no treino (tabelas e curvas)")
+    ap.add_argument("--segment-sweep-lines", action="store_true", help="só a varredura das marcações, com o gramado do config")
+    ap.add_argument("--segment-eval", action="store_true", help="métricas da segmentação do config (WC14 train_val; GSR --splits)")
     ap.add_argument("--splits", nargs="+", default=["train", "valid", "test"], help="partições do GSR")
     args = ap.parse_args()
     if not (args.overlay or args.gsr_quality or args.fit_calibration or args.evaluate or args.shadow_sheet
-            or args.segment_sweep):
+            or args.segment_sweep or args.segment_sweep_lines or args.segment_eval):
         ap.print_help()
     for spec in args.overlay or []:
         overlay(spec)
@@ -308,6 +310,13 @@ def main():
     if args.segment_sweep:
         from src import sweep_segment
         sweep_segment.report(sweep_segment.run(_pool))
+    if args.segment_sweep_lines:
+        from src import sweep_segment
+        with _pool() as ex:
+            sweep_segment.report(sweep_segment.run_lines(ex, sweep_segment.grass_config(), []))
+    if args.segment_eval:
+        from src import sweep_segment
+        sweep_segment.evaluate_final(_pool, args.splits)
 
 
 if __name__ == "__main__":

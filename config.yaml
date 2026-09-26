@@ -62,29 +62,30 @@ eval:
 segment:
   # Etapas 1 e 2 (src/segment.py). Tamanhos em fração da altura da imagem.
   common:
-    grass_method: lab          # [EMPÍRICO] hsv | lab | lab_hue | kmeans; a varrer no WC14 treino
+    grass_method: lab_hue      # [EMPÍRICO] hsv | lab | lab_hue; maior IoU médio no WC14 treino (0,9838; sombra 0,9797) (Fatia 3)
     hsv_green_band: [25, 95]   # faixa larga de matiz (OpenCV, 0-179) onde se procura o pico do verde (escolha)
     hsv_dh: 12                 # [EMPÍRICO] meia-largura em torno do pico de matiz; a varrer
     hsv_s_min: 40              # [EMPÍRICO] saturação mínima; a varrer
     hsv_v_min: 30              # [EMPÍRICO] valor mínimo; a varrer
-    lab_l_min: 20              # [EMPÍRICO] L* mínimo (abaixo, a cromaticidade é ruído); a varrer
+    lab_l_min: 20              # [EMPÍRICO] L* mínimo (abaixo, a cromaticidade é ruído); varredura no WC14 treino
     lab_r: 12                  # [EMPÍRICO] raio cromático em (a*, b*) em torno do pico; a varrer
-    lab_dhue_deg: 15           # [EMPÍRICO] lab_hue: meia-largura do ângulo de matiz em (a*, b*) em torno do pico; a varrer
-    lab_c_min: 6               # [EMPÍRICO] lab_hue: croma mínimo (abaixo, o ângulo é ruído); a varrer
-    open_frac: 0.005           # [EMPÍRICO] abertura, fração da altura; a varrer
-    close_frac: 0.02           # [EMPÍRICO] fechamento, fração da altura; a varrer
-    grass_steps: [open, close, largest, fill]   # [EMPÍRICO] ordem do pós-processamento; ablação
+    lab_dhue_deg: 20           # [EMPÍRICO] lab_hue: meia-largura do ângulo de matiz em (a*, b*); varredura no WC14 treino
+    lab_c_min: 10              # [EMPÍRICO] lab_hue: croma mínimo; varredura no WC14 treino
+    open_frac: 0.01            # [EMPÍRICO] abertura, fração da altura; interior do platô 0,9855-0,9862 (decisão de Victor: menos dano às bordas finas)
+    close_frac: 0.01           # [EMPÍRICO] fechamento, fração da altura; idem
+    grass_steps: [open, close, largest, fill]   # [EMPÍRICO] ablação no WC14 treino: todos os passos ficam
     component_min_frac: 0.05   # [EMPÍRICO] área mínima de componente, fração da imagem ("components"); a varrer
-    line_method: tophat        # [EMPÍRICO] tophat | filter; decisão pelo F1 a 3 px no WC14 treino
+    line_method: filter        # [EMPÍRICO] tophat | filter; F1 a 3 px no WC14 treino 0,579 x 0,560, confirmado no GSR
     line_bands: 3              # faixas horizontais com escala própria (escolha)
-    line_k: 2.0                # [EMPÍRICO] escala = k·w(v); a varrer
-    line_scales: [1.0]         # [EMPÍRICO] top-hat multiescala (máximo das escalas); variante se o zoom pedir
-    line_thr: 10               # [EMPÍRICO] contraste mínimo em L* (0-255); a varrer
+    line_k: 1.0                # [EMPÍRICO] escala = k·w(v); F1 máximo no WC14 treino (0,575; k = 0,75 dá 0,529)
+    line_scales: [1.0]         # [EMPÍRICO] escala única pelo F1; opção [1.0, 2.0] (linhas largas 0,32 -> 0,57 no WC14, F1 -0,024) decidida na Fatia 5 pelo erro da homografia
     grass_dilate_w: 1.0        # gramado dilatado em larguras de linha antes de restringir as marcações (escolha)
   wc14:
     width_ab: [0.00158, 0.00447]  # w(v)/h = a + b·v/h: larguras de 0,12 m projetadas pela H_gt no WC14 train_val (ajuste linear das medianas por faixa)
+    line_thr: 15                  # [EMPÍRICO] contraste mínimo em L* (0-255); F1 a 3 px máximo no WC14 train_val
   gsr:
     width_ab: [0.00109, 0.00780]  # idem, GSR train (1 frame a cada 50)
+    line_thr: 30                  # [EMPÍRICO] idem, F1 (cobertura a 2 px x precisão a 3 px) máximo no GSR train (decisão de Victor: cada base no seu treino)
 
 shadow:
   dL_min: 48          # [EMPÍRICO] ΔL mínimo entre as classes de Otsu do L* no gramado: 158 (faixa de corte, 46) x 184 (sombra, 51); folha de contato, aprovado por Victor
@@ -110,7 +111,7 @@ sweep_segment:
   open_frac: [0.002, 0.005, 0.01, 0.015, 0.02, 0.03]   # estendida: o ótimo caiu em 0,01, borda da grade inicial
   close_frac: [0.005, 0.0075, 0.01, 0.02, 0.04]       # estendida: o ótimo caiu em 0,01, borda da grade inicial
   component_min_frac: [0.01, 0.02, 0.05]
-  line_k: [1.0, 1.25, 1.5, 2.0]   # estendida para baixo: o ótimo caiu em 1,5, borda da grade inicial
+  line_k: [0.75, 1.0, 1.25, 1.5, 2.0]   # estendida para baixo duas vezes: o ótimo caiu na borda (1,5, depois 1,0); abaixo de 0,5 o filtro não funciona
   line_thr: [5, 10, 15, 20, 30, 40]
   line_scales: [[1.0], [1.0, 2.0], [1.0, 2.0, 3.0]]   # multiescala (máximo das escalas): linhas largas no WC14 caíram (0,50 em 6-8 px)
   width_bins_px: [0, 2, 4, 6, 8, 1000]   # faixas de largura projetada para a cobertura (análise)
