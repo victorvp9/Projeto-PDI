@@ -31,23 +31,64 @@ def _ellipse(x):
     return cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (k, k))
 
 
+def hue_distance(frame_lab, c_min, where=None):
+    """Distância angular (graus) do matiz em (a*, b*) de cada pixel (imagem) ao pico
+    verde do quadro, e o croma. O pico é medido nos pixels com croma >= c_min, em
+    `where` (ou na imagem toda)."""
+    da = frame_lab[:, :, 1].astype(np.float32) - 128
+    db = frame_lab[:, :, 2].astype(np.float32) - 128
+    hue, chroma = np.degrees(np.arctan2(db, da)), np.hypot(da, db)
+    sel = (chroma >= c_min) & (da < 0) if where is None else (chroma >= c_min) & (da < 0) & where
+    hist = np.bincount(np.round(hue[sel]).astype(int) + 180, minlength=361).astype(float)
+    peak = np.argmax(np.convolve(hist, np.ones(5) / 5, "same")) - 180
+    return np.abs((hue - peak + 180) % 360 - 180), chroma
+
+
 def green_hue(frame_lab, dhue_deg, c_min, where=None):
     """Pixels (imagem, bool) com ângulo de matiz em (a*, b*) a <= dhue_deg do pico
     verde e croma >= c_min. O pico é medido em `where` (ou na imagem toda).
     Escurecer encolhe o croma mas quase não muda o ângulo: a grama ao sol e na
     sombra diferem ~10-17 graus, e ~27 em distância cromática (docs/decisoes.md)."""
-    da = frame_lab[:, :, 1].astype(np.float32) - 128
-    db = frame_lab[:, :, 2].astype(np.float32) - 128
-    hue, chroma = np.degrees(np.arctan2(db, da)), np.hypot(da, db)
-    ok = chroma >= c_min
-    sel = ok & (da < 0) if where is None else ok & (da < 0) & where
-    hist = np.bincount(np.round(hue[sel]).astype(int) + 180, minlength=361).astype(float)
-    peak = np.argmax(np.convolve(hist, np.ones(5) / 5, "same")) - 180
-    return ok & (np.abs((hue - peak + 180) % 360 - 180) <= dhue_deg)
+    d, chroma = hue_distance(frame_lab, c_min, where)
+    return (chroma >= c_min) & (d <= dhue_deg)
+
+
+def touching(weak, strong):
+    """Histerese: componentes conexos (8-vizinhança) de `weak` que contêm algum pixel
+    de `strong`, unidos a `strong` (imagem, bool)."""
+    n, lab = cv2.connectedComponents(weak.astype(np.uint8))
+    keep = np.zeros(n, bool)
+    keep[np.unique(lab[strong & weak])] = True
+    keep[0] = False
+    return keep[lab] | strong
+
+
+def lab_clusters(frame_lab, P):
+    """k-means (cv2.kmeans, K = `kmeans_k`) em Lab, numa amostra de 1 a cada
+    `kmeans_step` px em cada eixo; cada pixel (imagem) recebe o centro mais próximo.
+    Semente fixa: o resultado é determinístico. Devolve (rótulos, centros K x 3 em
+    Lab do OpenCV, 0-255)."""
+    cv2.setRNGSeed(0)
+    sample = frame_lab[::P["kmeans_step"], ::P["kmeans_step"]].reshape(-1, 3).astype(np.float32)
+    iters, eps = P["kmeans_term"]
+    crit = (cv2.TERM_CRITERIA_MAX_ITER + cv2.TERM_CRITERIA_EPS, iters, eps)
+    _, _, centers = cv2.kmeans(sample, P["kmeans_k"], None, crit, P["kmeans_attempts"], cv2.KMEANS_PP_CENTERS)
+    X = frame_lab.reshape(-1, 3).astype(np.float32)
+    labels = ((centers ** 2).sum(1) - 2 * X @ centers.T).argmin(1)     # |x - c|² sem o |x|²
+    return labels.reshape(frame_lab.shape[:2]), centers
+
+
+def green_centers(centers, P):
+    """Grupos (bool por centro) que são grama: ângulo de matiz do centro em (a*, b*)
+    dentro da faixa `kmeans_hue_deg` e croma do centro >= `kmeans_c_min`."""
+    da, db = centers[:, 1] - 128, centers[:, 2] - 128
+    hue = np.degrees(np.arctan2(db, da))
+    lo, hi = P["kmeans_hue_deg"]
+    return (hue >= lo) & (hue <= hi) & (np.hypot(da, db) >= P["kmeans_c_min"])
 
 
 def _grass_raw(frame_bgr, P):
-    """Pixels verdes, com o pico de cor estimado no próprio quadro."""
+    """Pixels verdes, com o pico de cor (ou os grupos do k-means) do próprio quadro."""
     if P["grass_method"] == "hsv":
         frame_hsv = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2HSV)
         hue, sat, val = cv2.split(frame_hsv)
@@ -57,10 +98,19 @@ def _grass_raw(frame_bgr, P):
         peak = int(np.argmax(np.convolve(hist, np.ones(5) / 5, "same")))
         return valid & (np.abs(hue.astype(int) - peak) <= P["hsv_dh"])
     frame_lab = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2LAB)
+    if P["grass_method"] == "kmeans":
+        labels, centers = lab_clusters(frame_lab, P)
+        return green_centers(centers, P)[labels]
     L, a, b = cv2.split(frame_lab)
     valid = L >= P["lab_l_min"]
-    if P["grass_method"] == "lab_hue":
-        return valid & green_hue(frame_lab, P["lab_dhue_deg"], P["lab_c_min"], where=valid)
+    if P["grass_method"] in ("lab_hue", "hysteresis"):
+        d, chroma = hue_distance(frame_lab, P["lab_c_min"], where=valid)
+        strong = valid & (chroma >= P["lab_c_min"]) & (d <= P["lab_dhue_deg"])
+        if P["grass_method"] == "lab_hue":
+            return strong
+        # histerese: o lab_hue são as sementes; o fraco (faixa mais larga em torno do
+        # mesmo pico, croma menor) só entra onde está ligado a uma semente
+        return touching(valid & (chroma >= P["hyst_c_min"]) & (d <= P["hyst_dhue_deg"]), strong)
     green = valid & (a < 128)                      # a* < 0: lado verde
     hist = np.zeros((256, 256), np.float32)
     np.add.at(hist, (a[green], b[green]), 1)
@@ -130,14 +180,27 @@ def line_response(frame_bgr, P):
     return out
 
 
+def line_threshold(response, grass, P):
+    """Limiar das marcações: fixo (`line_thr`) ou, com `line_alpha` não nulo, relativo
+    ao quadro: α × percentil `line_pct` da resposta dentro do gramado."""
+    if P["line_alpha"] is None:
+        return P["line_thr"]
+    return P["line_alpha"] * np.percentile(response[grass], P["line_pct"]) if grass.any() else np.inf
+
+
+def grass_grown(grass, P):
+    """Gramado dilatado em `grass_dilate_w` larguras de linha (imagem, bool)."""
+    h = grass.shape[0]
+    grow = _ellipse(2 * P["grass_dilate_w"] * line_width(h, h, P) + 1)
+    return cv2.dilate(grass.astype(np.uint8), grow).astype(bool)
+
+
 def line_mask(frame_bgr, grass, P, response=None):
-    """Máscara bool (imagem) das marcações: resposta > `line_thr` dentro do gramado
+    """Máscara bool (imagem) das marcações: resposta acima do limiar dentro do gramado
     dilatado (para não cortar a lateral rente à borda da grama)."""
     if response is None:
         response = line_response(frame_bgr, P)
-    h = grass.shape[0]
-    grow = _ellipse(2 * P["grass_dilate_w"] * line_width(h, h, P) + 1)
-    return (response > P["line_thr"]) & cv2.dilate(grass.astype(np.uint8), grow).astype(bool)
+    return (response > line_threshold(response, grass, P)) & grass_grown(grass, P)
 
 
 def debug_overlay(frame_bgr, grass=None, lines=None):

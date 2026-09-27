@@ -75,11 +75,26 @@ segment:
     close_frac: 0.01           # [EMPÍRICO] fechamento, fração da altura; idem
     grass_steps: [open, close, largest, fill]   # [EMPÍRICO] ablação no WC14 treino: todos os passos ficam
     component_min_frac: 0.05   # [EMPÍRICO] área mínima de componente, fração da imagem ("components"); a varrer
+    # variante kmeans (grass_method: kmeans): grupos de cv2.kmeans em Lab por quadro; grama = centro na faixa de matiz verde
+    # REPROVADA no treino: nenhuma das 72 configurações fica no ruído do GSR train (vazamento 0,03-0,12 x 0,007); docs/decisoes.md
+    kmeans_k: 3                # [EMPÍRICO] a calibrar (3-4) no WC14 train_val + GSR train (decisão de Victor)
+    kmeans_hue_deg: [100, 170] # [EMPÍRICO] faixa larga do ângulo de matiz do centro em (a*, b*); a calibrar (idem)
+    kmeans_c_min: 3            # [EMPÍRICO] croma mínimo do centro (tira grupos cinzentos); a calibrar (idem)
+    kmeans_step: 4             # amostra do k-means: 1 a cada 4 px em cada eixo (escolha; custo)
+    kmeans_attempts: 3         # reinícios do cv2.kmeans (escolha)
+    kmeans_term: [20, 0.5]     # iterações máximas e ε do cv2.kmeans (escolha)
+    # variante histerese (grass_method: hysteresis), REPROVADA na rodada da GSR valid (jogo 5 além do ruído): sementes = lab_hue acima; fraco = faixa mais larga em torno do mesmo pico e croma menor;
+    # gramado = componentes do fraco que tocam as sementes (decisão de Victor)
+    hyst_dhue_deg: 40          # [EMPÍRICO] meia-largura da faixa do fraco: a mais permissiva das 10 (de 42) no ruído do atual no treino (docs/decisoes.md)
+    hyst_c_min: 10             # [EMPÍRICO] croma mínimo do fraco; idem (igual ao das sementes: o fraco só alarga o matiz)
     line_method: filter        # [EMPÍRICO] tophat | filter; F1 a 3 px no WC14 treino 0,579 x 0,560, confirmado no GSR
     line_bands: 3              # faixas horizontais com escala própria (escolha)
     line_k: 1.0                # [EMPÍRICO] escala = k·w(v); F1 máximo no WC14 treino (0,575; k = 0,75 dá 0,529)
     line_scales: [1.0]         # [EMPÍRICO] escala única pelo F1; opção [1.0, 2.0] (linhas largas 0,32 -> 0,57 no WC14, F1 -0,024) decidida na Fatia 5 pelo erro da homografia
     grass_dilate_w: 1.0        # gramado dilatado em larguras de linha antes de restringir as marcações (escolha)
+    # limiar relativo ao quadro: α × percentil da resposta no gramado; null = limiar fixo (line_thr, por base)
+    line_alpha: null           # [EMPÍRICO] a calibrar no treino das duas bases juntas (decisão de Victor)
+    line_pct: 98               # [EMPÍRICO] com α = 1,41 (eval_segment.variants): máximo do F1 médio WC14 train_val + GSR train (0,596; fixos 15/30: 0,575 e 0,611)
   wc14:
     width_ab: [0.00158, 0.00447]  # w(v)/h = a + b·v/h: larguras de 0,12 m projetadas pela H_gt no WC14 train_val (ajuste linear das medianas por faixa)
     line_thr: 15                  # [EMPÍRICO] contraste mínimo em L* (0-255); F1 a 3 px máximo no WC14 train_val
@@ -102,6 +117,9 @@ eval_segment:
   gsr_precision_px: 3       # precisão contra as linhas da H_gt; a lente desloca alguns px nas bordas (decisão de Victor)
   leak_m: 4.1               # vazamento: além disso fora das linhas; p99 da grass do WC14 train_val além das linhas
   border_px: 5              # margem de borda excluída do alvo das marcações (escolha)
+  variants:                 # candidatas da rodada única na GSR valid; ambas REPROVADAS (docs/decisoes.md), ficam só para reproduzir a tabela
+    histerese: {grass_method: hysteresis}   # parâmetros hyst_* em segment.common
+    relativo: {line_alpha: 1.41}   # limiar = 1,41 × percentil 98 da resposta no gramado
 
 sweep_segment:
   # grades da calibração da Fatia 3 (só no treino); os valores escolhidos vão para segment
@@ -116,6 +134,13 @@ sweep_segment:
   line_scales: [[1.0], [1.0, 2.0], [1.0, 2.0, 3.0]]   # multiescala (máximo das escalas): linhas largas no WC14 caíram (0,50 em 6-8 px)
   width_bins_px: [0, 2, 4, 6, 8, 1000]   # faixas de largura projetada para a cobertura (análise)
   wc14_model_step_m: 1.0                  # amostragem das linhas do modelo para a cobertura por largura no WC14
+  # variantes da Fatia 3 (docs/decisoes.md): calibradas no treino; a GSR valid só escolhe entre elas
+  kmeans: {kmeans_k: [3, 4], hue_lo: [90, 100, 110], hue_hi: [150, 160, 170, 180], kmeans_c_min: [0, 3, 6]}
+  hysteresis: {hyst_dhue_deg: [22, 25, 30, 35, 40, 50, 60], hyst_c_min: [2, 4, 6, 8, 9, 10]}   # estendida para o lado do atual (±20°, croma 10): a 1ª grade não teve nenhuma aprovada, a mais próxima no canto
+  line_pct: [90, 95, 98, 99, 99.5]
+  line_alpha: [0.25, 0.35, 0.5, 0.71, 1.0, 1.41, 2.0, 2.83, 4.0, 5.66, 8.0, 11.3, 16.0]   # fator √2
+  noise_grass: 0.005   # ruído no gramado (decisão de Victor; = ganho mínimo da ablação)
+  noise_lines: 0.01    # ruído nas marcações (decisão de Victor)
 
 render:
   px_per_m: 25       # vista de cima; 25 px/m faz a linha de 0,12 m ter 3 px inteiros (escolha)

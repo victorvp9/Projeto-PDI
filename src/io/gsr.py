@@ -8,6 +8,7 @@ H_gt_auxflow (RANSAC nas pessoas) serve só à tabela "protocolo AuxFlow"
 """
 import hashlib
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -150,6 +151,13 @@ def _cached_fits(clip_dir: Path, samples: list[Sample]) -> list[Fit]:
              resid=[x.resid_px for x in fits], rank=[x.rank for x in fits], cond=[x.cond for x in fits],
              n=[x.n_points for x in fits], ok=[x.ok for x in fits])
     return fits
+
+
+def game_id(clip_dir: Path) -> str:
+    """Jogo do clipe (`info.game_id`). Lê só o começo do JSON, onde fica o `info`,
+    para não carregar os ~30 MB."""
+    with open(clip_dir / "Labels-GameState.json", encoding="utf-8") as f:
+        return re.search(r'"game_id":\s*"([^"]+)"', f.read(4096)).group(1)
 
 
 def load_clip(clip_dir: Path, fit: str = "cache") -> list[Sample]:

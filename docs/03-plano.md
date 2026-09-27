@@ -199,6 +199,17 @@ depende do zoom).
 - **Saídas:** `outputs/segment_wc14.csv`, `outputs/segment_gsr.csv`, tabelas
   da varredura e da ablação, curvas precisão × cobertura, e
   `outputs/debug/segment/` (melhores, piores e com sombra).
+- **Fechada (2026-09-27), com duas limitações documentadas** (detalhe em
+  `decisoes.md`): (1) **sombra azulada e sem croma** (GSR valid, jogo 3, de
+  dia): o gramado cobre ~52% do campo nesse jogo; a histerese recuperaria até
+  ~72%, mas piorou o jogo 5 além do ruído e ficou de fora. (2) **Contraste
+  das linhas por jogo contra um limiar global**: nos jogos de contraste baixo
+  (treino 4; valid 2 e 5) a cobertura fica em 0,59–0,67 contra 0,88 nos de
+  contraste alto; o limiar relativo sobe a cobertura em ~0,11–0,12, mas perdeu
+  precisão no jogo 2 além do ruído. As duas afetam a Fatia 4 (menos linhas
+  detectadas nesses jogos) e voltam na análise de erro da Fatia 8. A GSR
+  `valid` foi usada para escolher variante: **o número limpo do GSR é o do
+  `test`, na Fatia 8.**
 
 ### Fatia 4 — Linhas e cônicas (semana 3)
 Etapas 3 e 4.
@@ -278,6 +289,11 @@ esforço.
 - **Qualidade do gabarito do GSR** como seção curta: quantos frames discordam
   das linhas, e o caso da bola no ar como exemplo de correspondência falsa.
 - Análise de falhas com imagens: os piores casos, e a causa de cada um.
+- **Ablação de limitações da segmentação por cor:** a tabela da rodada das
+  variantes da Fatia 3 na GSR `valid` (atual, histerese, limiar relativo e a
+  combinação, por jogo; `outputs/segment_variantes_gsr_train+valid.csv`),
+  com a nota de que a `valid` serviu para escolha e o número da histerese é
+  otimista.
 - **Saída:** `python -m src.run --all` reproduz tudo do zero.
 
 ---

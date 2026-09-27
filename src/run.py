@@ -2,6 +2,7 @@
 import argparse
 import csv
 import os
+import sys
 from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor
 
@@ -282,6 +283,7 @@ def evaluate(name, splits):
 
 
 def main():
+    sys.stdout.reconfigure(encoding="utf-8")    # saída redirecionada no Windows cai em cp1252 e quebra no "α"
     ap = argparse.ArgumentParser(prog="python -m src.run")
     ap.add_argument("--overlay", nargs="+", metavar="SPEC",
                     help="wc14:<split>/<N> ou gsr:<split>/<clipe>/<frame>[-<frame>]")
@@ -292,10 +294,14 @@ def main():
     ap.add_argument("--segment-sweep", action="store_true", help="calibração da Fatia 3 no treino (tabelas e curvas)")
     ap.add_argument("--segment-sweep-lines", action="store_true", help="só a varredura das marcações, com o gramado do config")
     ap.add_argument("--segment-eval", action="store_true", help="métricas da segmentação do config (WC14 train_val; GSR --splits)")
+    ap.add_argument("--segment-variants-calib", nargs="*", metavar="PARTE",
+                    help="calibra no treino as variantes da Fatia 3: kmeans, hysteresis, alpha (padrão: todas)")
+    ap.add_argument("--segment-variants", action="store_true", help="rodada das variantes da Fatia 3 (WC14 train_val; GSR --splits)")
     ap.add_argument("--splits", nargs="+", default=["train", "valid", "test"], help="partições do GSR")
     args = ap.parse_args()
     if not (args.overlay or args.gsr_quality or args.fit_calibration or args.evaluate or args.shadow_sheet
-            or args.segment_sweep or args.segment_sweep_lines or args.segment_eval):
+            or args.segment_sweep or args.segment_sweep_lines or args.segment_eval
+            or args.segment_variants_calib is not None or args.segment_variants):
         ap.print_help()
     for spec in args.overlay or []:
         overlay(spec)
@@ -317,6 +323,12 @@ def main():
     if args.segment_eval:
         from src import sweep_segment
         sweep_segment.evaluate_final(_pool, args.splits)
+    if args.segment_variants_calib is not None:
+        from src import sweep_segment
+        sweep_segment.calibrate_variants(_pool, args.segment_variants_calib or ["kmeans", "hysteresis", "alpha"])
+    if args.segment_variants:
+        from src import sweep_segment
+        sweep_segment.evaluate_variants(_pool, args.splits)
 
 
 if __name__ == "__main__":
