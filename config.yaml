@@ -182,12 +182,19 @@ lines:
 
 assign:
   # Etapas 5-7 (src/assign.py), pipeline mínimo da Fatia 5: tudo "escolha, sem calibrar" até a varredura
+  family_mode: vp           # vp | angle: famílias pelo ponto de fuga ou pelo ângulo com a horizontal (teto medido no GSR train)
+  vp_min_segs: 3            # ponto de fuga só com >= 3 segmentos (reforço; escolha)
+  angle_split_deg: 30       # modo angle: família ao longo do comprimento com ângulo <= isto (erra >= 32% no GSR train: não serve)
   vp_tol_deg: 2.0          # segmento pertence à família se aponta para o ponto de fuga a <= isto (escolha)
-  top_k: 4                 # segmentos mais longos por família usados nas hipóteses (escolha; custo)
+  top_k: 4                 # segmentos mais longos por família usados nas hipóteses (escolha; 6 não sobe o teto no GSR train)
   pair_min_frac: 0.02      # duas retas da mesma família precisam estar a >= isto·h (escolha)
   score_step_m: 1.0        # amostragem do modelo na verificação (escolha; custo)
   score_tol_frac: 0.0083333   # apoio na verificação: a <= 6/720·h de uma marca (escolha; folga para a lente)
-  score_lambda: 0.5        # [EMPÍRICO] peso da linha projetada sobre gramado sem marca; a calibrar
+  iou_scale: 0.125         # IoU campo projetado x gramado em 1/8 da resolução (escolha; custo)
+  verify_max_pts: 200      # pontos dos segmentos na verificação, em passo fixo (escolha; custo)
+  iou_prune: 0.5           # poda barata: hipótese com IoU campo x gramado < isto nem é verificada (H_gt no GSR train: p5 0,889)
+  gate_img: 0.45           # [EMPÍRICO] portão: fração explicada das marcas >= isto (H_gt no subconjunto do GSR train: p5 0,49); provisório
+  gate_iou: 0.85           # [EMPÍRICO] portão: IoU campo projetado x gramado >= isto (H_gt: p5 0,889); provisório
   band_frac: 0.0083333     # faixa do caminho guiado (pixels da máscara em volta da linha projetada), 6/720·h (escolha)
   guided_max_pts: 400      # pontos por classe no caminho guiado, subamostrados (escolha; custo)
   seg_step_px: 5           # amostragem dos segmentos classificados para o ajuste (escolha)
