@@ -291,3 +291,125 @@ def point_widths(H, lines_uv):
             n /= np.linalg.norm(n, axis=1, keepdims=True)
         out[k] = np.linalg.norm(_apply(H, XY + n * LINE_WIDTH / 2) - _apply(H, XY - n * LINE_WIDTH / 2), axis=1)
     return out
+
+
+# ======================= Etapa 3: segmentos de reta =======================
+STRAIGHT = [k for k in POLYLINES if not k.startswith("Circle")]
+CIRCLES = [k for k in POLYLINES if k.startswith("Circle")]
+
+
+def segment_gt(H, size, region=None):
+    """Gabarito das retas (imagem), por classe reta com eixo na imagem: mapa de
+    distância ao eixo de 1 px inteiro, pixels do eixo visíveis (fora de `border_px`
+    e, se dada, dentro de `region`) e se a linha conta como visível (eixo visível >=
+    `visible_min_frac`·h). Mais o mapa de distância aos círculos (cordas de arco)."""
+    w, h = size
+    b = ES["border_px"]
+    inner = np.zeros((h, w), bool)
+    inner[b:-b, b:-b] = True
+    if region is not None:
+        inner &= region
+    per_class = {}
+    for c in STRAIGHT:
+        ax = axis_mask(H, size, [c])
+        if ax.any():
+            v, u = np.nonzero(ax & inner)
+            per_class[c] = dict(dist=_dist_to(ax), axis=np.stack([u, v], 1).astype(float),
+                                visible=len(u) >= CFG["lines"]["visible_min_frac"] * h)
+    return per_class, _dist_to(axis_mask(H, size, CIRCLES))
+
+
+def _sample(segs):
+    """Pontos a cada ~1 px ao longo dos segmentos (imagem) e o índice do segmento."""
+    n = np.ceil(np.hypot(segs[:, 2] - segs[:, 0], segs[:, 3] - segs[:, 1])).astype(int) + 2
+    sid = np.repeat(np.arange(len(segs)), n)
+    t = np.concatenate([np.linspace(0, 1, k) for k in n])
+    return segs[sid, :2] + t[:, None] * (segs[sid, 2:] - segs[sid, :2]), sid
+
+
+def segment_counts(segs, gt, tol):
+    """Casamento dos segmentos (N, 4) com o gabarito de `segment_gt` a `tol` px: o
+    segmento casa com a classe reta em que >= `match_min` dos seus pontos estão a <= tol
+    (a de maior fração); sem reta, e com os pontos sobre um círculo, é corda de arco.
+    Devolve contagens somáveis entre frames e a classe de cada segmento (None: não casou).
+    Precisão = len_match/len_total; recall por comprimento = axis_cov/axis_total;
+    recall de linhas = lines_det/lines_vis; fragmentação = segs_match/classes_match."""
+    per_class, dist_arc = gt
+    out = dict(len_total=0.0, len_match=0.0, len_arc=0.0, axis_total=0, axis_cov=0,
+               lines_vis=0, lines_det=0, segs_match=0, classes_match=0)
+    cls = [None] * len(segs)
+    if len(segs):
+        m, names = CFG["lines"]["match_min"], list(per_class)
+        pts, sid = _sample(segs)
+        h, w = dist_arc.shape
+        u = np.clip(np.round(pts[:, 0]).astype(int), 0, w - 1)
+        v = np.clip(np.round(pts[:, 1]).astype(int), 0, h - 1)
+        npts = np.bincount(sid, minlength=len(segs))
+        frac = lambda dist: np.bincount(sid, dist[v, u] <= tol, len(segs)) / npts
+        best, best_f = np.full(len(segs), -1), np.zeros(len(segs))
+        for k, c in enumerate(names):
+            f = frac(per_class[c]["dist"])
+            up = (f >= m) & (f > best_f)
+            best[up], best_f[up] = k, f[up]
+        length = np.hypot(segs[:, 2] - segs[:, 0], segs[:, 3] - segs[:, 1])
+        arc = (best < 0) & (frac(dist_arc) >= m)
+        out.update(len_total=float(length.sum()), len_match=float(length[best >= 0].sum()),
+                   len_arc=float(length[arc].sum()), segs_match=int((best >= 0).sum()),
+                   classes_match=len(set(best[best >= 0])))
+        cls = [names[k] if k >= 0 else None for k in best]
+    for c, g in per_class.items():
+        if g["visible"]:
+            mine = segs[[i for i, x in enumerate(cls) if x == c]]
+            out["lines_vis"] += 1
+            out["axis_total"] += len(g["axis"])
+            if len(mine):
+                out["lines_det"] += 1
+                out["axis_cov"] += int((point_segment_distance(g["axis"], mine.reshape(-1, 2, 2)) <= tol).sum())
+    return out, cls
+
+
+# ======================= Etapa 4: elipses =======================
+def ellipse_gt(H, size):
+    """Por classe de círculo (imagem): pontos da polilinha projetada dentro da imagem e
+    se a classe conta como visível (>= metade da polilinha dentro da imagem)."""
+    w, h = size
+    out = {}
+    for c in CIRCLES:
+        uv, ok = project(H, POLYLINES[c])
+        inside = ok & (uv[:, 0] >= 0) & (uv[:, 0] <= w - 1) & (uv[:, 1] >= 0) & (uv[:, 1] <= h - 1)
+        if inside.any():
+            out[c] = dict(pts=uv[inside], visible=inside.mean() >= 0.5)
+    return out
+
+
+def ellipse_counts(ellipses, egt, shape, tol):
+    """Uma elipse casa com a classe de círculo cujos pontos dentro da imagem têm a menor
+    distância mediana a ela, se essa mediana é <= tol (a lente deforma o círculo
+    pintado: numa elipse certa, 20% dos pontos podem passar de tol). Também a regra
+    dos segmentos (>= `match_min` dos pontos a <= tol), com o sufixo 80. Contagens
+    somáveis: detectadas e casadas; visíveis e detectadas, à parte para o círculo
+    central e para os arcos das grandes áreas."""
+    from src.conics import dist_to_ellipse
+    keys = ("det_match", "det_central", "det_arco")
+    out = dict(det=len(ellipses), vis_central=0, vis_arco=0, **{k: 0 for k in keys}, **{k + "80": 0 for k in keys})
+    matched, matched80 = set(), set()
+    for E in ellipses:
+        d = dist_to_ellipse(E, shape)
+        med, frac = {}, {}
+        for c, g in egt.items():
+            p = np.round(g["pts"]).astype(int)
+            dd = d[p[:, 1], p[:, 0]]
+            med[c], frac[c] = float(np.median(dd)), float((dd <= tol).mean())
+        if med and min(med.values()) <= tol:
+            out["det_match"] += 1
+            matched.add(min(med, key=med.get))
+        if frac and max(frac.values()) >= CFG["lines"]["match_min"]:
+            out["det_match80"] += 1
+            matched80.add(max(frac, key=frac.get))
+    for c, g in egt.items():
+        if g["visible"]:
+            k = "central" if c == "Circle central" else "arco"
+            out[f"vis_{k}"] += 1
+            out[f"det_{k}"] += c in matched
+            out[f"det_{k}80"] += c in matched80
+    return out

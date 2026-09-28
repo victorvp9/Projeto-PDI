@@ -46,11 +46,12 @@ def pitch_mask(H, size):
     return _warp(top, H, size, cv2.INTER_NEAREST, 0).astype(bool)
 
 
-def axis_mask(H, size):
-    """Máscara bool (imagem) das polilinhas do modelo projetadas por H com 1 px."""
+def axis_mask(H, size, classes=None):
+    """Máscara bool (imagem) das polilinhas do modelo (ou só de `classes`) projetadas
+    por H com 1 px."""
     w, h = size
     t = np.zeros((h, w), np.uint8)
-    for poly in POLYLINES.values():
+    for poly in (POLYLINES.values() if classes is None else (POLYLINES[c] for c in classes)):
         segs = np.clip(project_segments(H, poly), -1e6, 1e6).astype(np.int32)
         cv2.polylines(t, list(segs), False, 1, 1)
     return t.astype(bool)

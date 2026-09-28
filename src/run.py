@@ -299,12 +299,14 @@ def main():
     ap.add_argument("--segment-variants", action="store_true", help="rodada das variantes da Fatia 3 (WC14 train_val; GSR --splits)")
     ap.add_argument("--lines-fp-sheet", action="store_true", help="Fatia 4: amostra dos falsos positivos da máscara de marcações (treino) e folhas de contato")
     ap.add_argument("--lines-fp-table", action="store_true", help="Fatia 4: tabela das categorias de falsos positivos (outputs/lines_fp_classes.csv)")
+    ap.add_argument("--lines-sweep", action="store_true", help="Fatia 4: grade das retas (escolha no GSR train; WC14 a 3 e 8 px como verificação)")
+    ap.add_argument("--lines-sweep-ellipses", action="store_true", help="Fatia 4: grade das elipses (escolha no GSR train; WC14 a 3 e 8 px como verificação)")
     ap.add_argument("--splits", nargs="+", default=["train", "valid", "test"], help="partições do GSR")
     args = ap.parse_args()
     if not (args.overlay or args.gsr_quality or args.fit_calibration or args.evaluate or args.shadow_sheet
             or args.segment_sweep or args.segment_sweep_lines or args.segment_eval
             or args.segment_variants_calib is not None or args.segment_variants
-            or args.lines_fp_sheet or args.lines_fp_table):
+            or args.lines_fp_sheet or args.lines_fp_table or args.lines_sweep or args.lines_sweep_ellipses):
         ap.print_help()
     for spec in args.overlay or []:
         overlay(spec)
@@ -338,6 +340,12 @@ def main():
     if args.lines_fp_table:
         from src import sweep_lines
         sweep_lines.fp_table()
+    if args.lines_sweep:
+        from src import sweep_lines
+        print(sweep_lines.calibrate_lines(_pool))
+    if args.lines_sweep_ellipses:
+        from src import sweep_lines
+        print(sweep_lines.calibrate_ellipses(_pool))
 
 
 if __name__ == "__main__":

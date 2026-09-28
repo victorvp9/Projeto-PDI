@@ -302,6 +302,24 @@ Etapas 5, 6 e 7. É a semana mais difícil.
   recupera as linhas largas (WC14, 6–8 px: 0,32 → 0,57), que são as do lado da
   câmera, ao custo de F1 −0,024. Decidir aqui pelo erro da homografia (as duas
   estão no config: `line_scales`).
+- **Decisão pendente da Fatia 4: td da fusão, 3/720 × 6/720 da altura.** A
+  varredura escolheu 6/720 (fragmentação 1,56 → 1,17, mesmo F1), mas a
+  fragmentação quase não custa depois da classificação, e uma linha perdida ou
+  uma fusão de paralelas custa. Decidir aqui pelo erro da homografia
+  (`lines.fuse_d_frac`). A conferência da Fatia 4 mostrou que as perdas de td
+  6/720 não são fusões de paralelas: são retas únicas ajustadas sobre linhas
+  curvadas pela lente; td 3/720 as deixa em pedaços que acompanham a curva.
+- **Círculo pelo caminho guiado** (decisão de Victor): com a H inicial das
+  retas, projetar o círculo central (e os arcos) e ajustar com os pixels da
+  máscara perto dele — o termo de Sampson do `fit_point_line` já faz isso. A
+  detecção às cegas da Fatia 4 (recall 0,74 no central, 0,20 nos arcos,
+  precisão 0,67) só é indispensável no meio-campo, onde há poucas retas.
+- **Segmentos marcados como corda** (decisão de Victor): a Fatia 4 não apaga as
+  cordas; cada segmento sobre uma elipse aceita fica na lista com o id dela
+  (`conics.chord_ids`). Aqui, por padrão, ficam fora das retas, mas **voltam se
+  a elipse for rejeitada pela consistência com a homografia** — 1/3 das
+  elipses é falso, e uma falsa encostada em retas marcaria uma reta de verdade
+  (sintético: a lateral esquerda).
 - **Risco (achado na Fatia 4):** no GSR, o friso claro da base das placas de
   LED é uma reta longa, paralela e logo além da lateral do fundo, e pode ser
   confundido com ela na classificação semântica. Ele entra na máscara porque o

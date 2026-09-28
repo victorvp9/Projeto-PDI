@@ -145,6 +145,40 @@ sweep_segment:
 lines:
   # Etapas 3 e 4 (src/lines.py, src/conics.py). Tolerâncias em fração da altura (decisão de Victor, plano da Fatia 4)
   tol_frac: 0.0041667   # 3/720: casamento e falso positivo a 3 px no WC14 (720p), 4,5 px no GSR (1080p)
+  match_min: 0.8        # segmento casa com a classe se >= 80% dos seus pontos estão a <= tol dela (plano da Fatia 4)
+  visible_min_frac: 0.05   # linha do gabarito conta como visível com >= 0,05·h de eixo na imagem (escolha)
+  # Etapa 3 (src/lines.py). Parâmetros comuns às duas bases, em fração da altura; calibrados só no GSR train (decisão de Victor)
+  hough_rho_px: 1         # resolução radial do acumulador (plano da Fatia 4)
+  hough_theta_deg: 0.5    # resolução angular (idem)
+  hough_votes_frac: 0.04  # [EMPÍRICO] votos mínimos, fração da altura; varredura no GSR train (topo plano: 0,02 dá o mesmo F1)
+  hough_min_len_frac: 0.06  # [EMPÍRICO] comprimento mínimo do segmento; varredura no GSR train (borda de cima da grade; não estendida, topo plano)
+  hough_gap_frac: 0.015   # [EMPÍRICO] vão máximo dentro de um segmento do Hough; varredura no GSR train (idem)
+  shape_filter: true      # [EMPÍRICO] tira da entrada do Hough os componentes pouco alongados (pessoas: alongamento mediano 2,7); ablação: F1 +0,044
+  shape_elong_min: 4      # alongamento mínimo (momentos) do componente, se shape_filter (escolha, pela amostra de falsos positivos)
+  fuse: true              # [EMPÍRICO] fusão de colineares; ablação: fragmentação 4,70 -> 1,17
+  fuse_theta_deg: 1.0     # [EMPÍRICO] diferença máxima de ângulo para fundir; varredura no GSR train (2° dá o mesmo)
+  fuse_d_frac: 0.0083333  # [EMPÍRICO] distância máxima dos extremos de um à reta do outro: 6/720·h pela varredura; EM ABERTO, 3/720 x 6/720 decidido na Fatia 5 pelo erro da homografia
+  fuse_gap_frac: 0.3      # [EMPÍRICO] vão máximo ao longo da reta (as linhas de cima das duas grandes áreas são colineares); varredura no GSR train
+  # Etapa 4 (src/conics.py): elipses ajustadas na máscara inteira; as cordas das aceitas saem das retas (decisão de Victor)
+  ellipse_tol_frac: 0.0041667   # [EMPÍRICO] τ: distância de apoio à elipse (3/720·h); rodada no GSR train (6/720: precisão 0,33)
+  ellipse_arc_min_frac: 0.4     # [EMPÍRICO] perímetro apoiado mínimo, fração da altura; rodada única no GSR train (borda de cima da grade; sem nova rodada)
+  ellipse_ratio_max: 8          # razão máxima dos semieixos: oráculo do GSR train (círculo projetado pela H_gt), p90 5,7 no central e 7,6 nos arcos (decisão de Victor)
+  # âncora geométrica (decisão de Victor), limites folgados sobre o oráculo do GSR train (clipes [::3], 1 frame a cada 50):
+  anchor_cross_deg: 60         # central: reta cruzando com ângulo >= isto ao eixo maior (oráculo: linha do meio >= 84,5°, p1)
+  anchor_center_b: 0.75        # central: ... e a <= isto·B do centro da elipse (oráculo: mediana 0,16, máximo 0,58)
+  anchor_round_ratio: 1.3      # central: abaixo desta razão dos semieixos o teste de ângulo não vale (eixo maior sem direção; vista de cima) (escolha)
+  anchor_parallel_deg: 30      # arco: reta a <= isto do eixo maior (oráculo: reta main a 9,5-13,7°)
+  anchor_end_b: 0.3            # arco: pontas do trecho apoiado a <= isto·B da reta (oráculo: 0, as pontas estão sobre ela)
+  anchor_bulge_b: 0.5          # arco: o arco se afasta da reta >= isto·B (oráculo: 0,71-0,81)
+  ellipse_support_min: 0.25     # fração mínima do perímetro dentro da imagem apoiada: o arco da grande área é ~1/3 da elipse (escolha)
+  ellipse_chords_min: 3        # cordas mínimas (segmentos com a maior parte dos pontos sobre a elipse): evidência de curvatura (escolha)
+  ellipse_turn_min_deg: 30     # [EMPÍRICO] leque mínimo de direções das cordas; rodada única no GSR train (borda de baixo da grade; sem nova rodada)
+  ellipse_b_min_frac: 0.02      # semieixo menor mínimo, fração da altura (escolha)
+  ellipse_a_max_frac: 3.0       # semieixo maior máximo, fração da altura (escolha)
+  ellipse_hough_min_len_frac: 0.02   # [EMPÍRICO] comprimento mínimo (e votos) do Hough das candidatas: cordas curtas cobrem as pontas (oráculo: leque 36° -> 100°); rodada no GSR train (borda de baixo; sem nova rodada)
+  ellipse_neighbors: 6          # vizinhos por ponto médio nos trios de candidatas (escolha; custo)
+  ellipse_max: 2                # círculo central e um arco da grande área (plano da Fatia 4)
+  chord_min: 0.5                # segmento é corda de uma elipse com mais da metade dos pontos a <= τ dela (decisão de Victor)
 
 sweep_lines:
   # análise da Fatia 4, só no treino (WC14 train_val, GSR train a cada eval_segment.gsr_frame_step)
@@ -154,6 +188,20 @@ sweep_lines:
   fp_context_frac: 0.5  # recorte de contexto, fração da altura (escolha)
   fp_panel_px: 160      # lado de cada painel na folha de contato (escolha)
   fp_per_sheet: 15      # 3 colunas x 5 linhas por folha (escolha)
+  # grade modesta das retas (decisão de Victor: o número que decide é o erro da homografia na Fatia 5)
+  hough_votes_frac: [0.02, 0.04]
+  hough_min_len_frac: [0.03, 0.06]
+  hough_gap_frac: [0.005, 0.015]
+  shape_filter: [false, true]
+  fuse_theta_deg: [1.0, 2.0]
+  fuse_d_frac: [0.0041667, 0.0083333]   # 3/720 e 6/720 da altura
+  fuse_gap_frac: [0.1, 0.3]
+  wc14_check_px: [3, 8]   # verificação no WC14: 3 px (= 3/720·h) e 8 px (p75 do deslocamento do gabarito; conservador)
+  # grade modesta das elipses (mesmo protocolo: escolha no GSR train, WC14 como verificação)
+  ellipse_tol_frac: [0.0041667, 0.0083333]   # τ: 3/720 e 6/720 da altura
+  ellipse_arc_min_frac: [0.2, 0.4]
+  ellipse_turn_min_deg: [30, 60]
+  ellipse_hough_min_len_frac: [0.02, 0.03]
 
 render:
   px_per_m: 25      # vista de cima; 25 px/m faz a linha de 0,12 m ter 3 px inteiros (escolha)
