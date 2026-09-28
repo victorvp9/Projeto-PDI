@@ -292,11 +292,41 @@ sem recalibrar nada dela.
   (jogo 3; contraste baixo), por isso o relatório por jogo.
 
 ### Fatia 5 — Classificação e homografia (semana 4)
-Etapas 5, 6 e 7. É a semana mais difícil.
+Etapas 5, 6 e 7. É a semana mais difícil. Plano aprovado por Victor em 2026-09-28,
+com os ajustes dele (`decisoes.md`).
 
-- Classificação semântica dos segmentos, correspondências, RANSAC + DLT.
-- Refinamento não-linear com termo ponto-linha — reaproveita a função escrita na
-  Fatia 2 para a `H_gt` pelas linhas.
+- **Ordem:** primeiro um pipeline mínimo de ponta a ponta (hipóteses →
+  verificação → refinamento), sem calibrar nada, num subconjunto do GSR train;
+  trazer o primeiro NPE, a cobertura, o número de hipóteses e o tempo por frame
+  antes de qualquer varredura.
+- **Classificação (Etapa 5) por hipótese e verificação:** duas famílias de
+  segmentos pelo ponto de fuga (sem as cordas marcadas); 2 retas de cada família
+  (das mais longas) atribuídas a linhas do modelo da família respeitando a ordem;
+  H pelo retângulo das 4 interseções; poda por plausibilidade; verificação pelo
+  modelo inteiro projetado contra a máscara (apoio − penalidade por linha
+  projetada sobre gramado sem marca). A melhor dá a H₀ e as classes. Friso das
+  placas de LED: segmento com não-gramado logo acima não pode ser a lateral do
+  fundo.
+- **Simetria de 180°:** o modelo é invariante a (X, Y) → (−X, −Y), então H e
+  H·R180 empatam; desempate pela convenção Y+ = lado da câmera (um ponto no pé
+  da imagem cai em Y maior que um mais acima), e descarte das espelhadas pelo
+  sinal do determinante. Teste unitário.
+- **Caminho principal:** H₀ da melhor hipótese → `fit_point_line`. Refinamento
+  com os pontos dos segmentos classificados **e**, como variante, com os pixels
+  da máscara numa faixa em volta de todas as linhas do modelo projetadas pela H
+  atual (recupera linhas que o Hough perdeu); ablação pelo NPE. Círculos pelo
+  caminho guiado nos dois casos.
+- **Correspondências (Etapa 6) + RANSAC viram ablação** ("com × sem"): p, pe
+  (até 50% além da imagem) e p1 (linha do meio × círculo).
+- **Aceite** pelo critério da `H_gt` (posto 8, condição ≤ 3000, resíduo ≤ 10 px);
+  fora disso, falha de cobertura. Vistas com uma família só e meio-campo sem
+  círculo: falha de cobertura é aceitável (alvo da Fatia 6), sem rodadas nelas.
+- **Elipses conferidas depois da H:** a rejeitada devolve as cordas e o frame é
+  reclassificado uma vez.
+- **Avaliação:** predições em `.npz` para o `--evaluate` (estendido ao WC14);
+  cobertura, NPE, `IoU_whole`, SN-Calib e LocSim no GSR, por jogo. Marco:
+  detector sozinho no WC14 `train_val` e no GSR `train`; uma medição no fim na
+  GSR `valid`, só relatório.
 - **Decisão pendente da Fatia 3: marcações em escala única × multiescala "1+2".**
   A escala única ficou pelo F1 por pixel, que é só uma aproximação; a "1+2"
   recupera as linhas largas (WC14, 6–8 px: 0,32 → 0,57), que são as do lado da

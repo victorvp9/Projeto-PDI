@@ -180,6 +180,19 @@ lines:
   ellipse_max: 2                # círculo central e um arco da grande área (plano da Fatia 4)
   chord_min: 0.5                # segmento é corda de uma elipse com mais da metade dos pontos a <= τ dela (decisão de Victor)
 
+assign:
+  # Etapas 5-7 (src/assign.py), pipeline mínimo da Fatia 5: tudo "escolha, sem calibrar" até a varredura
+  vp_tol_deg: 2.0          # segmento pertence à família se aponta para o ponto de fuga a <= isto (escolha)
+  top_k: 4                 # segmentos mais longos por família usados nas hipóteses (escolha; custo)
+  pair_min_frac: 0.02      # duas retas da mesma família precisam estar a >= isto·h (escolha)
+  score_step_m: 1.0        # amostragem do modelo na verificação (escolha; custo)
+  score_tol_frac: 0.0083333   # apoio na verificação: a <= 6/720·h de uma marca (escolha; folga para a lente)
+  score_lambda: 0.5        # [EMPÍRICO] peso da linha projetada sobre gramado sem marca; a calibrar
+  band_frac: 0.0083333     # faixa do caminho guiado (pixels da máscara em volta da linha projetada), 6/720·h (escolha)
+  guided_max_pts: 400      # pontos por classe no caminho guiado, subamostrados (escolha; custo)
+  seg_step_px: 5           # amostragem dos segmentos classificados para o ajuste (escolha)
+  refine_iters: 2          # reclassificação/reseleção + ajuste (escolha)
+
 sweep_lines:
   # análise da Fatia 4, só no treino (WC14 train_val, GSR train a cada eval_segment.gsr_frame_step)
   fp_n: 100             # pixels falsos positivos sorteados por base; erro-padrão ~5 p.p. (plano da Fatia 4)
