@@ -1,0 +1,165 @@
+conjunto,metrica,media,mediana
+GSR train / todos,frames,1710,
+GSR train / todos,frames com H_gt,1697,
+GSR train / todos,cobertura,0.33883323512080143,
+GSR train / todos,iou_whole,0.8336862793732841,0.9413360104702685
+GSR train / todos,iou_part,0.9720596163507945,0.9984371539751337
+GSR train / todos,npe,0.7081471780344187,0.0059557130642948234
+GSR train / todos,re_m,4.678708928433216,0.22282432291627868
+GSR train / todos,auxflow iou_whole,0.7308380865916857,0.8125395172388143
+GSR train / todos,auxflow iou_part,0.962567805733913,0.9935331014008425
+GSR train / todos,auxflow npe,0.7757032752041734,0.025429434243543093
+GSR train / todos,auxflow re_m,6.21928238316755,0.8021301626490294
+GSR train / todos,acc@5,0.2415362796722446,
+GSR train / todos,acc@10,0.2704360965545176,
+GSR train / todos,acc@20,0.2803381730355414,
+GSR train / todos,locsim@5,0.7981213850254507,0.9573167298547653
+GSR train / todos,locsim@2,0.6113500430086329,0.7613736037118572
+GSR train / todos,mAP-locsim,0.7501845885742108,
+GSR train / todos,locsim dist (m),4.739182823080941,0.6033456351524741
+GSR train / sem duvidosos,frames,1703,
+GSR train / sem duvidosos,frames com H_gt,1690,
+GSR train / sem duvidosos,cobertura,0.34023668639053256,
+GSR train / sem duvidosos,iou_whole,0.8336862793732841,0.9413360104702685
+GSR train / sem duvidosos,iou_part,0.9720596163507945,0.9984371539751337
+GSR train / sem duvidosos,npe,0.7081471780344187,0.0059557130642948234
+GSR train / sem duvidosos,re_m,4.678708928433216,0.22282432291627868
+GSR train / sem duvidosos,auxflow iou_whole,0.7308380865916857,0.8125395172388143
+GSR train / sem duvidosos,auxflow iou_part,0.962567805733913,0.9935331014008425
+GSR train / sem duvidosos,auxflow npe,0.7757032752041734,0.025429434243543093
+GSR train / sem duvidosos,auxflow re_m,6.21928238316755,0.8021301626490294
+GSR train / sem duvidosos,acc@5,0.2425290888077148,
+GSR train / sem duvidosos,acc@10,0.2715476953072373,
+GSR train / sem duvidosos,acc@20,0.28149047321830645,
+GSR train / sem duvidosos,locsim@5,0.7981213850254507,0.9573167298547653
+GSR train / sem duvidosos,locsim@2,0.6113500430086329,0.7613736037118572
+GSR train / sem duvidosos,mAP-locsim,0.7501845885742108,
+GSR train / sem duvidosos,locsim dist (m),4.739182823080941,0.6033456351524741
+"GSR train, jogo 4 / todos",frames,540,
+"GSR train, jogo 4 / todos",frames com H_gt,530,
+"GSR train, jogo 4 / todos",cobertura,0.22830188679245284,
+"GSR train, jogo 4 / todos",iou_whole,0.7584592275119977,0.8355427619119764
+"GSR train, jogo 4 / todos",iou_part,0.9621414175551515,0.9923838336368442
+"GSR train, jogo 4 / todos",npe,0.6127018523153603,0.03307313611697313
+"GSR train, jogo 4 / todos",re_m,6.989984086831756,1.014622087817376
+"GSR train, jogo 4 / todos",auxflow iou_whole,0.7160465583595073,0.7766646371838158
+"GSR train, jogo 4 / todos",auxflow iou_part,0.9591953101477226,0.9844439445588413
+"GSR train, jogo 4 / todos",auxflow npe,0.6080804103565625,0.045564236899294785
+"GSR train, jogo 4 / todos",auxflow re_m,7.250281500598329,1.3047689196252903
+"GSR train, jogo 4 / todos",acc@5,0.11988940329218106,
+"GSR train, jogo 4 / todos",acc@10,0.14485266019988244,
+"GSR train, jogo 4 / todos",acc@20,0.16002757787480007,
+"GSR train, jogo 4 / todos",locsim@5,0.746514825380776,0.931828794129574
+"GSR train, jogo 4 / todos",locsim@2,0.5363582225727853,0.6432070403527991
+"GSR train, jogo 4 / todos",mAP-locsim,0.698988702195792,
+"GSR train, jogo 4 / todos",locsim dist (m),6.820890378332882,0.7676086468482157
+"GSR train, jogo 4 / sem duvidosos",frames,540,
+"GSR train, jogo 4 / sem duvidosos",frames com H_gt,530,
+"GSR train, jogo 4 / sem duvidosos",cobertura,0.22830188679245284,
+"GSR train, jogo 4 / sem duvidosos",iou_whole,0.7584592275119977,0.8355427619119764
+"GSR train, jogo 4 / sem duvidosos",iou_part,0.9621414175551515,0.9923838336368442
+"GSR train, jogo 4 / sem duvidosos",npe,0.6127018523153603,0.03307313611697313
+"GSR train, jogo 4 / sem duvidosos",re_m,6.989984086831756,1.014622087817376
+"GSR train, jogo 4 / sem duvidosos",auxflow iou_whole,0.7160465583595073,0.7766646371838158
+"GSR train, jogo 4 / sem duvidosos",auxflow iou_part,0.9591953101477226,0.9844439445588413
+"GSR train, jogo 4 / sem duvidosos",auxflow npe,0.6080804103565625,0.045564236899294785
+"GSR train, jogo 4 / sem duvidosos",auxflow re_m,7.250281500598329,1.3047689196252903
+"GSR train, jogo 4 / sem duvidosos",acc@5,0.11988940329218106,
+"GSR train, jogo 4 / sem duvidosos",acc@10,0.14485266019988244,
+"GSR train, jogo 4 / sem duvidosos",acc@20,0.16002757787480007,
+"GSR train, jogo 4 / sem duvidosos",locsim@5,0.746514825380776,0.931828794129574
+"GSR train, jogo 4 / sem duvidosos",locsim@2,0.5363582225727853,0.6432070403527991
+"GSR train, jogo 4 / sem duvidosos",mAP-locsim,0.698988702195792,
+"GSR train, jogo 4 / sem duvidosos",locsim dist (m),6.820890378332882,0.7676086468482157
+"GSR train, jogo 6 / todos",frames,570,
+"GSR train, jogo 6 / todos",frames com H_gt,570,
+"GSR train, jogo 6 / todos",cobertura,0.43333333333333335,
+"GSR train, jogo 6 / todos",iou_whole,0.8662237900867501,0.9520953419535754
+"GSR train, jogo 6 / todos",iou_part,0.9831589486252447,0.998632943635747
+"GSR train, jogo 6 / todos",npe,0.3421162606837704,0.004824606397749971
+"GSR train, jogo 6 / todos",re_m,2.9462522449300574,0.1950945902474148
+"GSR train, jogo 6 / todos",auxflow iou_whole,0.7451797188196065,0.8407828499592958
+"GSR train, jogo 6 / todos",auxflow iou_part,0.9661076657519381,0.9937195414922095
+"GSR train, jogo 6 / todos",auxflow npe,0.5233993474185845,0.0226418609523465
+"GSR train, jogo 6 / todos",auxflow re_m,5.4949143523700155,0.7505309144019989
+"GSR train, jogo 6 / todos",acc@5,0.3504223310802259,
+"GSR train, jogo 6 / todos",acc@10,0.3818941292625504,
+"GSR train, jogo 6 / todos",acc@20,0.3886735778841043,
+"GSR train, jogo 6 / todos",locsim@5,0.8271024892002495,0.9625002741710909
+"GSR train, jogo 6 / todos",locsim@2,0.6404620496472017,0.7875087479826421
+"GSR train, jogo 6 / todos",mAP-locsim,0.7769992839317766,
+"GSR train, jogo 6 / todos",locsim dist (m),3.2895863323009085,0.5647667481716269
+"GSR train, jogo 6 / sem duvidosos",frames,563,
+"GSR train, jogo 6 / sem duvidosos",frames com H_gt,563,
+"GSR train, jogo 6 / sem duvidosos",cobertura,0.43872113676731794,
+"GSR train, jogo 6 / sem duvidosos",iou_whole,0.8662237900867501,0.9520953419535754
+"GSR train, jogo 6 / sem duvidosos",iou_part,0.9831589486252447,0.998632943635747
+"GSR train, jogo 6 / sem duvidosos",npe,0.3421162606837704,0.004824606397749971
+"GSR train, jogo 6 / sem duvidosos",re_m,2.9462522449300574,0.1950945902474148
+"GSR train, jogo 6 / sem duvidosos",auxflow iou_whole,0.7451797188196065,0.8407828499592958
+"GSR train, jogo 6 / sem duvidosos",auxflow iou_part,0.9661076657519381,0.9937195414922095
+"GSR train, jogo 6 / sem duvidosos",auxflow npe,0.5233993474185845,0.0226418609523465
+"GSR train, jogo 6 / sem duvidosos",auxflow re_m,5.4949143523700155,0.7505309144019989
+"GSR train, jogo 6 / sem duvidosos",acc@5,0.35477926947731575,
+"GSR train, jogo 6 / sem duvidosos",acc@10,0.3866423688803796,
+"GSR train, jogo 6 / sem duvidosos",acc@20,0.3935061090478498,
+"GSR train, jogo 6 / sem duvidosos",locsim@5,0.8271024892002495,0.9625002741710909
+"GSR train, jogo 6 / sem duvidosos",locsim@2,0.6404620496472017,0.7875087479826421
+"GSR train, jogo 6 / sem duvidosos",mAP-locsim,0.7769992839317766,
+"GSR train, jogo 6 / sem duvidosos",locsim dist (m),3.2895863323009085,0.5647667481716269
+"GSR train, jogo 9 / todos",frames,600,
+"GSR train, jogo 9 / todos",frames com H_gt,597,
+"GSR train, jogo 9 / todos",cobertura,0.34673366834170855,
+"GSR train, jogo 9 / todos",iou_whole,0.838834627822509,0.9455558214204233
+"GSR train, jogo 9 / todos",iou_part,0.9646130800342898,0.9985805757247253
+"GSR train, jogo 9 / todos",npe,1.200700419568797,0.0055023962263906784
+"GSR train, jogo 9 / todos",re_m,5.394904612776484,0.17474693015506493
+"GSR train, jogo 9 / todos",auxflow iou_whole,0.7223713800979522,0.8066913997233252
+"GSR train, jogo 9 / todos",auxflow iou_part,0.9603152769487766,0.9942166262369566
+"GSR train, jogo 9 / todos",auxflow npe,1.1735251731839598,0.023485497123706154
+"GSR train, jogo 9 / todos",auxflow re_m,6.477464230351459,0.7501756334942008
+"GSR train, jogo 9 / todos",acc@5,0.2475767195767196,
+"GSR train, jogo 9 / todos",acc@10,0.2775760582010582,
+"GSR train, jogo 9 / todos",acc@20,0.285699074074074,
+"GSR train, jogo 9 / todos",locsim@5,0.7970752862811189,0.9613750481784112
+"GSR train, jogo 9 / todos",locsim@2,0.6255159623086054,0.7817723179726953
+"GSR train, jogo 9 / todos",mAP-locsim,0.7514822555421123,
+"GSR train, jogo 9 / todos",locsim dist (m),5.119976943796109,0.5733439451453192
+"GSR train, jogo 9 / sem duvidosos",frames,600,
+"GSR train, jogo 9 / sem duvidosos",frames com H_gt,597,
+"GSR train, jogo 9 / sem duvidosos",cobertura,0.34673366834170855,
+"GSR train, jogo 9 / sem duvidosos",iou_whole,0.838834627822509,0.9455558214204233
+"GSR train, jogo 9 / sem duvidosos",iou_part,0.9646130800342898,0.9985805757247253
+"GSR train, jogo 9 / sem duvidosos",npe,1.200700419568797,0.0055023962263906784
+"GSR train, jogo 9 / sem duvidosos",re_m,5.394904612776484,0.17474693015506493
+"GSR train, jogo 9 / sem duvidosos",auxflow iou_whole,0.7223713800979522,0.8066913997233252
+"GSR train, jogo 9 / sem duvidosos",auxflow iou_part,0.9603152769487766,0.9942166262369566
+"GSR train, jogo 9 / sem duvidosos",auxflow npe,1.1735251731839598,0.023485497123706154
+"GSR train, jogo 9 / sem duvidosos",auxflow re_m,6.477464230351459,0.7501756334942008
+"GSR train, jogo 9 / sem duvidosos",acc@5,0.2475767195767196,
+"GSR train, jogo 9 / sem duvidosos",acc@10,0.2775760582010582,
+"GSR train, jogo 9 / sem duvidosos",acc@20,0.285699074074074,
+"GSR train, jogo 9 / sem duvidosos",locsim@5,0.7970752862811189,0.9613750481784112
+"GSR train, jogo 9 / sem duvidosos",locsim@2,0.6255159623086054,0.7817723179726953
+"GSR train, jogo 9 / sem duvidosos",mAP-locsim,0.7514822555421123,
+"GSR train, jogo 9 / sem duvidosos",locsim dist (m),5.119976943796109,0.5733439451453192
+WC14 train_val / todos,frames,209,
+WC14 train_val / todos,frames com H_gt,209,
+WC14 train_val / todos,cobertura,0.44019138755980863,
+WC14 train_val / todos,iou_whole,0.8671123442681669,0.9089265320748878
+WC14 train_val / todos,iou_part,0.9871764511782806,0.9942888431531313
+WC14 train_val / todos,npe,0.2722697144716158,0.01070941612360364
+WC14 train_val / todos,re_m,1.6334768211337976,0.3793516897829542
+WC14 train_val / todos,acc@5,nan,
+WC14 train_val / todos,acc@10,nan,
+WC14 train_val / todos,acc@20,nan,
+WC14 train_val / sem duvidosos,frames,209,
+WC14 train_val / sem duvidosos,frames com H_gt,209,
+WC14 train_val / sem duvidosos,cobertura,0.44019138755980863,
+WC14 train_val / sem duvidosos,iou_whole,0.8671123442681669,0.9089265320748878
+WC14 train_val / sem duvidosos,iou_part,0.9871764511782806,0.9942888431531313
+WC14 train_val / sem duvidosos,npe,0.2722697144716158,0.01070941612360364
+WC14 train_val / sem duvidosos,re_m,1.6334768211337976,0.3793516897829542
+WC14 train_val / sem duvidosos,acc@5,nan,
+WC14 train_val / sem duvidosos,acc@10,nan,
+WC14 train_val / sem duvidosos,acc@20,nan,

@@ -21,11 +21,13 @@ def file_to_internal(H_file):
 
 def load_sample(split: str, image_id: str) -> Sample:
     d = path("wc14") / split
+    grass = loadmat(d / f"{image_id}_grass_gt.mat")["grass"].astype(bool)
     return Sample(
         image_id=image_id,
         image_path=d / f"{image_id}.jpg",
         H_gt=file_to_internal(np.loadtxt(d / f"{image_id}.homographyMatrix")),
-        grass=loadmat(d / f"{image_id}_grass_gt.mat")["grass"].astype(bool),
+        size=(grass.shape[1], grass.shape[0]),
+        grass=grass,
     )
 
 

@@ -327,6 +327,9 @@ com os ajustes dele (`decisoes.md`).
   cobertura, NPE, `IoU_whole`, SN-Calib e LocSim no GSR, por jogo. Marco:
   detector sozinho no WC14 `train_val` e no GSR `train`; uma medição no fim na
   GSR `valid`, só relatório.
+- **Resolvido (2026-09-28): td 6/720 e escala única**, pelo NPE mediano com a
+  cobertura dentro do ruído (`decisoes.md`). Os dois itens abaixo ficam como
+  registro.
 - **Decisão pendente da Fatia 3: marcações em escala única × multiescala "1+2".**
   A escala única ficou pelo F1 por pixel, que é só uma aproximação; a "1+2"
   recupera as linhas largas (WC14, 6–8 px: 0,32 → 0,57), que são as do lado da

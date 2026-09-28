@@ -250,10 +250,12 @@ def shadow_sheet():
 
 
 def _eval_clip(args):
-    """Linhas de métrica de um clipe do GSR para a predição `name`: arquivo .npz,
-    "persons" (H pelas pessoas) ou "gt" (a própria H_gt, conferência do LocSim)."""
+    """Linhas de métrica de um clipe do GSR para a predição `name`: arquivo .npz (só os
+    frames tentados; H com NaN = falha de cobertura), "persons" (H pelas pessoas) ou "gt"
+    (a própria H_gt, conferência do LocSim)."""
     clip, name = args
     preds = None if name in ("persons", "gt") else np.load(name)
+    game = gsr.game_id(clip)
     rows = []
     for s in gsr.load_clip(clip):
         if name == "persons":
@@ -262,24 +264,96 @@ def _eval_clip(args):
             H = s.H_gt
         else:
             key = f"gsr/{clip.parent.name}/{clip.name}/{s.frame_idx}"
-            H = preds[key] if key in preds else None
-        rows.append(frame_metrics(H, s))
+            if key not in preds:
+                continue
+            H = preds[key] if np.isfinite(preds[key]).all() else None
+        rows.append(dict(**frame_metrics(H, s), jogo=game,
+                         n_pessoas=0 if s.persons_XY is None else len(s.persons_XY)))
     return rows
 
 
-def evaluate(name, splits):
-    """Tabela de métricas da predição `name` no GSR, com e sem os duvidosos."""
-    with _pool() as ex:
-        rows = [r for rs in ex.map(_eval_clip, [(c, name) for c in _clips(splits)]) for r in rs]
-    table = summarize(rows)
+def _eval_wc14(args):
+    name, split, image_id = args
+    preds = np.load(name)
+    H = preds[f"wc14/{split}/{image_id}"]
+    return frame_metrics(H if np.isfinite(H).all() else None, wc14.load_sample(split, image_id))
+
+
+def _print_table(title, table):
+    print(f"\n== {title}")
     for label, t in table.items():
-        print(f"\n[{label}]")
+        print(f"[{label}]")
         for k, v in t.items():
             print(f"  {k:16} " + (f"média {v[0]:.4f}  mediana {v[1]:.4f}" if isinstance(v, tuple) else f"{v:.4f}"))
+
+
+def evaluate(name, splits):
+    """Tabela de métricas da predição `name` no GSR (com e sem os duvidosos; por jogo se
+    for um .npz) e, se o .npz tiver chaves do WC14, no WC14."""
+    npz = name not in ("persons", "gt")
+    with _pool() as ex:
+        rows = [r for rs in ex.map(_eval_clip, [(c, name) for c in _clips(splits)]) for r in rs]
+        keys = [k.split("/") for k in np.load(name).files if k.startswith("wc14/")] if npz else []
+        w = list(ex.map(_eval_wc14, [(name, sp, i) for _, sp, i in keys]))
     tag = os.path.splitext(os.path.basename(name))[0]
-    _write_csv(path("outputs") / f"metrics_{tag}_{'+'.join(splits)}.csv",
-               [dict(conjunto=label, metrica=k, **({"media": v[0], "mediana": v[1]} if isinstance(v, tuple) else {"media": v, "mediana": ""}))
-                for label, t in table.items() for k, v in t.items()])
+    out = []
+    tables = [("GSR " + "+".join(splits), rows)]
+    if npz:
+        tables += [(f"GSR {'+'.join(splits)}, jogo {g}", [r for r in rows if r["jogo"] == g])
+                   for g in sorted({r["jogo"] for r in rows}, key=int)]
+    if w:
+        tables.append((f"WC14 {keys[0][1]}", w))
+    for title, rs in tables:
+        if not rs:
+            continue
+        table = summarize(rs)
+        _print_table(title, table)
+        out += [dict(conjunto=f"{title} / {label}", metrica=k, **({"media": v[0], "mediana": v[1]} if isinstance(v, tuple) else {"media": v, "mediana": ""}))
+                for label, t in table.items() for k, v in t.items()]
+    _write_csv(path("outputs") / f"metrics_{tag}_{'+'.join(splits)}.csv", out)
+
+
+def _detect_gsr_clip(args):
+    """Detector sozinho num clipe do GSR, 1 frame a cada `gsr_frame_step`."""
+    from src.assign import detect_frame
+    clip = args
+    cv2.setNumThreads(1)
+    D = CFG["detector"]
+    preds, rows = {}, []
+    for s in gsr.load_clip(clip, fit="none")[::D["gsr_frame_step"]]:
+        res = detect_frame(s.image, "gsr")
+        key = f"gsr/{clip.parent.name}/{clip.name}/{s.frame_idx}"
+        for v, (H, info) in res.items():
+            preds.setdefault(v, {})[key] = H if H is not None else np.full((3, 3), np.nan)
+            rows.append(dict(variante=v, chave=key, **{k: info.get(k) for k in ("ok", "hipoteses", "podadas", "margem", "img", "iou")}))
+    return preds, rows
+
+
+def _detect_wc14(args):
+    from src.assign import detect_frame
+    split, image_id = args
+    cv2.setNumThreads(1)
+    res = detect_frame(wc14.load_sample(split, image_id).image, "wc14")
+    key = f"wc14/{split}/{image_id}"
+    return ({v: {key: H if H is not None else np.full((3, 3), np.nan)} for v, (H, _) in res.items()},
+            [dict(variante=v, chave=key, **{k: info.get(k) for k in ("ok", "hipoteses", "podadas", "margem", "img", "iou")}) for v, (_, info) in res.items()])
+
+
+def detect(splits, wc14_split):
+    """Marco da Fatia 5: roda o detector (as variantes do config) no GSR `splits` e no WC14
+    `wc14_split`; grava outputs/pred_<variante>_<conjunto>.npz e outputs/detect_<conjunto>.csv."""
+    preds, rows = {}, []
+    with _pool() as ex:
+        for p_, r_ in list(ex.map(_detect_gsr_clip, _clips(splits))) + \
+                list(ex.map(_detect_wc14, [(wc14_split, i) for i in wc14.split_ids(wc14_split)] if wc14_split else [])):
+            for v, d in p_.items():
+                preds.setdefault(v, {}).update(d)
+            rows += r_
+    tag = "+".join(splits) + (f"_wc14-{wc14_split}" if wc14_split else "")
+    for v, d in preds.items():
+        np.savez_compressed(path("outputs") / f"pred_{v}_{tag}.npz", **d)
+        print(path("outputs") / f"pred_{v}_{tag}.npz")
+    _write_csv(path("outputs") / f"detect_{tag}.csv", rows)
 
 
 def main():
@@ -301,12 +375,14 @@ def main():
     ap.add_argument("--lines-fp-table", action="store_true", help="Fatia 4: tabela das categorias de falsos positivos (outputs/lines_fp_classes.csv)")
     ap.add_argument("--lines-sweep", action="store_true", help="Fatia 4: grade das retas (escolha no GSR train; WC14 a 3 e 8 px como verificação)")
     ap.add_argument("--lines-sweep-ellipses", action="store_true", help="Fatia 4: grade das elipses (escolha no GSR train; WC14 a 3 e 8 px como verificação)")
+    ap.add_argument("--detect", action="store_true", help="Fatia 5: detector sozinho (variantes do config) no GSR --splits e no WC14 --wc14-split")
+    ap.add_argument("--wc14-split", default="train_val", help="partição do WC14 do --detect ('' para pular); o test só na Fatia 8")
     ap.add_argument("--splits", nargs="+", default=["train", "valid", "test"], help="partições do GSR")
     args = ap.parse_args()
     if not (args.overlay or args.gsr_quality or args.fit_calibration or args.evaluate or args.shadow_sheet
             or args.segment_sweep or args.segment_sweep_lines or args.segment_eval
             or args.segment_variants_calib is not None or args.segment_variants
-            or args.lines_fp_sheet or args.lines_fp_table or args.lines_sweep or args.lines_sweep_ellipses):
+            or args.lines_fp_sheet or args.lines_fp_table or args.lines_sweep or args.lines_sweep_ellipses or args.detect):
         ap.print_help()
     for spec in args.overlay or []:
         overlay(spec)
@@ -314,6 +390,8 @@ def main():
         gsr_quality(args.splits)
     if args.fit_calibration:
         fit_calibration(args.splits)
+    if args.detect:
+        detect(args.splits, args.wc14_split)
     if args.evaluate:
         evaluate(args.evaluate, args.splits)
     if args.shadow_sheet:

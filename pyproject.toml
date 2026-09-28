@@ -15,3 +15,4 @@ dependencies = [
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+markers = ["slow: testes lentos; no dia a dia, pytest -m \"not slow\" (a suíte completa roda antes de cada commit)"]

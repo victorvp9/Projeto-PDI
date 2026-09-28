@@ -12,6 +12,7 @@ import cv2
 import numpy as np
 
 from src.config import CFG
+from src.evaluate import image_grid_displacement
 from src.geometry import point_segment_distance, project, project_segments
 from src.homography import LINE_EQ, fit_point_line
 from src.pitch_model import CORNERS, POLYLINES
@@ -51,14 +52,16 @@ def families(segs, P=A):
     largura). `family_mode`: "vp" — ponto de fuga por busca exaustiva em pares (peso =
     comprimento), com pelo menos `vp_min_segs` segmentos, reajustado por mínimos
     quadrados nos inliers e com os inliers recalculados; a família ao longo do
-    comprimento é a mais horizontal. "angle" — ângulo com a horizontal <= `angle_split_deg`."""
+    comprimento é a mais horizontal. Segmentos a <= `vp_both_deg` do ponto de fuga de uma
+    família entram nela também (fronteira: podem ficar nas duas). "angle" — ângulo com a
+    horizontal <= `angle_split_deg`."""
     length = np.hypot(segs[:, 2] - segs[:, 0], segs[:, 3] - segs[:, 1])
     if P["family_mode"] == "angle":
         ang = np.degrees(np.arctan2(np.abs(segs[:, 3] - segs[:, 1]), np.abs(segs[:, 2] - segs[:, 0])))
         return np.nonzero(ang <= P["angle_split_deg"])[0], np.nonzero(ang > P["angle_split_deg"])[0]
-    rest, groups = np.arange(len(segs)), []
+    rest, groups, vps = np.arange(len(segs)), [], []
     for _ in range(2):
-        best = (0.0, rest[:0])
+        best, vp_best = (0.0, rest[:0]), None
         for i, j in itertools.combinations(rest, 2):
             vp = np.cross(_hline(segs[i]), _hline(segs[j]))
             if np.any(vp):
@@ -66,12 +69,18 @@ def families(segs, P=A):
                 if len(inl) >= P["vp_min_segs"] and length[inl].sum() > best[0]:
                     best = (length[inl].sum(), inl)
         if len(best[1]):
-            inl = rest[_to_vp(segs[rest], _vp_refine(segs, best[1], length), P["vp_tol_deg"])]
+            vp_best = _vp_refine(segs, best[1], length)
+            inl = rest[_to_vp(segs[rest], vp_best, P["vp_tol_deg"])]
             best = (0.0, inl if len(inl) >= P["vp_min_segs"] else best[1])
         else:
             best = (0.0, rest)
         groups.append(best[1])
+        vps.append(vp_best)
         rest = np.setdiff1d(rest, best[1])
+    # fronteira: segmento a <= vp_both_deg do ponto de fuga da outra família entra nas duas
+    if P["vp_both_deg"] > P["vp_tol_deg"]:
+        allidx = np.arange(len(segs))
+        groups = [np.union1d(g, allidx[_to_vp(segs, vp, P["vp_both_deg"])]) if vp is not None else g for g, vp in zip(groups, vps)]
     horiz = [np.average(np.abs(segs[g, 3] - segs[g, 1]) / np.maximum(length[g], 1e-9), weights=length[g]) if len(g) else np.inf
              for g in groups]
     return (groups[0], groups[1]) if horiz[0] <= horiz[1] else (groups[1], groups[0])
@@ -277,9 +286,18 @@ def estimate(marks, grass, segs, refine="segments", P=A):
     info["podadas"] = len(Hs)
     if not Hs:
         return None, info
-    scores = [verify(H, ev, P)[3] for H in Hs]
-    H = Hs[int(np.argmax(scores))]
-    info["score"] = max(scores)
+    scores = np.array([verify(H, ev, P)[3] for H in Hs])
+    order = np.argsort(-scores)
+    H = Hs[order[0]]
+    # ambiguidade: margem sobre a melhor hipótese estruturalmente diferente (outra atribuição
+    # de retas: desloca a grade da imagem em > ambig_disp_frac·h); sem rival, margem = nota
+    margin = scores[order[0]]
+    for k in order[1:]:
+        d = image_grid_displacement(H, Hs[k], size)
+        if not np.isfinite(d) or d > P["ambig_disp_frac"] * h:
+            margin = scores[order[0]] - scores[k]
+            break
+    info.update(score=float(scores[order[0]]), margem=float(margin))
     fit_ok, lines_uv = True, {}
     if refine is not None:
         fit = None
@@ -300,5 +318,27 @@ def estimate(marks, grass, segs, refine="segments", P=A):
         fit_ok = bool(fit is not None and fit.ok)
         info["resid_px"] = fit.resid_px if fit else np.nan
     terms = verify(H, ev, P)
-    info.update(img=terms[0], mod=terms[1], iou=terms[2], fit_ok=fit_ok, ok=fit_ok and accept(terms, P))
+    info.update(img=terms[0], mod=terms[1], iou=terms[2], fit_ok=fit_ok,
+                ok=fit_ok and accept(terms, P) and margin >= P["ambig_margin"])
     return (H if info["ok"] else None), info
+
+
+def detect_frame(frame_bgr, dataset, variants=None, refine=None):
+    """Etapas 1-7 num frame (BGR) para cada variante {nome: {"segment": {...}, "lines": {...}}}
+    (padrão: as do config): {nome: (H campo -> imagem ou None, info)}. O gramado sai uma vez;
+    a máscara de marcações, uma vez por conjunto de parâmetros da segmentação."""
+    from src.conics import detect
+    from src.segment import grass_mask, line_mask, params
+    D = CFG["detector"]
+    variants = variants or D["variants"]
+    P = params(dataset)
+    grass = grass_mask(frame_bgr, P)
+    masks, out = {}, {}
+    for name, v in variants.items():
+        key = repr(sorted(v.get("segment", {}).items()))
+        if key not in masks:
+            masks[key] = line_mask(frame_bgr, grass, {**P, **v.get("segment", {})})
+        marks = masks[key]
+        segs, _, cid = detect(marks, {**CFG["lines"], **v.get("lines", {})})
+        out[name] = estimate(marks, grass, segs[cid < 0], refine or D["refine"])
+    return out

@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from src.assign import R180, estimate, valid_orientation
 from src.config import CFG
@@ -19,6 +20,7 @@ def test_orientation_rejects_rotated_and_mirrored():
     assert not valid_orientation(H_BROADCAST @ np.diag([1.0, -1, 1]), SIZE)  # espelhada em Y
 
 
+@pytest.mark.slow
 def test_gate_rejects_wrong_midfield_h():
     # meio-campo sintético (só a lateral do fundo, a linha do meio e o círculo): o pipeline
     # mínimo aceitava uma H a ~3000 px da certa com resíduo de 4,5 px; o portão tem de barrá-la
