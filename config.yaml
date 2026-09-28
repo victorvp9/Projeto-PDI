@@ -198,6 +198,9 @@ assign:
   gate_iou: 0.85           # [EMPÍRICO] portão: IoU campo projetado x gramado >= isto (H_gt: p5 0,889); provisório
   ambig_disp_frac: 0.03    # hipótese estruturalmente diferente: desloca a grade da imagem em > isto·h (escolha)
   ambig_margin: 0.0        # [EMPÍRICO] portão de ambiguidade: a melhor vence a diferente por >= isto; a calibrar no treino sem perder H certa
+  ellipse_check_frac: 0.0083333   # elipse confere com um círculo projetado pela H se a mediana <= 6/720·h (escolha: a H tem ~7 px de erro)
+  corr_beyond: 0.5         # interseção prolongada (pe) até 50% além da imagem (PnLCalib)
+  ransac_frac: 0.0111111   # limiar de inlier do RANSAC, 8/720·h (Maglo et al., referência)
   band_frac: 0.0083333     # faixa do caminho guiado (pixels da máscara em volta da linha projetada), 6/720·h (escolha)
   guided_max_pts: 400      # pontos por classe no caminho guiado, subamostrados (escolha; custo)
   seg_step_px: 5           # amostragem dos segmentos classificados para o ajuste (escolha)
@@ -207,11 +210,8 @@ detector:
   # marco da Fatia 5: detector sozinho (Etapas 1-7), frame a frame
   refine: guided           # ablação no subconjunto do GSR train: NPE mediano 0,0062 (guiado) x 0,0076 (segmentos)
   gsr_frame_step: 25       # 1 frame a cada 25 (como as avaliações das Fatias 3 e 4)
-  variants:                # decisões pendentes: td da fusão (Fatia 4) x escalas das marcações (Fatia 3), pelo NPE mediano no GSR train
-    td3_e1: {segment: {line_scales: [1.0]}, lines: {fuse_d_frac: 0.0041667}}
+  variants:                # td 6/720 x escala única, escolhida pelo NPE mediano no GSR train entre td 3/6 x escala 1/"1+2" (docs/decisoes.md)
     td6_e1: {segment: {line_scales: [1.0]}, lines: {fuse_d_frac: 0.0083333}}
-    td3_e12: {segment: {line_scales: [1.0, 2.0]}, lines: {fuse_d_frac: 0.0041667}}
-    td6_e12: {segment: {line_scales: [1.0, 2.0]}, lines: {fuse_d_frac: 0.0083333}}
 
 sweep_lines:
   # análise da Fatia 4, só no treino (WC14 train_val, GSR train a cada eval_segment.gsr_frame_step)

@@ -354,6 +354,13 @@ Adicionalmente, e específico deste projeto:
   protocolo oficial. Reporte τ = 5 m, τ = 2 m e o **mAP-LocSim** (média de
   τ = 1..10 m), como na tabela 7 do AuxFlow, que permite a comparação direta.
   Use só as pessoas: a caixa da bola no ar não está no chão.
+  **Penalizado × só cobertos.** O LocSim só dos frames cobertos (os que têm H)
+  mede a qualidade da H quando ela existe, mas é **otimista**: um método que só
+  responde nos frames fáceis tira nota alta cobrindo pouco. O **penalizado**
+  divide a soma das similaridades pelo total de pessoas de todos os frames
+  avaliados: a pessoa de um frame sem H vale 0, como vale para quem não a
+  localiza. É o comparável com métodos que cobrem todos os frames (tabela 7 do
+  AuxFlow: LocSim@5 do NBJW 0,885, do AuxFlow 0,929). Reporte os dois.
 - **Erro contra as linhas anotadas** (GSR) — distância dos pontos anotados às
   linhas do modelo projetadas pela homografia **estimada**, e acurácia a 5, 10 e
   20 px como no SN-Calib. É a única medida geométrica que **não depende de

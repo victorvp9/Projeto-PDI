@@ -264,13 +264,77 @@ def guided_points(H, marks, classes, P=A):
 CIRCLES = [k for k in POLYLINES if k not in LINE_EQ]
 
 
+def _image_lines(segs, cls, P=A):
+    """Classe -> reta homogênea da imagem por mínimos quadrados totais nos pontos dos
+    segmentos da classe."""
+    out = {}
+    for k in {c for c in cls if c}:
+        pts = np.concatenate([_sample(sg, P["seg_step_px"]) for sg, c in zip(segs, cls) if c == k])
+        c0 = pts.mean(0)
+        d = np.linalg.svd(pts - c0, full_matrices=False)[2][0]
+        out[k] = np.cross([*c0, 1.0], [*(c0 + d), 1.0])
+    return out
+
+
+def correspondences(segs, H, ellipses, size, P=A):
+    """Etapa 6: pares (campo, imagem) com as retas classificadas por H — interseções de
+    retas não paralelas no modelo, dentro da imagem (p) ou até `corr_beyond` além dela (pe),
+    e a linha do meio com a elipse do círculo central (p1)."""
+    w, h = size
+    lines = _image_lines(segs, classify(segs, H, h, P), P)
+    fld, img = [], []
+    b = P["corr_beyond"]
+    for k1, k2 in itertools.combinations(sorted(lines), 2):
+        X, x = np.cross(LINE_EQ[k1], LINE_EQ[k2]), np.cross(lines[k1], lines[k2])
+        if abs(X[2]) < 1e-9 or abs(x[2]) < 1e-9:
+            continue
+        x = x[:2] / x[2]
+        if -b * w <= x[0] <= (1 + b) * w and -b * h <= x[1] <= (1 + b) * h:
+            fld.append(X[:2] / X[2])
+            img.append(x)
+    if "Middle line" in lines:
+        from src.conics import ellipse_points
+        l = lines["Middle line"]
+        for E in ellipses:
+            if not ellipse_consistent(E, H, h, P, only="Circle central"):
+                continue
+            q = ellipse_points(E)
+            s_ = q @ l[:2] + l[2]
+            cross_ = np.nonzero(np.sign(s_) != np.sign(np.roll(s_, -1)))[0]
+            pts = [q[i] + (q[(i + 1) % len(q)] - q[i]) * s_[i] / (s_[i] - s_[(i + 1) % len(q)]) for i in cross_]
+            if len(pts) == 2:
+                model = np.array([[0.0, -9.15], [0.0, 9.15]])
+                for X in model:                              # cada ponto do modelo com a interseção mais próxima de sua projeção
+                    j = int(np.argmin([np.linalg.norm(pp - project(H, X[None])[0][0]) for pp in pts]))
+                    fld.append(X)
+                    img.append(pts[j])
+            break
+    return np.array(fld).reshape(-1, 2), np.array(img).reshape(-1, 2)
+
+
+def ellipse_consistent(E, H, h, P=A, only=None):
+    """Elipse (Etapa 4) confere com algum círculo do modelo projetado por H: mediana da
+    distância dos seus pontos ao círculo completo projetado <= ellipse_check_frac·h."""
+    from src.conics import ellipse_points
+    from src.homography import FULL_CIRCLES
+    pts = ellipse_points(E)
+    pts = pts[np.linspace(0, len(pts) - 1, min(len(pts), 200)).astype(int)]
+    for k, circ in FULL_CIRCLES.items():
+        if only and k != only:
+            continue
+        g = project_segments(H, circ)
+        if len(g) and np.median(point_segment_distance(pts, g)) <= P["ellipse_check_frac"] * h:
+            return True
+    return False
+
+
 def accept(terms, P=A):
     """Portão final: a H explica uma fração mínima das marcas (termo da imagem) e o campo
     projetado cobre o gramado (IoU). Barra H autoconsistente sobre as marcas erradas."""
     return terms[0] >= P["gate_img"] and terms[2] >= P["gate_iou"]
 
 
-def estimate(marks, grass, segs, refine="segments", P=A):
+def estimate(marks, grass, segs, refine="segments", P=A, ransac=False, ellipses=()):
     """Pipeline mínimo: hipóteses -> poda pelo IoU com o gramado -> verificação ->
     (refinamento) -> portão. `segs` sem as cordas marcadas. refine: None (só H₀),
     "segments" (pontos dos segmentos classificados + círculos guiados) ou "guided"
@@ -298,6 +362,13 @@ def estimate(marks, grass, segs, refine="segments", P=A):
             margin = scores[order[0]] - scores[k]
             break
     info.update(score=float(scores[order[0]]), margem=float(margin))
+    if ransac:                                   # ablação: correspondências (p, pe, p1) + RANSAC antes do refino
+        fld, img = correspondences(segs, H, ellipses, size, P)
+        info["correspondencias"] = len(fld)
+        if len(fld) >= 4:
+            Hr, _ = cv2.findHomography(fld.astype(np.float32), img.astype(np.float32), cv2.RANSAC, P["ransac_frac"] * h)
+            if Hr is not None and valid_orientation(Hr, size):
+                H = Hr
     fit_ok, lines_uv = True, {}
     if refine is not None:
         fit = None
@@ -339,6 +410,14 @@ def detect_frame(frame_bgr, dataset, variants=None, refine=None):
         if key not in masks:
             masks[key] = line_mask(frame_bgr, grass, {**P, **v.get("segment", {})})
         marks = masks[key]
-        segs, _, cid = detect(marks, {**CFG["lines"], **v.get("lines", {})})
-        out[name] = estimate(marks, grass, segs[cid < 0], refine or D["refine"])
+        segs, ells, cid = detect(marks, {**CFG["lines"], **v.get("lines", {})})
+        H, info = estimate(marks, grass, segs[cid < 0], refine or D["refine"])
+        # elipses conferidas depois da H: a rejeitada devolve as cordas e o frame é reclassificado uma vez
+        bad = [k for k, E in enumerate(ells) if not ellipse_consistent(E, H, marks.shape[0])] if H is not None else []
+        info["elipses_rejeitadas"] = len(bad)
+        if bad and np.isin(cid, bad).any():
+            H2, info2 = estimate(marks, grass, segs[(cid < 0) | np.isin(cid, bad)], refine or D["refine"])
+            if H2 is not None:
+                H, info = H2, {**info2, "elipses_rejeitadas": len(bad), "reclassificado": True}
+        out[name] = (H, info)
     return out

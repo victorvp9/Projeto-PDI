@@ -179,6 +179,10 @@ def summarize(rows):
             t["locsim@2"] = (locsim(d, 2).mean(), np.median(locsim(d, 2)))
             t["mAP-locsim"] = np.mean([locsim(d, tau).mean() for tau in E["locsim_taus_m"]])
             t["locsim dist (m)"] = (np.mean(d[np.isfinite(d)]), np.median(d))
+        n_all = sum(r.get("n_pessoas", 0) for r in rs)
+        if len(d) and n_all:                      # penalizado: pessoa de frame sem H vale 0 (docs/01-metodo.md)
+            t["locsim@5 penalizado"] = float(locsim(d, 5).sum() / n_all)
+            t["mAP-locsim penalizado"] = float(np.mean([locsim(d, tau).sum() / n_all for tau in E["locsim_taus_m"]]))
         table[label] = t
     return table
 

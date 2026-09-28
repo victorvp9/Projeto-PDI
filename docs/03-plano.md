@@ -385,6 +385,12 @@ esforço.
   pergunta do projeto. Incluir também âncora ingênua (a cada N frames), que no
   AuxFlow ficou abaixo do detector sozinho.
 - Kalman (BHITK) fica como opcional, se sobrar tempo.
+- **Risco principal (achado na Fatia 5): H erradas aceitas pelo detector** — a
+  cauda do NPE médio (0,58 com mediana 0,0064 no GSR train), quase sempre uma
+  troca de reta (grande × pequena área) ou o friso das placas tomado pela
+  lateral. Na propagação, uma âncora errada espalha o erro para os vizinhos.
+  Candidato: **verificação temporal da âncora**, rejeitando H inconsistente com o
+  movimento medido por Lucas–Kanade em relação aos vizinhos (anotação de Victor).
 
 ### Fatia 7 — Estabilidade, visibilidade e calibração (semana 6)
 - Métrica de estabilidade temporal pelos cantos projetados, **na série estimada**

@@ -1,0 +1,161 @@
+conjunto,metrica,media,mediana
+GSR valid / todos,frames,1740,
+GSR valid / todos,frames com H_gt,1697,
+GSR valid / todos,cobertura,0.26870948733058336,
+GSR valid / todos,iou_whole,0.7340199341835351,0.8732880319070132
+GSR valid / todos,iou_part,0.9398245948625773,0.9967326935794247
+GSR valid / todos,npe,0.7041061431563984,0.014375236455793323
+GSR valid / todos,re_m,8.185208530667055,0.4551768965968235
+GSR valid / todos,auxflow iou_whole,0.6256835677925671,0.6783063042848975
+GSR valid / todos,auxflow iou_part,0.9206109320619484,0.9897473579245497
+GSR valid / todos,auxflow npe,1.0719182303814307,0.02910384101510629
+GSR valid / todos,auxflow re_m,9.51290457667834,1.0148326911597516
+GSR valid / todos,acc@5,0.15772252675016368,
+GSR valid / todos,acc@10,0.18246171476521375,
+GSR valid / todos,acc@20,0.19112069786385202,
+GSR valid / todos,locsim@5,0.7044044282712559,0.9484108856618237
+GSR valid / todos,locsim@2,0.5536903635235209,0.7181717421523334
+GSR valid / todos,mAP-locsim,0.664859180835747,
+GSR valid / todos,locsim dist (m),8.395993842681552,0.6648490083565249
+GSR valid / todos,locsim@5 penalizado,0.174134623696119,
+GSR valid / todos,mAP-locsim penalizado,0.1643587101658019,
+GSR valid / sem duvidosos,frames,1740,
+GSR valid / sem duvidosos,frames com H_gt,1697,
+GSR valid / sem duvidosos,cobertura,0.26870948733058336,
+GSR valid / sem duvidosos,iou_whole,0.7340199341835351,0.8732880319070132
+GSR valid / sem duvidosos,iou_part,0.9398245948625773,0.9967326935794247
+GSR valid / sem duvidosos,npe,0.7041061431563984,0.014375236455793323
+GSR valid / sem duvidosos,re_m,8.185208530667055,0.4551768965968235
+GSR valid / sem duvidosos,auxflow iou_whole,0.6256835677925671,0.6783063042848975
+GSR valid / sem duvidosos,auxflow iou_part,0.9206109320619484,0.9897473579245497
+GSR valid / sem duvidosos,auxflow npe,1.0719182303814307,0.02910384101510629
+GSR valid / sem duvidosos,auxflow re_m,9.51290457667834,1.0148326911597516
+GSR valid / sem duvidosos,acc@5,0.15772252675016368,
+GSR valid / sem duvidosos,acc@10,0.18246171476521375,
+GSR valid / sem duvidosos,acc@20,0.19112069786385202,
+GSR valid / sem duvidosos,locsim@5,0.7044044282712559,0.9484108856618237
+GSR valid / sem duvidosos,locsim@2,0.5536903635235209,0.7181717421523334
+GSR valid / sem duvidosos,mAP-locsim,0.664859180835747,
+GSR valid / sem duvidosos,locsim dist (m),8.395993842681552,0.6648490083565249
+GSR valid / sem duvidosos,locsim@5 penalizado,0.174134623696119,
+GSR valid / sem duvidosos,mAP-locsim penalizado,0.1643587101658019,
+"GSR valid, jogo 2 / todos",frames,540,
+"GSR valid, jogo 2 / todos",frames com H_gt,525,
+"GSR valid, jogo 2 / todos",cobertura,0.42095238095238097,
+"GSR valid, jogo 2 / todos",iou_whole,0.704118315776911,0.8403050927012439
+"GSR valid, jogo 2 / todos",iou_part,0.9847862169153027,0.9972685753464043
+"GSR valid, jogo 2 / todos",npe,0.44918304081402033,0.015171609971474643
+"GSR valid, jogo 2 / todos",re_m,7.640040791366239,0.3978434638544913
+"GSR valid, jogo 2 / todos",auxflow iou_whole,0.5843605778485079,0.6383146077248738
+"GSR valid, jogo 2 / todos",auxflow iou_part,0.9567422048538248,0.9934747900508154
+"GSR valid, jogo 2 / todos",auxflow npe,0.994137248652879,0.030001065613065855
+"GSR valid, jogo 2 / todos",auxflow re_m,9.490399411069525,0.9886826139414675
+"GSR valid, jogo 2 / todos",acc@5,0.24209903265458824,
+"GSR valid, jogo 2 / todos",acc@10,0.2846741221741222,
+"GSR valid, jogo 2 / todos",acc@20,0.2992376810432366,
+"GSR valid, jogo 2 / todos",locsim@5,0.7544532705189965,0.9527091103777354
+"GSR valid, jogo 2 / todos",locsim@2,0.5806079002958159,0.7387576619761811
+"GSR valid, jogo 2 / todos",mAP-locsim,0.7088146015399234,
+"GSR valid, jogo 2 / todos",locsim dist (m),7.009271334518157,0.6358371602968962
+"GSR valid, jogo 2 / todos",locsim@5 penalizado,0.3047554998127983,
+"GSR valid, jogo 2 / todos",mAP-locsim penalizado,0.2863201163119218,
+"GSR valid, jogo 2 / sem duvidosos",frames,540,
+"GSR valid, jogo 2 / sem duvidosos",frames com H_gt,525,
+"GSR valid, jogo 2 / sem duvidosos",cobertura,0.42095238095238097,
+"GSR valid, jogo 2 / sem duvidosos",iou_whole,0.704118315776911,0.8403050927012439
+"GSR valid, jogo 2 / sem duvidosos",iou_part,0.9847862169153027,0.9972685753464043
+"GSR valid, jogo 2 / sem duvidosos",npe,0.44918304081402033,0.015171609971474643
+"GSR valid, jogo 2 / sem duvidosos",re_m,7.640040791366239,0.3978434638544913
+"GSR valid, jogo 2 / sem duvidosos",auxflow iou_whole,0.5843605778485079,0.6383146077248738
+"GSR valid, jogo 2 / sem duvidosos",auxflow iou_part,0.9567422048538248,0.9934747900508154
+"GSR valid, jogo 2 / sem duvidosos",auxflow npe,0.994137248652879,0.030001065613065855
+"GSR valid, jogo 2 / sem duvidosos",auxflow re_m,9.490399411069525,0.9886826139414675
+"GSR valid, jogo 2 / sem duvidosos",acc@5,0.24209903265458824,
+"GSR valid, jogo 2 / sem duvidosos",acc@10,0.2846741221741222,
+"GSR valid, jogo 2 / sem duvidosos",acc@20,0.2992376810432366,
+"GSR valid, jogo 2 / sem duvidosos",locsim@5,0.7544532705189965,0.9527091103777354
+"GSR valid, jogo 2 / sem duvidosos",locsim@2,0.5806079002958159,0.7387576619761811
+"GSR valid, jogo 2 / sem duvidosos",mAP-locsim,0.7088146015399234,
+"GSR valid, jogo 2 / sem duvidosos",locsim dist (m),7.009271334518157,0.6358371602968962
+"GSR valid, jogo 2 / sem duvidosos",locsim@5 penalizado,0.3047554998127983,
+"GSR valid, jogo 2 / sem duvidosos",mAP-locsim penalizado,0.2863201163119218,
+"GSR valid, jogo 3 / todos",frames,630,
+"GSR valid, jogo 3 / todos",frames com H_gt,614,
+"GSR valid, jogo 3 / todos",cobertura,0.09120521172638436,
+"GSR valid, jogo 3 / todos",iou_whole,0.7132070771621934,0.6512135901243616
+"GSR valid, jogo 3 / todos",iou_part,0.6771073682319203,0.5977468210032165
+"GSR valid, jogo 3 / todos",npe,0.39056423379713895,0.144140535343174
+"GSR valid, jogo 3 / todos",re_m,13.06615595358244,12.97569298323598
+"GSR valid, jogo 3 / todos",auxflow iou_whole,0.6287717294026066,0.5894424185105969
+"GSR valid, jogo 3 / todos",auxflow iou_part,0.6664334141324811,0.5941574022529468
+"GSR valid, jogo 3 / todos",auxflow npe,0.39830829496495096,0.15786198524952688
+"GSR valid, jogo 3 / todos",auxflow re_m,13.419271098455482,14.010771639758786
+"GSR valid, jogo 3 / todos",acc@5,0.04659686433495958,
+"GSR valid, jogo 3 / todos",acc@10,0.04771175473556426,
+"GSR valid, jogo 3 / todos",acc@20,0.04842604044984998,
+"GSR valid, jogo 3 / todos",locsim@5,0.43292373691265845,2.817375344360568e-16
+"GSR valid, jogo 3 / todos",locsim@2,0.3436138143596349,6.479320088720556e-98
+"GSR valid, jogo 3 / todos",mAP-locsim,0.40873404546583536,
+"GSR valid, jogo 3 / todos",locsim dist (m),17.98237921699156,17.285968402805715
+"GSR valid, jogo 3 / todos",locsim@5 penalizado,0.03900813065539272,
+"GSR valid, jogo 3 / todos",mAP-locsim penalizado,0.036828544358738176,
+"GSR valid, jogo 3 / sem duvidosos",frames,630,
+"GSR valid, jogo 3 / sem duvidosos",frames com H_gt,614,
+"GSR valid, jogo 3 / sem duvidosos",cobertura,0.09120521172638436,
+"GSR valid, jogo 3 / sem duvidosos",iou_whole,0.7132070771621934,0.6512135901243616
+"GSR valid, jogo 3 / sem duvidosos",iou_part,0.6771073682319203,0.5977468210032165
+"GSR valid, jogo 3 / sem duvidosos",npe,0.39056423379713895,0.144140535343174
+"GSR valid, jogo 3 / sem duvidosos",re_m,13.06615595358244,12.97569298323598
+"GSR valid, jogo 3 / sem duvidosos",auxflow iou_whole,0.6287717294026066,0.5894424185105969
+"GSR valid, jogo 3 / sem duvidosos",auxflow iou_part,0.6664334141324811,0.5941574022529468
+"GSR valid, jogo 3 / sem duvidosos",auxflow npe,0.39830829496495096,0.15786198524952688
+"GSR valid, jogo 3 / sem duvidosos",auxflow re_m,13.419271098455482,14.010771639758786
+"GSR valid, jogo 3 / sem duvidosos",acc@5,0.04659686433495958,
+"GSR valid, jogo 3 / sem duvidosos",acc@10,0.04771175473556426,
+"GSR valid, jogo 3 / sem duvidosos",acc@20,0.04842604044984998,
+"GSR valid, jogo 3 / sem duvidosos",locsim@5,0.43292373691265845,2.817375344360568e-16
+"GSR valid, jogo 3 / sem duvidosos",locsim@2,0.3436138143596349,6.479320088720556e-98
+"GSR valid, jogo 3 / sem duvidosos",mAP-locsim,0.40873404546583536,
+"GSR valid, jogo 3 / sem duvidosos",locsim dist (m),17.98237921699156,17.285968402805715
+"GSR valid, jogo 3 / sem duvidosos",locsim@5 penalizado,0.03900813065539272,
+"GSR valid, jogo 3 / sem duvidosos",mAP-locsim penalizado,0.036828544358738176,
+"GSR valid, jogo 5 / todos",frames,570,
+"GSR valid, jogo 5 / todos",frames com H_gt,558,
+"GSR valid, jogo 5 / todos",cobertura,0.3207885304659498,
+"GSR valid, jogo 5 / todos",iou_whole,0.7774488596643117,0.9027613171914979
+"GSR valid, jogo 5 / todos",iou_part,0.9665041826707584,0.9960124010343854
+"GSR valid, jogo 5 / todos",npe,1.1169349283060297,0.013399531065155089
+"GSR valid, jogo 5 / todos",re_m,7.331292411685036,0.5077996397239174
+"GSR valid, jogo 5 / todos",auxflow iou_whole,0.6757853696888073,0.7458276515322367
+"GSR valid, jogo 5 / todos",auxflow iou_part,0.9559202634655289,0.9888752296045056
+"GSR valid, jogo 5 / todos",auxflow npe,1.3786633394736703,0.02453214841126567
+"GSR valid, jogo 5 / todos",auxflow re_m,8.31137140655246,0.9869634356221291
+"GSR valid, jogo 5 / todos",acc@5,0.2006099901417239,
+"GSR valid, jogo 5 / todos",acc@10,0.2345630740948078,
+"GSR valid, jogo 5 / todos",acc@20,0.24640922988833203,
+"GSR valid, jogo 5 / todos",locsim@5,0.7455948754556594,0.9618878533582224
+"GSR valid, jogo 5 / todos",locsim@2,0.5983666017034782,0.7843822568173974
+"GSR valid, jogo 5 / todos",mAP-locsim,0.7072561472388372,
+"GSR valid, jogo 5 / todos",locsim dist (m),6.527516622788288,0.5694497455643239
+"GSR valid, jogo 5 / todos",locsim@5 penalizado,0.2282252635501619,
+"GSR valid, jogo 5 / todos",mAP-locsim penalizado,0.2164898471202744,
+"GSR valid, jogo 5 / sem duvidosos",frames,570,
+"GSR valid, jogo 5 / sem duvidosos",frames com H_gt,558,
+"GSR valid, jogo 5 / sem duvidosos",cobertura,0.3207885304659498,
+"GSR valid, jogo 5 / sem duvidosos",iou_whole,0.7774488596643117,0.9027613171914979
+"GSR valid, jogo 5 / sem duvidosos",iou_part,0.9665041826707584,0.9960124010343854
+"GSR valid, jogo 5 / sem duvidosos",npe,1.1169349283060297,0.013399531065155089
+"GSR valid, jogo 5 / sem duvidosos",re_m,7.331292411685036,0.5077996397239174
+"GSR valid, jogo 5 / sem duvidosos",auxflow iou_whole,0.6757853696888073,0.7458276515322367
+"GSR valid, jogo 5 / sem duvidosos",auxflow iou_part,0.9559202634655289,0.9888752296045056
+"GSR valid, jogo 5 / sem duvidosos",auxflow npe,1.3786633394736703,0.02453214841126567
+"GSR valid, jogo 5 / sem duvidosos",auxflow re_m,8.31137140655246,0.9869634356221291
+"GSR valid, jogo 5 / sem duvidosos",acc@5,0.2006099901417239,
+"GSR valid, jogo 5 / sem duvidosos",acc@10,0.2345630740948078,
+"GSR valid, jogo 5 / sem duvidosos",acc@20,0.24640922988833203,
+"GSR valid, jogo 5 / sem duvidosos",locsim@5,0.7455948754556594,0.9618878533582224
+"GSR valid, jogo 5 / sem duvidosos",locsim@2,0.5983666017034782,0.7843822568173974
+"GSR valid, jogo 5 / sem duvidosos",mAP-locsim,0.7072561472388372,
+"GSR valid, jogo 5 / sem duvidosos",locsim dist (m),6.527516622788288,0.5694497455643239
+"GSR valid, jogo 5 / sem duvidosos",locsim@5 penalizado,0.2282252635501619,
+"GSR valid, jogo 5 / sem duvidosos",mAP-locsim penalizado,0.2164898471202744,
