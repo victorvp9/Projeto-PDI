@@ -33,3 +33,15 @@ def test_pitch_mask_ignores_points_behind_camera():
     mask = pitch_mask(H_steep, SIZE)
     assert mask[500, 640]          # centro do campo
     assert not mask[:160].any()
+
+
+def test_lines_mask_keeps_far_lines():
+    """Plano aberto (H da WC14 196): longe, o warp da vista de cima pula ~19% do eixo
+    das linhas; o lines_mask tem de cobrir o eixo de 1 px inteiro."""
+    from src.render import axis_mask, lines_mask
+    H_wide = np.array([[24.562785, -8.309995, 659.850943],
+                       [-0.087259, -1.599212, 437.83858],
+                       [-0.000312, -0.012699, 1.0]])
+    axis = axis_mask(H_wide, SIZE)
+    assert axis.sum() > 1000
+    assert not (axis & ~lines_mask(H_wide, SIZE)).any()

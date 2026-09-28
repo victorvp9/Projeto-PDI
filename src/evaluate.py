@@ -8,9 +8,9 @@ import cv2
 import numpy as np
 
 from src.config import CFG
-from src.geometry import point_segment_distance, project, project_segments
+from src.geometry import point_segment_distance, project
 from src.pitch_model import CORNERS, HL, HW, POLYLINES
-from src.render import pitch_mask
+from src.render import axis_mask, pitch_mask
 
 E = CFG["eval"]
 _X, _Y = np.meshgrid(np.arange(-HL, HL + 1e-9, E["grid_dx_m"]), np.arange(-HW, HW + 1e-9, E["grid_dy_m"]))
@@ -219,14 +219,9 @@ def shadow_score(frame_bgr, region, dark_mask=False):
 def lines_target(H, size, region=None):
     """Alvo das marcações (imagem, bool): polilinhas do modelo desenhadas por H com
     1 px, fora de `border_px` da borda e, se dada, dentro de `region`."""
-    w, h = size
-    t = np.zeros((h, w), np.uint8)
-    for poly in POLYLINES.values():
-        segs = np.clip(project_segments(H, poly), -1e6, 1e6).astype(np.int32)
-        cv2.polylines(t, list(segs), False, 1, 1)
+    t = axis_mask(H, size)
     b = ES["border_px"]
-    t[:b], t[-b:], t[:, :b], t[:, -b:] = 0, 0, 0, 0
-    t = t.astype(bool)
+    t[:b], t[-b:], t[:, :b], t[:, -b:] = False, False, False, False
     return t & region if region is not None else t
 
 

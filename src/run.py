@@ -297,11 +297,14 @@ def main():
     ap.add_argument("--segment-variants-calib", nargs="*", metavar="PARTE",
                     help="calibra no treino as variantes da Fatia 3: kmeans, hysteresis, alpha (padrão: todas)")
     ap.add_argument("--segment-variants", action="store_true", help="rodada das variantes da Fatia 3 (WC14 train_val; GSR --splits)")
+    ap.add_argument("--lines-fp-sheet", action="store_true", help="Fatia 4: amostra dos falsos positivos da máscara de marcações (treino) e folhas de contato")
+    ap.add_argument("--lines-fp-table", action="store_true", help="Fatia 4: tabela das categorias de falsos positivos (outputs/lines_fp_classes.csv)")
     ap.add_argument("--splits", nargs="+", default=["train", "valid", "test"], help="partições do GSR")
     args = ap.parse_args()
     if not (args.overlay or args.gsr_quality or args.fit_calibration or args.evaluate or args.shadow_sheet
             or args.segment_sweep or args.segment_sweep_lines or args.segment_eval
-            or args.segment_variants_calib is not None or args.segment_variants):
+            or args.segment_variants_calib is not None or args.segment_variants
+            or args.lines_fp_sheet or args.lines_fp_table):
         ap.print_help()
     for spec in args.overlay or []:
         overlay(spec)
@@ -329,6 +332,12 @@ def main():
     if args.segment_variants:
         from src import sweep_segment
         sweep_segment.evaluate_variants(_pool, args.splits)
+    if args.lines_fp_sheet:
+        from src import sweep_lines
+        sweep_lines.sample_fp(_pool)
+    if args.lines_fp_table:
+        from src import sweep_lines
+        sweep_lines.fp_table()
 
 
 if __name__ == "__main__":

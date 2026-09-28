@@ -142,8 +142,21 @@ sweep_segment:
   noise_grass: 0.005   # ruído no gramado (decisão de Victor; = ganho mínimo da ablação)
   noise_lines: 0.01    # ruído nas marcações (decisão de Victor)
 
+lines:
+  # Etapas 3 e 4 (src/lines.py, src/conics.py). Tolerâncias em fração da altura (decisão de Victor, plano da Fatia 4)
+  tol_frac: 0.0041667   # 3/720: casamento e falso positivo a 3 px no WC14 (720p), 4,5 px no GSR (1080p)
+
+sweep_lines:
+  # análise da Fatia 4, só no treino (WC14 train_val, GSR train a cada eval_segment.gsr_frame_step)
+  fp_n: 100             # pixels falsos positivos sorteados por base; erro-padrão ~5 p.p. (plano da Fatia 4)
+  fp_seed: 0
+  fp_crop_frac: 0.15    # recorte ampliado, fração da altura: cabe um jogador inteiro (escolha)
+  fp_context_frac: 0.5  # recorte de contexto, fração da altura (escolha)
+  fp_panel_px: 160      # lado de cada painel na folha de contato (escolha)
+  fp_per_sheet: 15      # 3 colunas x 5 linhas por folha (escolha)
+
 render:
-  px_per_m: 25       # vista de cima; 25 px/m faz a linha de 0,12 m ter 3 px inteiros (escolha)
+  px_per_m: 25      # vista de cima; 25 px/m faz a linha de 0,12 m ter 3 px inteiros (escolha)
   margin_m: 1        # borda da vista de cima além do campo; basta cobrir meia largura de linha (escolha)
   supersample: 4     # renderiza 4x maior e reduz por média de área: linha sub-pixel vira cinza em vez de sumir (empírico)
   grass_bgr: [40, 120, 40]      # cor sintética arbitrária

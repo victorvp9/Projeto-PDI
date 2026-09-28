@@ -39,4 +39,4 @@ def test_gsr_lines_subset():
     cov = np.mean([r["cobertura"] for r in rows])
     prec = np.mean([r["precisao"] for r in rows])
     assert cov >= 0.751, cov                    # medido 0,7608
-    assert prec >= 0.520, prec                  # medido 0,5303; barra o "marcar tudo"
+    assert prec >= 0.523, prec                  # medido 0,5338 (gabarito das linhas corrigido); barra o "marcar tudo"

@@ -46,13 +46,26 @@ def pitch_mask(H, size):
     return _warp(top, H, size, cv2.INTER_NEAREST, 0).astype(bool)
 
 
+def axis_mask(H, size):
+    """Máscara bool (imagem) das polilinhas do modelo projetadas por H com 1 px."""
+    w, h = size
+    t = np.zeros((h, w), np.uint8)
+    for poly in POLYLINES.values():
+        segs = np.clip(project_segments(H, poly), -1e6, 1e6).astype(np.int32)
+        cv2.polylines(t, list(segs), False, 1, 1)
+    return t.astype(bool)
+
+
 def lines_mask(H, size):
     """Máscara bool (imagem) das marcações com a largura projetada de 0,12 m: pixel
-    tocado por qualquer fração de linha na vista de cima deformada por H."""
+    tocado por qualquer fração de linha. Perto, a vista de cima deformada por H dá a
+    largura; longe, um pixel da imagem cobre vários da vista de cima e o warp pula a
+    linha (3,5% do eixo no WC14 train_val, até 20% num frame; docs/decisoes.md), e o
+    eixo de 1 px projetado direto garante o pixel tocado."""
     top = np.zeros(TOP_SIZE[::-1], np.uint8)
     for poly in POLYLINES.values():
         cv2.polylines(top, [_to_top(poly)], False, 255, int(round(LINE_WIDTH * PPM)))
-    return _warp(top, H, size, cv2.INTER_LINEAR, 0) > 0
+    return (_warp(top, H, size, cv2.INTER_LINEAR, 0) > 0) | axis_mask(H, size)
 
 
 def render_synthetic(H, size):

@@ -212,19 +212,84 @@ depende do zoom).
   `test`, na Fatia 8.**
 
 ### Fatia 4 — Linhas e cônicas (semana 3)
-Etapas 3 e 4.
+Etapas 3 e 4. Plano aprovado por Victor em 2026-09-28, com os ajustes dele
+(`decisoes.md`). Entrada fixa: a máscara de marcações da Fatia 3 (config atual),
+sem recalibrar nada dela.
 
-- **Antes de filtrar a máscara de marcações** (precisão ~0,5 na Fatia 3):
-  classificar uma amostra dos falsos positivos — jogadores de branco,
-  publicidade pintada no gramado, faixas de corte, bola, outros. O candidato
-  clássico é filtrar componentes pela forma (fino e alongado × compacto), já que
-  não há detector de jogador; entra se o número justificar.
-- Hough probabilística e, sobretudo, **fusão de colineares**. Sem fusão, o resto
-  quebra.
-- Ajuste de elipse no círculo central.
-- **Teste:** na imagem sintética, o pipeline recupera as linhas esperadas.
-- **Teste (GSR):** as linhas detectadas caem sobre as linhas anotadas do JSON.
-- **Saída:** segmentos desenhados sobre o frame.
+- **Tolerâncias em pixels como fração da altura** (convenção da Fatia 3): o
+  casamento a "3 px" é 3/720 da altura (3 px no WC14, 4,5 px no GSR); a mesma
+  regra vale para td, G e os limiares das elipses. Com pixels fixos, o GSR
+  ficaria 1,5× mais apertado e as linhas curvadas pela lente na borda deixariam
+  de casar.
+- **Parâmetros comuns às duas bases**, separados por base só se os ótimos
+  diferirem além do ruído (como o limiar das marcações na Fatia 3).
+- **1. Falsos positivos da máscara, antes de filtrar** (precisão ~0,5 na Fatia
+  3): falso positivo = pixel da máscara a mais de 3/720·h da linha com largura
+  da `H_gt`. Amostra de 100 pixels sorteados uniformemente (semente fixa) no
+  WC14 `train_val` e 100 no GSR `train` (1 frame a cada 25); estimativa
+  ponderada por pixel, erro-padrão ~5 p.p. Folhas de contato (contexto, recorte
+  cru, recorte com a máscara) classificadas por mim e auditadas por Victor, em:
+  pessoa (jogador, árbitro, staff, fotógrafo); bola; trave, rede ou
+  bandeirinha; publicidade pintada no gramado; textura ou faixa de corte da
+  grama; linha do modelo desalinhada (erro da `H_gt` ou lente: não é falso
+  positivo de verdade); marca não modelada (pênalti, tracejados, área
+  técnica); fora do campo (placas, torcida, bancos, equipamento); grafismo da
+  transmissão; outros (`outputs/lines_fp_classes.csv`). Forma do
+  componente da máscara que contém o pixel (área, alongamento pelos momentos,
+  espessura em larguras de linha) no CSV. **Parada:** tabela por categoria e
+  base.
+- **2. Filtro de forma (condicional):** tirar da máscara os componentes
+  compactos. Só entra se melhorar o F1 de segmentos (item 5) no treino além do
+  ruído (0,01) sem perder recall de linhas além do ruído — o Hough com
+  comprimento mínimo já é um filtro de forma.
+- **3. Etapa 3:** **sem afinamento** de início; se a ablação pedir, esqueleto
+  morfológico com erode/dilate do OpenCV. `HoughLinesP` (ρ 1 px, θ 0,5°; votos,
+  comprimento mínimo e vão `[EMPÍRICO]`, em fração da altura). **Fusão de
+  colineares** por union-find: Δθ ≤ tθ, extremos de um a ≤ td da reta do outro
+  (td em larguras de linha w(v): ao longe as paralelas ficam próximas) e vão ao
+  longo da reta ≤ G (as linhas de cima das duas grandes áreas são colineares no
+  campo). Reajuste por mínimos quadrados totais nos pixels do grupo, extremos
+  pelas projeções; repetir até estabilizar.
+- **4. Etapa 4:** pixels da máscara a mais de td das retas aceitas; RANSAC de
+  cônica (5 pontos de até dois componentes curvos; consenso por distância de
+  Sampson ≤ τ) e reajuste com `cv2.fitEllipse`; aceite por arco ≥ S e razão de
+  eixos plausível; até 2 elipses por quadro. O centro da elipse não vira
+  correspondência (nota do método).
+- **5. Gabarito e métricas:** polilinhas do modelo projetadas pela `H_gt`
+  (as duas bases), recortadas à imagem e ao gramado; visível = comprimento
+  projetado ≥ Lmin. Segmento casa com a classe c se ≥ 80% dos seus pontos estão
+  a ≤ 3/720·h da polilinha de c. Recall de linhas (≥ 1 segmento casado) e por
+  comprimento; precisão por comprimento; fragmentação (segmentos por linha
+  casada, alvo 1); erros angular e de distância. Elipses: recall do círculo
+  central com ≥ 50% do arco visível, e precisão. No GSR, distância mediana dos
+  pontos anotados ao segmento casado da mesma classe. GSR por jogo.
+- **6. Calibração das retas só no GSR train** (decisão de Victor, depois da
+  classificação dos falsos positivos): o gabarito do WC14 está deslocado 5–8 px
+  em trechos, e o do GSR (ajuste pelas linhas) tem resíduo de ~0,5 px. O WC14
+  vira verificação, a 3 px e a 8 px (p75 do deslocamento; declarado
+  conservador); se a escolhida no GSR ficar muito abaixo da melhor do WC14 a
+  8 px, discutir. Grade modesta: F1 entre recall e
+  precisão por comprimento, média das duas bases, fragmentação como desempate;
+  ablação (fusão, filtro de forma, afinamento se entrar) exige +0,01 de F1 ou
+  menos fragmentação. **O número que decide é o erro da homografia na Fatia 5:**
+  com métricas de segmentos razoáveis, sem rodadas extras aqui. **Parada:**
+  tabelas antes de fixar os testes de regressão.
+- **7. Partições:** ajuste e escolha só no treino; uma medição no fim na GSR
+  `valid`, só relatório; WC14 `test` e GSR `test` intocados até a Fatia 8.
+- **Testes:** sintéticos (plano fechado e aberto: cada linha visível ≥ Lmin
+  sai como um segmento a ≤ 1 px e ≤ 0,5° da projeção, nenhum a mais; círculo
+  central a ≤ 1 px da elipse); unitários da fusão (reta quebrada com vãos vira
+  um segmento; paralelas a mais de td e colineares com vão > G não se fundem);
+  com dados (`skipif`), limites fixados com aprovação (folga 0,003 no WC14, 0,01
+  no GSR).
+- **Saídas:** `outputs/debug/lines/` (segmentos por grupo, elipses, folhas dos
+  falsos positivos); `outputs/lines_fp_*.csv`, `lines_sweep*.csv`,
+  `lines_wc14.csv`, `lines_gsr_<split>.csv`; `--lines-fp-sheet`,
+  `--lines-sweep`, `--lines-eval`. Código em `src/lines.py`, `src/conics.py`,
+  métricas em `src/evaluate.py`, varredura em `src/sweep_lines.py`.
+- **Riscos:** lente no GSR (linhas longas curvas: fragmentação ou fusão errada);
+  paralelas próximas ao longe; recall menor nos jogos das limitações da Fatia 3
+  (jogo 3; contraste baixo), por isso o relatório por jogo.
 
 ### Fatia 5 — Classificação e homografia (semana 4)
 Etapas 5, 6 e 7. É a semana mais difícil.
@@ -237,6 +302,10 @@ Etapas 5, 6 e 7. É a semana mais difícil.
   recupera as linhas largas (WC14, 6–8 px: 0,32 → 0,57), que são as do lado da
   câmera, ao custo de F1 −0,024. Decidir aqui pelo erro da homografia (as duas
   estão no config: `line_scales`).
+- **Risco (achado na Fatia 4):** no GSR, o friso claro da base das placas de
+  LED é uma reta longa, paralela e logo além da lateral do fundo, e pode ser
+  confundido com ela na classificação semântica. Ele entra na máscara porque o
+  gramado é dilatado em uma largura de linha antes de restringir as marcações.
 - **Teste:** na imagem sintética, a homografia recuperada bate com a usada para
   renderizar.
 - **Marco:** primeiro número real no WC14, com taxa de cobertura, e o mesmo
