@@ -379,14 +379,23 @@ def main():
     ap.add_argument("--wc14-split", default="train_val", help="partição do WC14 do --detect ('' para pular); o test só na Fatia 8")
     ap.add_argument("--detect-series", action="store_true", help="Fatia 6: série do detector em todos os frames (cache), no --clips ou no subconjunto do config")
     ap.add_argument("--smooth-eval", action="store_true", help="Fatia 6 (6a): tabela do Savitzky-Golay nos clipes com série em cache")
+    ap.add_argument("--cut-calib", action="store_true", help="Fatia 6 (6b): calibração da detecção de corte com cortes sintéticos nos clipes escolhidos")
+    ap.add_argument("--cut-table", action="store_true", help="Fatia 6 (6b): precisão/recall do corte, falsos positivos em todos os clipes escolhidos")
+    ap.add_argument("--hampel-calib", action="store_true", help="Fatia 6 (6a robusto): grade do Hampel antes do SG (use com --clip-step 3 --splits train)")
+    ap.add_argument("--propagate-eval", action="store_true", help="Fatia 6 (6c): propagação por Lucas-Kanade a partir de âncoras, com as ablações")
     ap.add_argument("--clips", nargs="+", help="clipes do GSR (split/clipe ou só clipe, no primeiro --splits); padrão: temporal.subset_clips")
+    ap.add_argument("--clip-step", type=int, help="1 clipe a cada N de cada --splits (em vez de --clips)")
     ap.add_argument("--splits", nargs="+", default=["train", "valid", "test"], help="partições do GSR")
+    ap.add_argument("--workers", type=int, help="processos do pool (padrão: núcleos - 1); o 6c usa ~0,5 GB por processo")
     args = ap.parse_args()
+    if args.workers:
+        global WORKERS
+        WORKERS = args.workers
     if not (args.overlay or args.gsr_quality or args.fit_calibration or args.evaluate or args.shadow_sheet
             or args.segment_sweep or args.segment_sweep_lines or args.segment_eval
             or args.segment_variants_calib is not None or args.segment_variants
             or args.lines_fp_sheet or args.lines_fp_table or args.lines_sweep or args.lines_sweep_ellipses or args.detect
-            or args.detect_series or args.smooth_eval):
+            or args.detect_series or args.smooth_eval or args.cut_calib or args.propagate_eval or args.hampel_calib or args.cut_table):
         ap.print_help()
     for spec in args.overlay or []:
         overlay(spec)
@@ -396,13 +405,24 @@ def main():
         fit_calibration(args.splits)
     if args.detect:
         detect(args.splits, args.wc14_split)
-    if args.detect_series or args.smooth_eval:
+    if args.detect_series or args.smooth_eval or args.cut_calib or args.propagate_eval or args.hampel_calib or args.cut_table:
         from src import temporal
-        clips = [path("gsr") / (c if "/" in c else f"{args.splits[0]}/{c}") for c in (args.clips or CFG["temporal"]["subset_clips"])]
+        if args.clip_step:
+            clips = [c for sp in args.splits for c in sorted((path("gsr") / sp).glob("SNGS-*"))[::args.clip_step]]
+        else:
+            clips = [path("gsr") / (c if "/" in c else f"{args.splits[0]}/{c}") for c in (args.clips or CFG["temporal"]["subset_clips"])]
         if args.detect_series:
             temporal.build_series(_pool, clips)
         if args.smooth_eval:
             temporal.evaluate_6a(_pool, clips)
+        if args.cut_calib:
+            temporal.calibrate_cuts(_pool, clips)
+        if args.propagate_eval:
+            temporal.evaluate_6c(_pool, clips)
+        if args.hampel_calib:
+            temporal.calibrate_hampel(_pool, clips)
+        if args.cut_table:
+            temporal.cut_table(_pool, clips)
     if args.evaluate:
         evaluate(args.evaluate, args.splits)
     if args.shadow_sheet:

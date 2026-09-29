@@ -40,6 +40,10 @@ hardcode um limiar no meio de uma função.
 - OpenCV, numpy, scipy (inclusive `scipy.io.loadmat` para o WC14), pyyaml,
   matplotlib, pytest; `shapely` quando chegar a Fatia 7
 - **Sem** torch, tensorflow, ultralytics ou equivalentes
+- CuPy **opcional** (extra `gpu`: `uv sync --extra gpu`), só para as máscaras
+  do 6c (`src/gpu.py`), com saída idêntica à da CPU (testado). Nada pode
+  depender dele: sem GPU, tudo roda na CPU. Não usar GPU no detector (congelado,
+  e ~4% do tempo dele é operação de imagem; `docs/decisoes.md`)
 - CLI única: `python -m src.run`
 - **Ambiente Windows.** Caminhos sempre com `pathlib`; os caminhos dos dados
   ficam em `config.yaml`.

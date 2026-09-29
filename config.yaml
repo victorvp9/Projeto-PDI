@@ -222,6 +222,29 @@ temporal:
   points_u: [0.25, 0.75]   # representação por pontos: 4 pontos fixos da imagem (fração da largura)...
   points_v: [0.6, 0.95]    # ... e da altura, na metade de baixo: no gramado nas vistas de transmissão (escolha)
   subset_clips: [SNGS-060, SNGS-070, SNGS-099, SNGS-109, SNGS-154, SNGS-164]   # desenvolvimento: treino [::10]
+  hist_scale: 0.25         # 6b: histograma numa imagem reduzida a 1/4 (escolha; custo)
+  hist_bins: [8, 8, 8]     # 6b: histograma HSV 8x8x8, distância de Bhattacharyya (escolha)
+  hampel_half_grid: [3, 7, 12, 15]   # 6a robusto: Hampel antes do SG, meia janela (frames); grade calibrada no train[::3] (decisão de Victor)
+  hampel_sigma_grid: [2, 3, 4, 6]    # ... limiar em desvios robustos (1,4826·MAD); grade calibrada no train[::3]
+  hampel_min_valid: 3                # janela com menos frames com H que isto não julga (escolha: mediana de 3 é o mínimo com maioria)
+  cut_thr: 0.202           # [EMPÍRICO] 6b: corte se a distância > isto: logo acima do maior salto dentro dos clipes (0,201, placa de LED), 19 clipes do treino; folga mínima para o corte sintético do mesmo jogo (0,205)
+  # 6c: propagação por Lucas–Kanade a partir de âncoras (tudo escolha até a calibração)
+  anchor_window: 12        # âncora candidata: máximo local de (IoU com o gramado + fração explicada) em +-12 frames
+  verify_window: 10        # verificação: vizinhos com H do detector a até 10 frames
+  verify_tol_frac: 0.0111111   # ... a H da âncora levada pelo movimento concorda com a do vizinho a <= 8/720·h (grade da imagem)
+  verify_min: 2            # ... com pelo menos 2 vizinhos conferidos, maioria concordando
+  grid_m: [2.5, 2.0]       # grade de pontos auxiliares do campo, X x Y (AuxFlow)
+  border_frac: 0.02        # pontos a menos disto·h da borda da imagem ficam fora
+  compact_dilate_frac: 0.01   # componentes compactos de não-gramado (jogadores, bola) dilatados em isto·h
+  lk_win: 21               # janela do Lucas–Kanade piramidal (px)
+  lk_levels: 3             # níveis da pirâmide
+  lk_fb_px: 1.0            # erro ida-e-volta máximo (AuxFlow)
+  resample_min: 20         # reamostra a grade pela H atual abaixo de 20 pontos...
+  resample_every: 25       # ... ou a cada 25 frames (limita a deriva do rastreio)
+  alpha_points: 1.0        # peso dos pontos propagados contra os pixels das linhas na reestimativa
+  naive_step: 150          # âncora ingênua a cada 150 frames (AuxFlow)
+  use_gpu: true            # máscaras do 6c na GPU (src/gpu.py) se o extra `gpu` e uma placa existirem; mesma saída da CPU (decisão de Victor)
+  debug_every: 50         # depuração: um frame propagado a cada 50 em outputs/debug/propagacao/
 
 sweep_lines:
   # análise da Fatia 4, só no treino (WC14 train_val, GSR train a cada eval_segment.gsr_frame_step)

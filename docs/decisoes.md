@@ -115,3 +115,104 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
 - 2026-09-28 | **Plano da Fatia 6 aprovado** (`03-plano`). Decisões de Victor: (1) jogadores e bola excluídos da grade de pontos auxiliares pela máscara de não-gramado, **só os componentes compactos** (filtro de forma da Fatia 4), mantendo as linhas do campo, boas para o Lucas–Kanade; as caixas de gabarito ficam só na avaliação do LocSim; (2) detector em todos os frames com cache, ~3 h por partição, começando pelo subconjunto de 6 clipes; (3) a saída do 6c é a H propagada e reestimada, sem desempate detector × propagada pela nota, e a H do detector só entra nas âncoras; (4) medir a fração de âncoras verificáveis e, se baixa, verificar no encontro de âncoras consecutivas; (5) ablação opcional "sem linhas". | Decisões de Victor.
 - 2026-09-28 | **Série do detector em todos os frames e 6a no subconjunto** (6 clipes do treino, 4.500 frames; `--detect-series`, `--smooth-eval`). Custo real: 54 min com 15 processos (~0,7 s por frame), o que dá ~8,5 h por partição inteira. **O detector "pisca":** trechos contínuos com H de 1 a 3 frames (mediana), lacunas com mediana de 1 a 3 frames; por isso preencher as lacunas de até 25 frames sobe a cobertura de 0,413 para 0,625. **6a** (Savitzky–Golay 31/3): com o preenchimento, LocSim@5 penalizado 0,333 → 0,364, mas NPE mediano 0,0064 → 0,034 (os frames interpolados são menos precisos); sem preencher, tremor mediano 1,51 → 0,35 px (p90 107 → 9 px), mas NPE 0,0064 → 0,0081, porque as H erradas aceitas contaminam os vizinhos pela janela. Matriz e pontos praticamente empatam. **Previsão a testar no ponto de parada 3:** nas lacunas curtas, a propagação por Lucas–Kanade deve dar a cobertura do preenchimento com NPE perto do detector (a interpolação linear piora o NPE ~5×); comparar as duas lado a lado. | Observação medida; previsão de Victor.
 - 2026-09-28 | **Custo da Fatia 6, sem mudar o detector** (mudar invalidaria os números e a regressão da Fatia 5). Calibração da Fatia 6 em **1 a cada 3 clipes do GSR train** (19 clipes, ~2,8 h de série); **GSR valid inteiro** (~8,5 h, à noite) só para o relatório; GSR test só na Fatia 8. O subconjunto de 6 clipes fica para desenvolvimento. **6a robusto:** filtro de Hampel antes do Savitzky–Golay, com janela e limiar calibrados nesses 19 clipes; o "como o Bassek" (preenchimento ≤ 25, sem Hampel) fica na tabela como referência da literatura. Regra de escolha, fixada antes de rodar: maior LocSim@5 penalizado; empate a 0,01 pelo menor NPE mediano. | Decisões de Victor.
+- 2026-09-28 | **6b, calibração do corte** (`--cut-calib --splits train --clip-step 3`; `outputs/cortes_sinteticos.csv`). Histograma HSV 8×8×8 da imagem reduzida a 1/4, distância de Bhattacharyya entre frames consecutivos. **Negativos** (14.231 pares consecutivos nos 19 clipes, câmera principal): mediana 0,032, p99,9 0,111, máximo 0,201. **Cortes sintéticos** (último frame de um clipe × primeiro de outro, 342 pares ordenados, 102 do mesmo jogo): mínimo 0,205, mediana 0,682; mesmo jogo mínimo 0,205 (mediana 0,410); jogos diferentes mínimo 0,416. Os dois maiores negativos (SNGS-115/429: 0,201; SNGS-168/23: 0,141) foram conferidos: **não são cortes**, são as placas de LED trocando de conteúdo e brilho, com a mesma vista. **Limiar pela regra (o menor sem falso positivo dentro dos clipes): 0,202**, recall 100% nos 342 cortes. **Folga frágil:** a animação das placas chega a 0,201, e o corte sintético mais parecido (mesmo jogo, a câmera principal em outro momento) a 0,205; entre jogos diferentes a folga é grande. | Regra fixada antes de rodar. Candidato, se a Fatia 6 mostrar falsos cortes: histograma só na máscara de gramado (sem placas e torcida) ou dois níveis — corte certo acima de 0,30 (recall 95%, 84% no mesmo jogo, 0 falso positivo), e a zona de 0,15 a 0,30 decidida pelo Lucas–Kanade (a grade não se sustenta através de um corte).
+- 2026-09-28 | **6c, implementação** (`src/temporal.py`, seção `temporal` do config). Nada nos arquivos da chave do cache da série (`segment`, `lines`, `conics`, `assign`, `homography`, `geometry`, `render` e as seções deles no config): mudar qualquer um refaria ~11 h de série. Por isso o ajuste de pontos + linhas (`fit_points_lines`) repete o `fit_point_line` com um termo de pontos, marcado `TODO(divida)` para unificar na Fatia 8. Duas diferenças medidas no SNGS-099 (25 frames): (1) **só o passo de Sampson**, sem o geométrico da Fatia 2 (polilinha densa nos círculos, que existe para inícios distantes; aqui a H inicial vem dos pontos propagados, perto da solução): 2,3 → 0,43 s por frame, e o que sobra é quase todo o `guided_points`; (2) **pontos como resíduo (du, dv)**, não a norma: a norma não é diferenciável no zero e segurava o `least_squares` em ~300 avaliações contra 3, com a mesma mediana (0,401 × 0,401 px). As máscaras (gramado, marcações, componentes compactos de não-gramado) custam 0,7 s por frame, uma vez por clipe, e servem a todas as variantes. Âncora ingênua: o primeiro frame com H do detector em cada bloco de 150. Âncora de gabarito: a `H_gt` nos mesmos frames das âncoras verificadas (isola o erro da âncora do erro da propagação). Os planos entre cortes (6b, limiar 0,202) limitam a propagação e a verificação. "Sem fluxo": a H da âncora copiada até o ponto médio entre âncoras. "Sem linhas": a mesma propagação, com só os pontos na reestimativa. | Escolhas de implementação; os números vêm no ponto de parada 3.
+- 2026-09-28 | **6a robusto, Hampel** (`hampel_outliers`). Julgado na representação por pontos (m no campo, as 8 coordenadas dos 4 pontos fixos da imagem): um frame sai se alguma coordenada passa de limiar·1,4826·MAD da mediana da janela, contando só os frames com H; uma janela com menos de 3 frames com H não julga. Depois do Hampel, o SG na matriz, como no Bassek. O MAD inclui o movimento da câmera dentro da janela: numa panorâmica rápida, uma janela longa esconde o salto (visto no teste sintético, com uma rampa de 1 m por frame). A grade (meia janela 3/7/12/15 × limiar 2/3/4/6) roda nos 19 clipes do train[::3], quando a série deles terminar. | Decisão de Victor (Hampel calibrado no treino); a representação em que ele julga foi escolha minha.
+- 2026-09-28 | **6b, conferência do corte no GSR train inteiro** (`--cut-table --splits train --clip-step 1`; `outputs/cortes_negativos.csv`). Negativos: 14.231 pares consecutivos nos 19 clipes da calibração e **28.462 nos outros 38, que a calibração não viu**; máximo 0,201 × 0,194. Positivos: os 342 cortes sintéticos da calibração. Limiar 0,150: 1 + 8 falsos positivos, recall 1,000, precisão 0,974. Limiar 0,200: 1 + 0, recall 1,000, precisão 0,997. **Limiar 0,202: 0 + 0, recall 1,000, precisão 1,000.** Limiar 0,250: 0 + 0, recall 0,988 (mesmo jogo 0,961). Limiar 0,300: 0 + 0, recall 0,953 (0,843). Limiar 0,400: 0 + 0, recall 0,854 (0,510). A precisão depende da proporção arbitrária entre cortes sintéticos e pares consecutivos; o número que se sustenta é a contagem de falsos positivos. Os três maiores negativos fora da calibração (SNGS-098/648: 0,194; SNGS-163/427: 0,178; SNGS-154/367: 0,172) foram conferidos em `outputs/debug/cortes/`: **são as placas de LED mudando de cor** (vermelho → rosa → branco; escuro → laranja), com a mesma vista, como na calibração. A folga de 0,202 fora da calibração é 0,008. | Medição, sem mudar o limiar. Reforça o candidato já registrado (histograma só na máscara de gramado), a testar só se a Fatia 6 mostrar falsos cortes.
+- 2026-09-28 | **GSR test: só a série do detector pré-calculada, sem avaliação, até a Fatia 8.** Se a máquina ficar livre depois da série da `valid`, roda `--detect-series --splits test --clip-step 1`, que grava só as H do detector em cache (`outputs/cache/detector/test/`). Nada de `--evaluate`, `--smooth-eval`, `--propagate-eval` nem qualquer métrica no test. O detector está congelado desde a Fatia 5, e a chave do cache (`_series_key`: config e código do detector) invalida a série se algo mudar. O loader lê o JSON só para listar as imagens: com `fit="none"`, o ajuste da `H_gt` não roda. Ele também calcula de passagem a H pelas pessoas, que é descartada: nada além das H do detector é salvo ou impresso. | Decisão de Victor.
+- 2026-09-29 | **Estudo GPU (RTX 5060) × CPU**, medido com a CPU livre (processos longos congelados). A GPU é acessível por dois caminhos: o OpenCL do OpenCV (já instalado) e o CuPy 14.2 (`cupy-cuda12x[ctk]` + wheels da CUDA, com `CUDA_PATH` apontado para as pastas do pip; ambiente descartável, sem mudar o `pyproject`). Operação pequena (projetar 4 pontos e decidir): CPU 2,9 µs × GPU 171 µs, 58× mais lenta. Operação grande (distância de cor no frame inteiro, com envio e volta): CPU 56 ms × GPU 3,5 ms, 16× mais rápida. **Detector** (4,8 s por frame, 1 processo): as operações de imagem são ~7,5% (segmentação 3,8%, pixels guiados 3%, Hough 0,7%); o resto são contas pequenas (ajuste da H 37,5%, hipóteses, elipses). Ganho máximo com GPU ≤ 8%, e o detector está congelado: não vale. **6c** (máscaras e propagação com linhas, 60 frames do SNGS-099, H propagadas idênticas nas quatro versões): CPU atual 494 ms por frame; **CPU otimizada 261 ms (1,9×)**: `_grass_raw` uma vez só nas máscaras em vez de duas, e pixels guiados lendo as marcações uma vez em vez de varrer a imagem por classe (9,3× nessa parte); CPU otimizada + GPU na distância de matiz 209 ms (2,4×); tudo na GPU 203 ms (os pixels guiados na GPU saem 3× mais lentos que na CPU otimizada, pelo envio de uma imagem por classe). A GPU acrescenta ~20% sobre a CPU otimizada no núcleo do 6c, ao custo de uma dependência de CUDA (~1 GB de wheels e o ajuste de `CUDA_PATH` no Windows). | Medição (superada pela revisão abaixo: essa versão da GPU estava mal feita).
+- 2026-09-29 | **Revisão da GPU, pedida por Victor.** A versão acima tinha cinco defeitos:
+  - só 1 dos ~8 passos das máscaras ia para a GPU, com ida e volta de dados a cada frame;
+  - sincronizações CPU↔GPU desnecessárias;
+  - pixels guiados na GPU, com uma imagem enviada por classe;
+  - máscaras calculadas sob demanda no meio da propagação, com a CPU esperando;
+  - nenhum teste com vários processos.
+
+  **Versão revisada** (`scratchpad/masks_impl.py`):
+  - A cadeia inteira das máscaras roda residente na GPU: gramado bruto, abertura/fechamento com elipse, maior componente, buracos, filtro de linha, dilatação, filtro de forma, dilatação dos compactos. Há 1 envio (o Lab; a conversão BGR→Lab de 8 bits fica na CPU, porque não é reproduzível bit a bit fora do OpenCV) e 1 volta (as 3 máscaras empacotadas).
+  - O filtro de forma usa somas inteiras uint64 só nos pixels de não-gramado (15,5 → 2,2 ms). Continuam exatas: são inteiros abaixo de 2^53.
+  - As máscaras do clipe são calculadas em lote ao abri-lo, com a leitura do próximo JPEG numa thread.
+  - Os pixels guiados ficam na CPU otimizada: as marcações são lidas uma vez, e cada classe é desenhada com o próprio valor, sem limpar o canvas.
+
+  **Exatidão:** 0 pixels diferentes nas 3 máscaras em 40 frames de 4 clipes; métricas por frame idênticas no 6c completo.
+
+  **Máscaras, por frame, incluindo ler o JPEG:** CPU atual 274 ms; CPU otimizada 187 ms; GPU residente 30,5 ms; **com pré-leitura 18,5 ms**.
+
+  **Vazão com K processos em paralelo:**
+
+  | K | CPU otimizada (frames/s) | GPU (frames/s) |
+  |---|---|---|
+  | 1 | 5,1 | 53,8 |
+  | 4 | 14,6 | 77,0 |
+  | 8 | 15,3 | 79,4 |
+
+  A CPU satura a partir de 4 processos por banda de memória, o que explica por que o detector leva 4,8 s por frame sozinho e ~10 s com 15 processos. Os 8 processos juntos ocupam ~1,3 GB de VRAM.
+
+  **6c completo no SNGS-099** (750 frames, 1 processo): atual 752 s; CPU otimizada 475 s (1,58×); **CPU otimizada + máscaras na GPU 366 s (2,06×)**; métricas idênticas.
+
+  **O que sobra é CPU por natureza:**
+  - a propagação: ajuste por mínimos quadrados, Lucas–Kanade, contas pequenas;
+  - as métricas: `evaluate.py`, que não se muda para manter a comparação com a Fatia 5;
+  - a leitura repetida do JPEG, ~6 vezes por frame.
+
+  | Medição. Integrar exige aprovação de Victor: o CuPy vira dependência opcional, com o caminho da CPU como reserva e um teste de igualdade GPU = CPU.
+- 2026-09-29 | **CPU otimizada + GPU opcional no 6c, integradas.**
+  - **Dependência:** o CuPy entra como extra opcional `gpu` no `pyproject` (`cupy-cuda12x[ctk]`, `nvidia-cuda-runtime-cu12`, `nvidia-cuda-nvrtc-cu12`). `uv sync --extra gpu --inexact` só acrescentou pacotes; numpy, OpenCV e scipy não mudaram.
+  - **Código:** `src/gpu.py` tem a cadeia das máscaras. `temporal.ClipFrames` calcula as máscaras do clipe em lote na GPU quando `temporal.use_gpu` e uma placa existem; sem elas, calcula sob demanda na CPU. `temporal._masks` usa o gramado bruto uma vez só. `temporal._guided_points` repete `assign.guided_points` (~9× mais rápida), marcada `TODO(divida)` para trocar em `assign.py` na Fatia 8, porque `assign.py` está na chave do cache da série.
+  - **Testes** (`tests/test_temporal.py`): máscaras = composição original; pixels guiados = `assign.guided_points`; GPU = CPU pixel a pixel num frame sintético com "jogadores" e em 3 frames reais do SNGS-099 (pulado sem GPU).
+  - **O que fica de fora:** o detector continua sem GPU (congelado). A série não muda: o `temporal.py` não entra na chave dela. A chave do 6c (`_eval_6c_key`) muda com o código novo.
+  - **Aviso do CuPy:** com as wheels da CUDA 12, o CuPy 14 não define uma raiz única e avisa "CUDA path could not be detected". O aviso é silenciado em `src/gpu.py`; os cabeçalhos e DLLs ele acha pelo `cuda-pathfinder`.
+  **Validação de ponta a ponta:** o 6c novo (CPU otimizada + GPU) nos 6 clipes do subconjunto dá as mesmas métricas que a rodada com o código antigo. São 31.500 linhas (clipe × variante × frame), com 0 diferenças e as mesmas âncoras. Tempo: ~25 min por clipe, contra ~56 min da rodada antiga, as duas disputando a máquina com a série do detector (~2,2×).
+  | Decisão de Victor (as duas: CPU otimizada + GPU opcional).
+- 2026-09-29 | **6c no subconjunto de 6 clipes (ponto de parada 3)**, 4.500 frames, `outputs/cache/eval_6c_train_6clipes.pkl` (código de antes da otimização).
+
+  **Geral:**
+
+  | série | cobertura | NPE mediano | LocSim@5 penalizado |
+  |---|---|---|---|
+  | detector | 0,413 | 0,0064 | 0,333 |
+  | 6a Bassek | 0,625 | 0,034 | 0,364 |
+  | **6c com fluxo** | 0,833 | 0,0088 | **0,683** |
+  | 6c sem fluxo | 0,833 | 0,231 | 0,282 |
+  | 6c sem linhas | 0,833 | 0,0107 | 0,668 |
+  | âncora ingênua a cada 150 frames | 1,000 | 0,119 | 0,464 |
+  | âncora de gabarito (teto) | 0,833 | 0,0069 | 0,737 |
+
+  **Conjunto comum (os 1.850 frames com H do detector):**
+
+  | série | NPE mediano | LocSim@5 penalizado | LocSim@5 nos cobertos |
+  |---|---|---|---|
+  | detector | 0,0064 | 0,786 | — |
+  | 6a Bassek | 0,0111 | 0,722 | — |
+  | **6c com fluxo** (cobertura 0,932; falta o SNGS-060) | **0,0057** | **0,834** | 0,885 |
+  | 6c sem linhas | 0,0062 | 0,829 | 0,880 |
+  | 6c sem fluxo | 0,0444 | 0,535 | 0,568 |
+  | âncora ingênua | 0,0070 | 0,742 | — |
+  | âncora de gabarito | 0,0035 | 0,872 | 0,926 |
+
+  - Nos mesmos frames, a H propagada e reestimada é **melhor que a do próprio detector**.
+  - O 6a Bassek é pior que o detector também no conjunto comum: a janela espalha as H erradas aceitas.
+
+  **Âncoras:** 111 candidatas; 91 verificáveis (82%, então a verificação no encontro de âncoras não foi necessária); 50 aceitas.
+
+  | âncoras | erradas (NPE > 0,05) |
+  |---|---|
+  | aceitas | 4% (2) |
+  | verificáveis | 24% |
+  | rejeitadas | 49% |
+
+  No SNGS-060, todas as candidatas têm a H errada (NPE ≥ 0,035), e a verificação rejeitou todas. Ela não pega erro sistemático: a candidata 502 (NPE 1,87) tem vizinhos que concordam com ela a 4 px, e só caiu porque a maioria discordou.
+
+  **Lacunas: a previsão de Victor se confirmou.** Nas lacunas de 1–3 frames, a interpolação do 6a dá NPE 0,156 (24× o detector) e a propagação 0,0071; nas de 4–25, 0,389 contra 0,0104.
+
+  **Hipótese das linhas (Victor):** as linhas pesam pouco na média porque a maioria das lacunas é curta, e a deriva sem linhas aparece nas longas. **Confirmada.**
+
+  | lacuna | NPE com linhas | NPE sem linhas | diferença |
+  |---|---|---|---|
+  | 1–3 frames | 0,0071 | 0,0077 | pequena |
+  | 4–25 frames | 0,0104 | 0,0095 | sem linhas até ligeiramente melhor |
+  | > 25 frames | 0,0269 | 0,0375 | +39% sem linhas |
+  | pontas do clipe (longe da âncora) | 0,0271 | 0,0692 | 2,6× sem linhas |
+
+  Mesmo nas lacunas longas, os dois erros ficam quase sempre abaixo dos 5 m do LocSim. Por isso a média do LocSim@5 cai só 0,015, contra 5,4 pontos no AuxFlow. | Medição; hipótese e previsão de Victor.
+- 2026-09-29 | **Incidente da pausa.** Depois de `pausa.ps1 continuar`, dois processos (o principal do 6c e um trabalhador da série) continuaram congelados, e a CPU somada dos outros escondeu isso. O pool travou: os trabalhadores do 6c ficaram bloqueados enviando resultados a um principal que não lia. O diagnóstico veio do `py-spy dump` e do estado das threads no Windows. Retomados à mão, os dois seguiram sem perda. **Correção:** o `continuar` repete a retomada até não sobrar thread suspensa, o `pausar` nunca suspende duas vezes, e o `estado` conta os congelados processo por processo. | Lição operacional: conferir processo por processo, não a CPU somada.

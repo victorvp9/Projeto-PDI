@@ -12,6 +12,14 @@ dependencies = [
     "shapely>=2.1.2",
 ]
 
+[project.optional-dependencies]
+# máscaras do 6c na GPU (src/gpu.py); sem este extra, o 6c roda na CPU com o mesmo resultado
+gpu = [
+    "cupy-cuda12x[ctk]>=14.2",
+    "nvidia-cuda-runtime-cu12",   # cabeçalhos para o CuPy compilar os kernels
+    "nvidia-cuda-nvrtc-cu12",     # compilador em tempo de execução
+]
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]

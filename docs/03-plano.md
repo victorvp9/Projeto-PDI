@@ -429,6 +429,16 @@ Etapa 8, no GSR. É a contribuição do projeto. Plano aprovado por Victor em
 - Rodada completa em WC14 e GSR, com e sem propagação.
 - Comparação do ganho relativo com o que o AuxFlow reporta sobre detector
   treinado (tabelas 4, 5 e 7 dele, no mesmo teste do GSR).
+  - **No GSR test e no HSB:** o ganho da propagação sobre o nosso detector
+    (no subconjunto de treino da Fatia 6: +0,35 em LocSim@5 penalizado, de
+    0,333 para 0,683) contra o ganho do AuxFlow sobre o NBJW (+0,044 em
+    LocSim@5, de 0,885 para 0,929, tabela 7 dele).
+  - **Ressalva obrigatória:** o LocSim deles não tem frames sem H (os dois
+    métodos devolvem H em todo frame). O nosso é penalizado (pessoa de frame
+    sem H vale 0, `01-metodo`), e boa parte do nosso ganho vem da cobertura
+    (0,413 → 0,833). Reportar também o LocSim@5 só nos frames cobertos e no
+    conjunto comum (frames com H do detector), onde a comparação fica mais
+    perto da deles.
 - **Frames difíceis isolados.** Bassek et al. apontam que o efeito do
   pós-processamento temporal sobre frames com grande zoom nunca foi testado.
   Reporte o subconjunto HSB do AuxFlow (IDs e intervalos na tabela 3 dele) à
