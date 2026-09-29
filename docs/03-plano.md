@@ -364,27 +364,48 @@ com os ajustes dele (`decisoes.md`).
   primeira metade do projeto.
 
 ### Fatia 6 — Consistência temporal (semana 5)
-Etapa 8, no GSR. É a contribuição do projeto. Três braços, nesta ordem de
-esforço.
+Etapa 8, no GSR. É a contribuição do projeto. Plano aprovado por Victor em
+2026-09-28, com os ajustes dele (`decisoes.md`).
 
-- **6a — Savitzky-Golay** sobre a série de homografias (janela 31, grau 3, como
-  em Bassek et al.). Vinte linhas. Faça primeiro: é a referência que as outras
-  precisam superar para justificar sua complexidade.
-- **6b — Detecção de corte.** Descontinuidade por diferença de histograma ou
-  salto na homografia, reiniciando a série. Sem isso, 6a e 6c suavizam através de
-  cortes e pioram o resultado. Referência: 10,9 cortes por minuto (em
-  transmissão). Os clipes do GSR são da câmera principal e o SNGS-070 não tem
-  corte; o teste de 6b usa **cortes sintéticos**, concatenando clipes. Cuidado com
-  falso positivo: um salto na homografia estimada pode ser erro do detector, e
-  não corte — a diferença de histograma distingue os dois.
-- **6c — Propagação por fluxo óptico.** Seleção de âncora usando a máscara de
-  gramado da Fatia 3 como métrica substituta; grade regular de pontos auxiliares
-  (excluindo as caixas de jogador e da bola); Lucas-Kanade; reestimativa.
-- **Teste:** com tudo desligado, o resultado é idêntico ao da Fatia 5.
-- **Ablação obrigatória:** com e sem fluxo óptico. É a comparação que responde à
-  pergunta do projeto. Incluir também âncora ingênua (a cada N frames), que no
-  AuxFlow ficou abaixo do detector sozinho.
-- Kalman (BHITK) fica como opcional, se sobrar tempo.
+- **0. Série do detector em todos os frames**, em cache por clipe
+  (`outputs/cache/detector/`): H (ou NaN), termos da nota, margem, aceite.
+  ~3 h por partição, uma vez; começa pelo subconjunto de 6 clipes do treino
+  (SNGS-060, 070, 099, 109, 154, 164; 4.500 frames).
+- **6a — Savitzky–Golay** (janela 31, grau 3, Bassek) sobre a série do detector;
+  lacunas ≤ 25 frames por interpolação linear, as maiores cortam a série;
+  comparar entradas da matriz (H[2,2] = 1) × pontos projetados com a H
+  reestimada. Referência que 6c precisa superar.
+- **6b — Detecção de corte:** diferença de histograma HSV (primária) + salto da H
+  (auxiliar; sozinho é erro do detector); reinicia as séries; testada com cortes
+  sintéticos (clipes emendados), limiar calibrado no treino.
+- **6c — Propagação por Lucas–Kanade** a partir de âncoras, nos dois sentidos do
+  tempo: grade do campo 2,5 × 2 m projetada pela âncora, sobre o gramado, **sem
+  os componentes compactos de não-gramado** (jogadores, bola; mesmo filtro de
+  forma da Fatia 4 — as linhas do campo ficam na grade: estáticas, borda
+  forte); ida-e-volta ≤ 1 px; reestimativa com o `fit_point_line` (pontos
+  propagados + pixels guiados das linhas). **A saída é a H propagada e
+  reestimada**; a H do detector só entra na escolha e na verificação das
+  âncoras (a nota não separa H certas de erradas aceitas).
+- **Âncoras:** máximos locais da nota da Fatia 5 (IoU com o gramado + fração
+  explicada), com **verificação temporal obrigatória** (a H da âncora, levada
+  pelo movimento medido por Lucas–Kanade, concorda com a do detector nos
+  vizinhos). Medir a fração de candidatas verificáveis; se for baixa, verificar
+  também no encontro de âncoras consecutivas (a H propagada de A até B concorda
+  com a de B).
+- **Ablações:** detector sozinho × 6a × 6c com fluxo × 6c sem fluxo (H da âncora
+  copiada); âncora ingênua a cada 150 frames; âncora de gabarito (`H_gt`, teto,
+  tabela 4 do AuxFlow); opcional "sem linhas" (só pontos propagados na
+  reestimativa: o 83,67 → 78,30 do AuxFlow). Kalman (8b) só se sobrar tempo.
+- **Métricas:** LocSim@5 e mAP penalizados (principal), NPE, cobertura,
+  `IoU_whole`, por jogo; estabilidade temporal medida na série estimada, nunca
+  contra a `H_gt`.
+- **Partições:** calibração só no GSR train; valid só relatório; test e HSB
+  intocados até a Fatia 8.
+- **Testes:** "tudo desligado" = Fatia 5; sintéticos (Lucas–Kanade propaga uma
+  panorâmica/zoom conhecida; Savitzky–Golay reduz o tremor; corte sintético
+  detectado); regressão depois da calibração.
+- **Paradas:** série no subconjunto + tabela do 6a; calibração do corte; 6c de
+  ponta a ponta no subconjunto; tabelas de calibração antes da regressão.
 - **Risco principal (achado na Fatia 5): H erradas aceitas pelo detector** — a
   cauda do NPE médio (0,58 com mediana 0,0064 no GSR train), quase sempre uma
   troca de reta (grande × pequena área) ou o friso das placas tomado pela

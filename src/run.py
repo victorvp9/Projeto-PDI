@@ -377,12 +377,16 @@ def main():
     ap.add_argument("--lines-sweep-ellipses", action="store_true", help="Fatia 4: grade das elipses (escolha no GSR train; WC14 a 3 e 8 px como verificação)")
     ap.add_argument("--detect", action="store_true", help="Fatia 5: detector sozinho (variantes do config) no GSR --splits e no WC14 --wc14-split")
     ap.add_argument("--wc14-split", default="train_val", help="partição do WC14 do --detect ('' para pular); o test só na Fatia 8")
+    ap.add_argument("--detect-series", action="store_true", help="Fatia 6: série do detector em todos os frames (cache), no --clips ou no subconjunto do config")
+    ap.add_argument("--smooth-eval", action="store_true", help="Fatia 6 (6a): tabela do Savitzky-Golay nos clipes com série em cache")
+    ap.add_argument("--clips", nargs="+", help="clipes do GSR (split/clipe ou só clipe, no primeiro --splits); padrão: temporal.subset_clips")
     ap.add_argument("--splits", nargs="+", default=["train", "valid", "test"], help="partições do GSR")
     args = ap.parse_args()
     if not (args.overlay or args.gsr_quality or args.fit_calibration or args.evaluate or args.shadow_sheet
             or args.segment_sweep or args.segment_sweep_lines or args.segment_eval
             or args.segment_variants_calib is not None or args.segment_variants
-            or args.lines_fp_sheet or args.lines_fp_table or args.lines_sweep or args.lines_sweep_ellipses or args.detect):
+            or args.lines_fp_sheet or args.lines_fp_table or args.lines_sweep or args.lines_sweep_ellipses or args.detect
+            or args.detect_series or args.smooth_eval):
         ap.print_help()
     for spec in args.overlay or []:
         overlay(spec)
@@ -392,6 +396,13 @@ def main():
         fit_calibration(args.splits)
     if args.detect:
         detect(args.splits, args.wc14_split)
+    if args.detect_series or args.smooth_eval:
+        from src import temporal
+        clips = [path("gsr") / (c if "/" in c else f"{args.splits[0]}/{c}") for c in (args.clips or CFG["temporal"]["subset_clips"])]
+        if args.detect_series:
+            temporal.build_series(_pool, clips)
+        if args.smooth_eval:
+            temporal.evaluate_6a(_pool, clips)
     if args.evaluate:
         evaluate(args.evaluate, args.splits)
     if args.shadow_sheet:

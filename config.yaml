@@ -213,6 +213,16 @@ detector:
   variants:                # td 6/720 x escala única, escolhida pelo NPE mediano no GSR train entre td 3/6 x escala 1/"1+2" (docs/decisoes.md)
     td6_e1: {segment: {line_scales: [1.0]}, lines: {fuse_d_frac: 0.0083333}}
 
+temporal:
+  # Etapa 8 (src/temporal.py), Fatia 6
+  series_chunk: 50         # frames por tarefa na série do detector (escolha; paralelismo)
+  max_gap: 25              # lacunas de até 25 frames preenchidas por interpolação linear antes do filtro (Bassek et al.)
+  sg_window: 31            # Savitzky–Golay: janela 31 (Bassek et al.)
+  sg_poly: 3               # grau 3 (Bassek et al.)
+  points_u: [0.25, 0.75]   # representação por pontos: 4 pontos fixos da imagem (fração da largura)...
+  points_v: [0.6, 0.95]    # ... e da altura, na metade de baixo: no gramado nas vistas de transmissão (escolha)
+  subset_clips: [SNGS-060, SNGS-070, SNGS-099, SNGS-109, SNGS-154, SNGS-164]   # desenvolvimento: treino [::10]
+
 sweep_lines:
   # análise da Fatia 4, só no treino (WC14 train_val, GSR train a cada eval_segment.gsr_frame_step)
   fp_n: 100             # pixels falsos positivos sorteados por base; erro-padrão ~5 p.p. (plano da Fatia 4)
