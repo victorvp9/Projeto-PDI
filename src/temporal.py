@@ -552,7 +552,7 @@ def _gap_lengths(ok):
     return L
 
 
-VARIANTS_6C = ("detector", "6a Bassek", "6c fluxo", "6c sem fluxo", "6c sem linhas", "6c âncora ingênua /150", "6c âncora de gabarito")
+VARIANTS_6C = ("detector", "6a Bassek", "6a robusto", "6c fluxo", "6c sem fluxo", "6c sem linhas", "6c âncora ingênua /150", "6c âncora de gabarito")
 
 
 def _eval_clip_6c(clip):
@@ -580,6 +580,7 @@ def _eval_clip_6c(clip):
     series = {
         "detector": ser["H"],
         "6a Bassek": smooth_homographies(ser["H"], size, "matrix"),
+        "6a robusto": smooth_homographies(hampel_homographies(ser["H"], size, T["hampel_half"], T["hampel_sigma"]), size, "matrix"),
         "6c fluxo": fill_from_anchors(cf, anc, ser["H"], seg, "flow", dbg),
         "6c sem fluxo": fill_from_anchors(cf, anc, ser["H"], seg, "noflow"),
         "6c sem linhas": fill_from_anchors(cf, anc, ser["H"], seg, "nolines"),
@@ -637,17 +638,17 @@ def evaluate_6c(pool, clips):
     """Roda o 6c nos clipes (cache por clipe em outputs/cache/eval_6c/) e imprime as tabelas."""
     with pool() as ex:
         res = list(ex.map(_eval_clip_6c_cached, clips))
-    return report_6c(res)
+    return report_6c(res, f"{clips[0].parent.name}_{len(clips)}clipes")
 
 
-def report_6c(res):
+def report_6c(res, tag):
     """Tabelas do 6c: geral, conjunto comum (frames com H do detector), âncoras e as
     lacunas do detector (6a preenchendo por interpolação x 6c propagando)."""
     from src.evaluate import summarize
     from src.run import _write_csv
     rows = [r for rs, _, _ in res for r in rs]
     anc = [a for _, _, aa in res for a in aa]
-    _write_csv(path("outputs") / "ancoras_6c.csv", anc)
+    _write_csv(path("outputs") / f"ancoras_6c_{tag}.csv", anc)
     print(f"{len(res)} clipes, {len(rows) // len(VARIANTS_6C)} frames")
     print("série                    | cobertura | NPE med  média  | IoU_whole med | LocSim@5 pen | mAP pen | tremor med (px) p90")
     for name in VARIANTS_6C:
@@ -671,10 +672,10 @@ def report_6c(res):
         print(f"   {label:26} {len(e):5}  NPE mediano {np.median(f) if len(f) else np.nan:.4f}  "
               f"NPE > 0,05 (erradas): {int((f > 0.05).sum())} ({np.mean(f > 0.05) if len(f) else np.nan:.1%})")
     print("\nlacunas do detector (frames sem H, lacuna interna de L frames): cobertura e NPE mediano")
-    print("   L        frames | detector cob NPE | 6a Bassek cob NPE | 6c fluxo cob NPE  | 6c sem linhas     | 6c sem fluxo cob NPE")
+    print("   L        frames | detector cob NPE | 6a Bassek cob NPE | 6a robusto        | 6c fluxo cob NPE  | 6c sem linhas     | 6c sem fluxo cob NPE")
     for lo, hi in ((0, 0), (1, 3), (4, 25), (26, 10**6), (-1, -1)):
         line = []
-        for name in ("detector", "6a Bassek", "6c fluxo", "6c sem linhas", "6c sem fluxo"):
+        for name in ("detector", "6a Bassek", "6a robusto", "6c fluxo", "6c sem linhas", "6c sem fluxo"):
             rs = [r for r in rows if r["variante"] == name and lo <= r["lacuna"] <= hi and r["has_gt"]]
             e = [r["npe"] for r in rs if "npe" in r]
             line.append(f"{len(e) / max(len(rs), 1):.3f} {np.median(e) if e else np.nan:.4f}")

@@ -439,6 +439,18 @@ Etapa 8, no GSR. É a contribuição do projeto. Plano aprovado por Victor em
     (0,413 → 0,833). Reportar também o LocSim@5 só nos frames cobertos e no
     conjunto comum (frames com H do detector), onde a comparação fica mais
     perto da deles.
+  - **Medida principal do ganho:** a fração da distância fechada entre o
+    detector e o teto da âncora de gabarito, (6c − detector) / (teto −
+    detector). Nos 19 clipes de calibração: (0,708 − 0,364) / (0,771 − 0,364)
+    ≈ 85%.
+  - No conjunto comum, o 6c supera o detector também em NPE (0,0049 × 0,0052).
+  - **Linhas:** pesam nas lacunas longas (+53% de NPE sem elas acima de 25
+    frames; 1,8× nas pontas) e quase nada nas curtas. Como o nosso detector
+    pisca, a maioria das lacunas é curta; isso explica a diferença em relação
+    ao AuxFlow, onde tirar as linhas custa 5,4 pontos.
+  - **Limitação:** nos clipes em que o detector erra de forma sistemática
+    (SNGS-060, 066), nenhuma âncora passa, e a propagação não tem de onde
+    partir. Ao rejeitar todas, a verificação evita que H erradas se espalhem.
 - **Frames difíceis isolados.** Bassek et al. apontam que o efeito do
   pós-processamento temporal sobre frames com grande zoom nunca foi testado.
   Reporte o subconjunto HSB do AuxFlow (IDs e intervalos na tabela 3 dele) à

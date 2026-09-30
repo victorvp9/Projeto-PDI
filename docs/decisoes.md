@@ -215,4 +215,92 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   | pontas do clipe (longe da âncora) | 0,0271 | 0,0692 | 2,6× sem linhas |
 
   Mesmo nas lacunas longas, os dois erros ficam quase sempre abaixo dos 5 m do LocSim. Por isso a média do LocSim@5 cai só 0,015, contra 5,4 pontos no AuxFlow. | Medição; hipótese e previsão de Victor.
+- 2026-09-29 | **6a robusto: calibração do Hampel** (`--hampel-calib --splits train --clip-step 3`; `outputs/hampel_descartes.csv`). São 19 clipes e 14.250 frames; das 6.055 H do detector com gabarito, 844 estão erradas (NPE > 0,05). O SG é na matriz, com preenchimento ≤ 25.
+
+  | configuração | cobertura | NPE mediano | LocSim@5 penalizado | descartados (errados entre eles) |
+  |---|---|---|---|---|
+  | Bassek, sem Hampel | 0,661 | 0,0161 | 0,415 | — |
+  | Hampel, pior LocSim (3/2, 3/3, 3/4, 3/6) | 0,656–0,659 | 0,0099–0,0101 | 0,434 | — |
+  | Hampel, melhor LocSim (12/4 e 12/6) | — | — | **0,442** | — |
+  | 12/6 | — | — | — | 318 (219, 69%) |
+  | 15/6 | — | — | — | 328 (230, 70%) |
+  | **15/2** | 0,602 | **0,0082** | 0,435 | 779 (339, 44%) |
+  | 3/2 | — | — | — | 983 (228, 23%) |
+
+  - **Qualquer meia janela e limiar da grade:** o Hampel ganha do Bassek, com +0,019 a +0,027 em LocSim@5 penalizado e o NPE mediano caindo de 0,0161 para 0,008–0,010.
+  - **O que a regra fixada escolhe:** ela manda pegar o maior LocSim e, em empate a 0,01, o menor NPE. Pela regra, as 16 configurações empatam (entre 0,434 e 0,442), e o NPE decide: **15/2**.
+  - **Um viés da própria regra:** o NPE mediano é medido só nos frames cobertos, então cai quando se descarta mais. A 15/2 é a que mais descarta frames certos (440) e tem a menor cobertura (0,602).
+  - **A diferença prática é pequena:** entre a 15/2 e a de maior LocSim (12/4 ou 12/6), são ≤ 0,007 de LocSim.
+
+  | Medição. Regra aplicada como fixada; o viés do desempate fica para Victor decidir (manter 15/2 ou desempatar por outra medida), sem mudar a regra por conta própria.
+- 2026-09-29 | **Hampel fixado em meia janela 12, limiar 6** (`hampel_half`, `hampel_sigma`), um desvio da regra fixada. O desempate pelo NPE mediano favorece descartar mais, porque o NPE só é medido nos frames que sobram. Por isso a escolha foi pelo critério principal, o maior LocSim@5 penalizado, que já pondera a cobertura: 0,442, empatado com a 12/4. O empate foi desfeito pela maior cobertura (0,642 × 0,639), pelo maior mAP (0,418 × 0,417) e pela precisão dos descartes (69% × 59%). Custo contra a 15/2 da regra: NPE mediano 0,0092 × 0,0082, com LocSim +0,007. Entra no 6c como "6a robusto" (Hampel na representação por pontos + SG na matriz). Na próxima regra de escolha, não desempatar por métrica medida só nos frames cobertos. | Decisão delegada por Victor.
+- 2026-09-29 | **Ponto de parada 4: 6c nos 19 clipes de calibração** (train[::3], 14.250 frames, `--propagate-eval --splits train --clip-step 3`, CPU otimizada + GPU; `outputs/ancoras_6c_train_19clipes.csv`).
+
+  **Geral:**
+
+  | série | cobertura | NPE mediano | LocSim@5 penalizado | tremor mediano / p90 (px) |
+  |---|---|---|---|---|
+  | detector | 0,428 | 0,0052 | 0,364 | 1,32 / 13,3 |
+  | 6a Bassek | 0,661 | 0,0161 | 0,415 | — |
+  | 6a robusto (Hampel 12/6) | 0,642 | 0,0092 | 0,442 | — |
+  | **6c com fluxo** | 0,894 | 0,0082 | **0,708** (+0,344) | 0,47 / 1,6 |
+  | 6c sem linhas | 0,894 | 0,0110 | 0,699 | — |
+  | 6c sem fluxo | 0,894 | 0,217 | 0,326 | — |
+  | âncora ingênua a cada 150 frames | 1,000 | 0,041 | 0,539 | — |
+  | âncora de gabarito (teto) | 0,894 | 0,0051 | 0,771 | — |
+
+  **Conjunto comum (6.055 frames com H do detector):**
+
+  | série | NPE mediano | LocSim@5 penalizado | nos cobertos |
+  |---|---|---|---|
+  | detector | 0,0052 | 0,830 | — |
+  | 6a Bassek | 0,0064 | 0,783 | — |
+  | 6a robusto | 0,0054 | 0,821 | — |
+  | **6c com fluxo** (cobertura 0,958) | **0,0049** | **0,860** | 0,900 |
+  | teto (âncora de gabarito) | — | 0,888 | 0,929 |
+
+  **Âncoras:**
+
+  | | n | erradas (NPE > 0,05) |
+  |---|---|---|
+  | candidatas | 365 | 34,5% |
+  | verificáveis | 295 (81%) | 22,4% |
+  | aceitas | 189 | **1,6%** (3) |
+  | rejeitadas | 106 | 59% |
+
+  Os clipes em que o detector erra de forma sistemática ficam quase sem âncora: SNGS-060 (0), SNGS-066 (0), SNGS-063 (1), SNGS-069 (2).
+
+  **Lacunas, NPE mediano por faixa:**
+
+  | lacuna | 6a Bassek | 6a robusto | 6c com fluxo | 6c sem linhas |
+  |---|---|---|---|---|
+  | 1–3 frames | 0,149 | 0,031 | **0,0079** | 0,0101 |
+  | 4–25 frames | 0,612 | 0,507 | **0,0101** | 0,0176 |
+  | > 25 frames | — | — | 0,0217 | 0,0331 (+53%) |
+  | pontas do clipe | — | — | 0,0207 | 0,0376 (1,8×) |
+
+  - O Hampel limpa as lacunas curtas, porque tira as H erradas que contaminavam a interpolação, mas não resolve as médias.
+  - As linhas pesam mais aqui que no subconjunto, já a partir de 4 frames.
+
+  | Medição (conjunto de calibração); base dos limites da regressão da Fatia 6.
+- 2026-09-29 | **Leitura do resultado da Fatia 6, para o relatório (Victor).**
+  - **Medida principal do ganho:** a fração da distância fechada entre o detector e o teto da âncora de gabarito. Nos 19 clipes de calibração: (0,708 − 0,364) / (0,771 − 0,364) ≈ **85%**.
+  - **Conjunto comum:** o 6c supera o detector também em NPE mediano (0,0049 × 0,0052), além do LocSim@5 (0,860 × 0,830).
+  - **As linhas pesam nas lacunas longas e quase nada nas curtas:** acima de 25 frames, o NPE sobe 53% sem elas; nas pontas do clipe, 1,8×. Como o detector pisca e a maioria das lacunas é curta, a média do LocSim@5 cai só 0,009 sem as linhas. Isso explica a diferença para o AuxFlow, onde tirar as linhas custa 5,4 pontos.
+  - **Limitação:** nos clipes em que o detector erra de forma sistemática (SNGS-060, 066), nenhuma âncora passa, e a propagação não tem de onde partir. Ao rejeitar todas, a verificação evita que H erradas se espalhem pelo clipe.
+  | Leitura de Victor.
+- 2026-09-29 | **Regressão da Fatia 6** (`tests/test_temporal_regression.py`, lentos, ~5 min), com as séries do detector em cache: pula sem cache e falha se a chave não bater. Limites aprovados por Victor:
+
+  | teste | medido | limite |
+  |---|---|---|
+  | 6c, janela de 250 frames do SNGS-099: cobertura | 1,000 | ≥ 0,99 |
+  | LocSim@5 penalizado | 0,821 | ≥ 0,811 |
+  | NPE mediano | 0,0101 | ≤ 0,0111 |
+  | verificação no SNGS-060: âncoras aceitas | 0 | = 0 |
+  | verificáveis | 6 | ≥ 5 |
+  | 6a robusto no SNGS-099 inteiro: LocSim@5 penalizado | 0,578 | ≥ 0,568 |
+  | NPE mediano | 0,0067 | ≤ 0,0074 |
+  | robusto ≥ Bassek em LocSim@5 | 0,578 × 0,553 | robusto ≥ Bassek |
+
+  | Decisão de Victor.
 - 2026-09-29 | **Incidente da pausa.** Depois de `pausa.ps1 continuar`, dois processos (o principal do 6c e um trabalhador da série) continuaram congelados, e a CPU somada dos outros escondeu isso. O pool travou: os trabalhadores do 6c ficaram bloqueados enviando resultados a um principal que não lia. O diagnóstico veio do `py-spy dump` e do estado das threads no Windows. Retomados à mão, os dois seguiram sem perda. **Correção:** o `continuar` repete a retomada até não sobrar thread suspensa, o `pausar` nunca suspende duas vezes, e o `estado` conta os congelados processo por processo. | Lição operacional: conferir processo por processo, não a CPU somada.

@@ -226,7 +226,9 @@ temporal:
   hist_bins: [8, 8, 8]     # 6b: histograma HSV 8x8x8, distância de Bhattacharyya (escolha)
   hampel_half_grid: [3, 7, 12, 15]   # 6a robusto: Hampel antes do SG, meia janela (frames); grade calibrada no train[::3] (decisão de Victor)
   hampel_sigma_grid: [2, 3, 4, 6]    # ... limiar em desvios robustos (1,4826·MAD); grade calibrada no train[::3]
-  hampel_min_valid: 3                # janela com menos frames com H que isto não julga (escolha: mediana de 3 é o mínimo com maioria)
+  hampel_half: 12                    # escolhida na grade: maior LocSim@5 penalizado (0,442, empate com 12/4 desfeito por cobertura, mAP e precisão dos descartes; decisoes.md 2026-09-29)
+  hampel_sigma: 6                    # idem
+  hampel_min_valid: 3               # janela com menos frames com H que isto não julga (escolha: mediana de 3 é o mínimo com maioria)
   cut_thr: 0.202           # [EMPÍRICO] 6b: corte se a distância > isto: logo acima do maior salto dentro dos clipes (0,201, placa de LED), 19 clipes do treino; folga mínima para o corte sintético do mesmo jogo (0,205)
   # 6c: propagação por Lucas–Kanade a partir de âncoras (tudo escolha até a calibração)
   anchor_window: 12        # âncora candidata: máximo local de (IoU com o gramado + fração explicada) em +-12 frames
