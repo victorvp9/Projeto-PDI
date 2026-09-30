@@ -341,12 +341,28 @@ Adicionalmente, e específico deste projeto:
 
 - **Taxa de cobertura** — fração de imagens em que o pipeline produziu
   homografia. Um método que acerta muito em poucos frames não serve.
-- **Estabilidade temporal** — variação da homografia entre frames consecutivos,
-  medida pelo deslocamento dos quatro cantos do campo projetados. É onde a
-  propagação deve aparecer. Medida **na série estimada** (e, quando útil,
-  comparada ao movimento real da imagem medido por Lucas–Kanade), **nunca como
+- **Estabilidade temporal** — variação da homografia entre frames consecutivos.
+  É onde a propagação deve aparecer. Medida **na série estimada**, **nunca como
   diferença contra a `H_gt`**: o gabarito do GSR tem tremor e desvios locais
   próprios, e comparar contra ele puniria o método por não reproduzi-los.
+  > **Alteração da especificação (Fatia 7, aprovada por Victor em 2026-09-30).**
+  > A versão anterior media o deslocamento dos **quatro cantos do campo**
+  > projetados. Na vista de transmissão, os cantos quase sempre caem fora da
+  > imagem ou além do horizonte, onde a projeção explode, e a medida ficaria
+  > dominada por pontos que ninguém vê. Agora, a medida usa a **grade de pontos
+  > do campo visíveis na imagem** nos frames envolvidos, em duas grandezas:
+  > - **tremor** — segunda diferença (px) dos pontos projetados, mediana por
+  >   frame: mede a trepidação sem punir a panorâmica suave;
+  > - **deslize** — distância (px) entre o movimento que a série implica,
+  >   `H_t·H_{t−1}⁻¹`, e o movimento real da imagem, nos pontos visíveis. O
+  >   movimento real é medido por **ECC** (`cv2.findTransformECC`, homografia,
+  >   restrito ao gramado), um método **independente do Lucas–Kanade** que o
+  >   6c usa para propagar; medir com o próprio Lucas–Kanade seria circular.
+  >   Reporta-se a **taxa de convergência do ECC**, e os pares em que ele não
+  >   converge ficam fora do deslize.
+  >
+  > Pares separados por corte, ou sem H num dos dois frames, ficam fora das
+  > duas medidas.
 - **LocSim** (se o conjunto temporal for o SoccerNet-GSR) — similaridade de
   localização do GS-HOTA, `exp(ln(0,05)·d²/τ²)`: o centro da base da caixa de
   gabarito (imagem) vai para o campo pela **inversa da homografia estimada** e

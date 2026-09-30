@@ -303,4 +303,119 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   | robusto ≥ Bassek em LocSim@5 | 0,578 × 0,553 | robusto ≥ Bassek |
 
   | Decisão de Victor.
+- 2026-09-30 | **Plano da Fatia 7 aprovado** (`03-plano`), com quatro decisões de Victor:
+  1. **Estabilidade** pela grade de pontos visíveis, no lugar dos 4 cantos, e deslize medido por ECC, independente do 6c. Registrado no `01-metodo` como alteração da especificação. Reporta-se a taxa de convergência do ECC, e os pares em que ele não converge ficam fora do deslize.
+  2. **Kalman agora**, com o nome "Kalman de velocidade constante + RTS (simplificado)", deixando claro que não é o BHITK. Uma rodada de calibração, com a regra fixada antes: maior LocSim@5 penalizado e, no empate a 0,01, o menor tremor mediano. Não se desempata por NPE (lição do Hampel).
+  3. **Inversão:** jogadores como medida principal (unilateral) e grade como complemento, nas duas versões (penalizada e só cobertos), mais o indicador na linha do Bassek.
+  4. **Sensibilidade descritiva** no lugar da recalibração sistemática. Um ganho ≥ 0,02 vira proposta, sem mudar nada.
+
+  O cache por clipe do 6c passa a guardar as séries de H de cada variante, para a estabilidade e a visibilidade (a chave muda e os caches antigos são refeitos quando pedidos).
+  | Decisões de Victor.
+- 2026-09-30 | **7b: calibração do Kalman de velocidade constante + RTS (simplificado; não é o BHITK)** (`--kalman-calib --splits train --clip-step 3`; 19 clipes, 14.250 frames). Grade q ∈ {0,001; 0,01; 0,1; 1} × r ∈ {0,01; 0,1; 1; 10}.
+
+  | configuração | cobertura | LocSim@5 penalizado | NPE mediano | tremor mediano (px) |
+  |---|---|---|---|---|
+  | Bassek (referência) | 0,661 | 0,415 | 0,0161 | 0,60 |
+  | 6a robusto (referência) | 0,642 | 0,442 | 0,0092 | 0,37 |
+  | Kalman, grade inteira | 0,659 | 0,442–0,465 | 0,0082–0,0211 | 0,16–1,41 |
+  | Kalman, maior LocSim (q 0,01 / r 0,1) | 0,659 | **0,465** | 0,0084 | 0,34 |
+  | **Kalman pela regra (q 0,01 / r 10)** | 0,659 | 0,456 | 0,0116 | **0,23** |
+
+  - **Qualquer (q, r) da grade supera o Bassek**, e 14 das 16 superam o 6a robusto em LocSim.
+  - **A regra fixada** (maior LocSim; empate a 0,01 pelo menor tremor) empata 9 configurações e escolhe **q = 0,01, r = 10**.
+  - **Viés estrutural da regra:** desempatar por uma medida que melhora sempre com mais suavização (o tremor) leva à borda da faixa de empate. A escolha fica 0,009 abaixo do melhor LocSim, com o NPE mediano em 0,0116 contra 0,0084: a suavização pesada atrasa a H nas panorâmicas.
+  - **Aplicada como fixada e aprovada.** Registra-se, para a próxima regra, que desempates por medida monotônica na suavização empurram para a borda da tolerância, como o NPE medido só nos cobertos no Hampel.
+
+  | Regra de Victor, aplicada; o viés fica registrado.
+- 2026-09-30 | **Executor à prova de falha silenciosa** (`src/executor.py`). Houve três falhas que passaram em silêncio: o `tail` no pytest, o `echo` depois de uma rodada e a exceção de um clipe que derrubou o 6c na valid inteira.
+  - **Correção, num lugar só:** o `_pool()` da CLI devolve um pool cujo `map` roda cada tarefa dentro de try/except. A que falha rende `None` e as outras seguem.
+  - **Manifesto:** cada rodada grava `outputs/runs/<função>_<data>.json`, com status, contagens e, por tarefa, duração, erro e traceback. Ele é atualizado a cada tarefa concluída.
+  - **Código de saída:** no fim, a CLI sai com código 1 se alguma tarefa falhou (`exit_if_failed`).
+  - **Rodadas das Fatias 6 e 7:** pulam os `None` e calculam as tabelas com o que deu certo. Uma série do detector com um trecho que falhou não é gravada e fica para a próxima rodada. As rodadas antigas (Fatias 2–5) herdam a proteção.
+  - **Vigia:** passa a ler os manifestos (cada falha e cada conclusão, com as contagens), e não o código de saída do último comando.
+  - **Testes:** `tests/test_executor.py` (uma tarefa que lança exceção não derruba as outras, vai ao manifesto com traceback e deixa o código de saída em 1). Com threads e subprocesso, sem pool de processos no pytest. Conferido à mão com processos de verdade.
+  | Decisão de Victor.
+- 2026-09-30 | **Fatia 7, ponto de parada 1: estabilidade e visibilidade no subconjunto** (6 clipes do treino, 4.500 frames; `--consequence-eval`). Pelo manifesto, 6 ok e 0 falhas, com a chave do ECC conferida.
+  - **ECC:** 4.494 pares, 100% sem divergência. A correlação final tem p1 0,931, p5 0,953 e mediana 0,989, sem nenhum par abaixo de 0,9. O OpenCV só acusa divergência, não o limite de iterações; por isso reporto a correlação junto.
+
+  | série | cobertura | tremor mediano / p90 (px) | deslize mediano / p90 (px) | inversão de jogadores, penalizada / só cobertos | grade, penalizada / só cobertos | 0 visíveis, penalizada / só cobertos |
+  |---|---|---|---|---|---|---|
+  | detector | 0,411 | 1,51 / 107 | 2,31 / 68 | 0,615 / 0,095 | 0,678 / 0,168 | 0,603 / 0,038 |
+  | 6a Bassek | 0,622 | 1,29 / 24 | 4,97 / 77 | 0,473 / 0,169 | 0,548 / 0,293 | 0,407 / 0,050 |
+  | 6a robusto | 0,611 | 0,55 / 8,0 | 2,84 / 47 | 0,461 / 0,136 | 0,529 / 0,239 | 0,414 / 0,046 |
+  | Kalman + RTS | 0,622 | **0,26 / 3,1** | 2,52 / 22 | 0,450 / 0,133 | 0,501 / 0,197 | 0,409 / 0,054 |
+  | **6c com fluxo** | **0,833** | 0,57 / 1,9 | **1,37 / 3,9** | **0,236 / 0,068** | **0,319 / 0,114** | **0,201** / 0,041 |
+  | 6c sem fluxo | 0,833 | 0,00 / 0,00 | 6,09 / 18 | 0,405 / 0,274 | 0,536 / 0,418 | 0,230 / 0,075 |
+
+  - **Tremor e deslize medem coisas diferentes.** A H congelada do "sem fluxo" tem tremor zero e deslize de 6 px. O Kalman tem o menor tremor, mas desliza mais que o 6c, porque suaviza atrasando nas panorâmicas.
+  - **O 6c é o único que segue o movimento real,** com deslize p90 de 3,9 px, contra 22 a 77 px nos outros.
+  - **Inversão de jogadores, penalizada:** cai de 61,5% (detector) para 23,6% (6c), puxada pela cobertura. Só nos frames cobertos, cai de 9,5% para 6,8%.
+  - **Indicador do Bassek** (o registro deixa 0 jogadores visíveis com ≥ 1 no gabarito): 3,8% (detector) e 4,1% (6c) só nos cobertos, na mesma ordem dos 3% do pipeline deles. Na versão penalizada, 60% e 20%.
+  - **Depuração** em `outputs/debug/visibilidade/`: por exemplo, SNGS-099/400, com os campos de visão quase coincidentes, e SNGS-164/150, com o 6c errado e quase todos os jogadores invertidos.
+
+  | Medição (subconjunto de desenvolvimento).
+- 2026-09-30 | **Comparação frame a frame, no train[::3], do 6c antes × depois da correção da H degenerada** (pedido de Victor; `scratchpad/compare_hfix.py`).
+  - **Método:** as propagações antiga (sem as duas proteções) e nova foram reproduzidas em float64, com os mesmos insumos e registro dos eventos degenerados. A reprodução antiga foi conferida contra o cache antigo e bateu em todos os frames: mesmo NPE e mesmas distâncias do LocSim.
+  - **Resultado,** em 19 clipes, 5 variantes que propagam e 14.250 frames por variante:
+    - (a) **0 frames** com deslocamento máximo > 1e-6 px na grade de 2,5 × 2 m;
+    - (b) **nenhum evento degenerado** no train[::3], então a correção nunca foi acionada ali;
+    - (c) **LocSim@5 penalizado idêntico** em todos os clipes e variantes.
+  - **Os números da Fatia 6 no treino e os alvos da regressão ficam como estão.** A janela do SNGS-099 e o SNGS-060 também foram medidos de novo: 1,000 / 0,0101026 / 0,8207073 e 6 verificáveis / 0 aceitas, iguais aos de antes.
+  - **Nota sobre precisão:** a série nova em float64 difere do cache em float32 só por arredondamento. O maior valor absoluto (1,41, no SNGS-100) está numa H da âncora ingênua com entradas de 3,6e8, um erro relativo de ~4e-9.
+  | Medição.
+- 2026-09-30 | **Chave derivada dos bytes lidos na importação, conferida no trabalhador e no fechamento da rodada** (decisão de Victor).
+  - **Na importação:** o `temporal.py` importa os módulos das chaves e lê os bytes deles uma vez (`_SRC`).
+    - A chave da série usa esses bytes, com o mesmo valor de antes.
+    - A do 6c passa a ser config temporal + chave da série + bytes do `temporal.py`, `evaluate.py` e `io/gsr.py`, sem `inspect.getsource`.
+    - A do ECC é config + bytes do `stability.py` e do `temporal.py`.
+  - **Onde a captura mora:** no módulo dono da chave. Os módulos do detector e o `io/gsr.py` não guardam os próprios bytes, porque editá-los mudaria a série do detector e o cache da H_gt.
+  - **No trabalhador:** ele recalcula a chave com o código que importou e lança exceção se ela não for a recebida do processo principal (`executor.check_key`).
+  - **No fechamento:** a rodada grava no manifesto a chave de cada tarefa e marca falha nas divergentes (`verify_keys`).
+  - **Troca sem recalcular:** `scratchpad/rekey.py` conferiu, antes do patch, o `git diff` vazio nos arquivos da chave contra `refs/snapshots/rodada-6c-20260930` (o código das duas rodadas) e a chave antiga igual à gravada; depois do patch, a chave da série inalterada. Só então regravou a chave em 81 caches (58 da valid e 23 do train), nenhum com chave estranha.
+  - **Testes:** divergência no trabalhador (6c e série) vira falha no manifesto; chave gravada divergente marca a rodada como falha. Conferido também de ponta a ponta com processos de verdade: a rodada carregou do cache e fechou com as chaves conferidas.
+  - **Pendente, da mesma família:** a chave do cache da H_gt (`gsr._cache_key`) ainda lê os arquivos na hora da chamada. Fica para a Fatia 8, quando esse cache for refeito.
+  | Decisão de Victor; a captura no módulo dono da chave foi escolha minha, para não invalidar a série e a H_gt.
+- 2026-09-30 | **6c na GSR valid inteira, só relatório** (`--propagate-eval --splits valid --clip-step 1`; `outputs/ancoras_6c_valid_58clipes.csv`). São 58 clipes e 43.500 frames. Pelo manifesto, 58 ok e 0 falhas, com a chave gravada conferida nos 58. **18 clipes ficaram sem âncora aceita:** SNGS-021, 029, 040, 041, 043, 045, 046, 047, 050, 051, 052, 055, 056, 058, 059, 094, 095, 096.
+
+  **Geral:**
+
+  | série | cobertura | NPE mediano | LocSim@5 penalizado |
+  |---|---|---|---|
+  | detector | 0,273 | 0,0142 | 0,173 |
+  | 6a Bassek | 0,442 | 0,098 | 0,196 |
+  | 6a robusto | 0,435 | 0,040 | 0,212 |
+  | **6c com fluxo** | 0,693 | 0,0221 | **0,436** |
+  | 6c sem linhas | 0,693 | 0,0313 | 0,423 |
+  | 6c sem fluxo | 0,693 | 0,444 | 0,164 |
+  | âncora ingênua | 0,982 | 0,254 | 0,283 |
+  | âncora de gabarito (teto) | 0,693 | 0,0118 | 0,529 |
+
+  Fração da distância ao teto: (0,436 − 0,173) / (0,529 − 0,173) ≈ **74%**, contra 85% no treino.
+
+  **Conjunto comum (11.697 frames):** o 6c fica em 0,766 contra 0,689 do detector (0,812 nos cobertos), com NPE mediano 0,0098 contra 0,0142.
+
+  **Âncoras:** 827 candidatas (52% erradas), 635 verificáveis (40% erradas), 295 aceitas, **10% delas erradas** (contra 1,6% no treino). A verificação filtra menos nos jogos de contraste baixo e na sombra, onde o detector erra do mesmo jeito em frames seguidos.
+
+  **Lacunas, NPE mediano:**
+
+  | lacuna | 6a (interpola) | 6c com fluxo | 6c sem linhas |
+  |---|---|---|---|
+  | 1–3 frames | 0,306 | 0,018 | 0,026 |
+  | 4–25 frames | 0,775 | 0,021 | 0,032 |
+  | > 25 frames | — | 0,070 | 0,081 |
+
+  | Medição única, só relatório (nada se calibra na valid).
+- 2026-09-30 | **Chave do cache calculada no processo principal.** A rodada do 6c na valid (com a correção da H degenerada) processou os 58 clipes sem erro, mas 47 foram gravados com a chave errada.
+  - **Causa:** cada trabalhador calculava a chave na hora de gravar, com `inspect.getsource`, que lê o arquivo naquele momento. Durante a rodada, o `temporal.py` foi editado (o executor), com linhas acrescentadas acima das funções da chave. O `getsource` passou a ler trechos deslocados, embora o código carregado fosse o mesmo.
+  - **Prova de que o cálculo estava certo:** a chave de hoje é igual à dos 11 clipes gravados antes da edição, então as funções da chave não mudaram.
+  - **Mesmo assim, os 47 foram recalculados**, sem remendar o cache à mão.
+  - **Correção:** a chave do 6c e a do ECC são calculadas uma vez, no processo principal, no início da rodada, e vão para os trabalhadores junto com o clipe. Isso não muda o valor da chave.
+  - **Lição:** não editar arquivos cuja fonte entra numa chave enquanto uma rodada que a usa está no ar; a correção torna isso inofensivo.
+  | Correção de defeito.
+- 2026-09-30 | **6c: H degenerada na propagação** (achado no 6c da valid). No SNGS-049, com uma única âncora aceita, a H dos pontos rastreados saiu singular (condição 5e19, determinante −7e−28): eram 1.465 pontos, mas espremidos numa faixa de 78 px, quase colineares. O ajuste quebrou ao invertê-la (`LinAlgError`), e a exceção derrubou a rodada inteira.
+  - **Correção:** a H dos pontos só entra se for finita e tiver condição ≤ `h_cond_max` = 1e12, senão fica a anterior. Um ajuste que passa por uma H singular conta como não aceito.
+  - **Limite:** medido nas 19.171 H aceitas pelo detector (mediana 1,3e5, máximo 4,6e9).
+  - **Teste:** `test_propagation_survives_degenerate_homography`.
+  - **Custo:** a chave do cache do 6c mudou, e os caches refazem: 56 clipes da valid já prontos, mais o subconjunto e o train[::3] quando forem pedidos. Os números da Fatia 6 no train[::3] e no subconjunto foram medidos antes da correção; ela só muda o caminho degenerado, mas a igualdade será conferida na próxima rodada deles.
+  | Correção de defeito; limite empírico.
 - 2026-09-29 | **Incidente da pausa.** Depois de `pausa.ps1 continuar`, dois processos (o principal do 6c e um trabalhador da série) continuaram congelados, e a CPU somada dos outros escondeu isso. O pool travou: os trabalhadores do 6c ficaram bloqueados enviando resultados a um principal que não lia. O diagnóstico veio do `py-spy dump` e do estado das threads no Windows. Retomados à mão, os dois seguiram sem perda. **Correção:** o `continuar` repete a retomada até não sobrar thread suspensa, o `pausar` nunca suspende duas vezes, e o `estado` conta os congelados processo por processo. | Lição operacional: conferir processo por processo, não a CPU somada.

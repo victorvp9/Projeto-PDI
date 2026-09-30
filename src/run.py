@@ -4,12 +4,12 @@ import csv
 import os
 import sys
 from collections import defaultdict
-from concurrent.futures import ProcessPoolExecutor
 
 import cv2
 import numpy as np
 
 from src.config import CFG, path
+from src.executor import SafeProcessPool, exit_if_failed
 from src.evaluate import frame_metrics, image_grid_displacement, summarize
 from src.io import gsr, wc14
 from src.render import draw_overlay
@@ -18,8 +18,10 @@ WORKERS = max(1, (os.cpu_count() or 2) - 1)
 
 
 def _pool():
-    """Um processo por clipe; o OpenCV fica com uma thread em cada, para não disputar CPU."""
-    return ProcessPoolExecutor(WORKERS, initializer=cv2.setNumThreads, initargs=(1,))
+    """Um processo por clipe; o OpenCV fica com uma thread em cada, para não disputar CPU.
+    Pool seguro (src/executor.py): tarefa que falha não derruba as outras, vai para o
+    manifesto da rodada (outputs/runs/) e faz a CLI sair com código != 0."""
+    return SafeProcessPool(WORKERS, initializer=cv2.setNumThreads, initargs=(1,))
 
 
 def overlay(spec: str):
@@ -381,6 +383,8 @@ def main():
     ap.add_argument("--smooth-eval", action="store_true", help="Fatia 6 (6a): tabela do Savitzky-Golay nos clipes com série em cache")
     ap.add_argument("--cut-calib", action="store_true", help="Fatia 6 (6b): calibração da detecção de corte com cortes sintéticos nos clipes escolhidos")
     ap.add_argument("--cut-table", action="store_true", help="Fatia 6 (6b): precisão/recall do corte, falsos positivos em todos os clipes escolhidos")
+    ap.add_argument("--consequence-eval", action="store_true", help="Fatia 7: estabilidade (tremor, deslize por ECC) e inversão de visibilidade das séries (pede os caches do 6c)")
+    ap.add_argument("--kalman-calib", action="store_true", help="Fatia 7 (7b): grade (q, r) do Kalman + RTS (use com --clip-step 3 --splits train)")
     ap.add_argument("--hampel-calib", action="store_true", help="Fatia 6 (6a robusto): grade do Hampel antes do SG (use com --clip-step 3 --splits train)")
     ap.add_argument("--propagate-eval", action="store_true", help="Fatia 6 (6c): propagação por Lucas-Kanade a partir de âncoras, com as ablações")
     ap.add_argument("--clips", nargs="+", help="clipes do GSR (split/clipe ou só clipe, no primeiro --splits); padrão: temporal.subset_clips")
@@ -395,7 +399,7 @@ def main():
             or args.segment_sweep or args.segment_sweep_lines or args.segment_eval
             or args.segment_variants_calib is not None or args.segment_variants
             or args.lines_fp_sheet or args.lines_fp_table or args.lines_sweep or args.lines_sweep_ellipses or args.detect
-            or args.detect_series or args.smooth_eval or args.cut_calib or args.propagate_eval or args.hampel_calib or args.cut_table):
+            or args.detect_series or args.smooth_eval or args.cut_calib or args.propagate_eval or args.hampel_calib or args.cut_table or args.kalman_calib or args.consequence_eval):
         ap.print_help()
     for spec in args.overlay or []:
         overlay(spec)
@@ -405,7 +409,7 @@ def main():
         fit_calibration(args.splits)
     if args.detect:
         detect(args.splits, args.wc14_split)
-    if args.detect_series or args.smooth_eval or args.cut_calib or args.propagate_eval or args.hampel_calib or args.cut_table:
+    if args.detect_series or args.smooth_eval or args.cut_calib or args.propagate_eval or args.hampel_calib or args.cut_table or args.kalman_calib or args.consequence_eval:
         from src import temporal
         if args.clip_step:
             clips = [c for sp in args.splits for c in sorted((path("gsr") / sp).glob("SNGS-*"))[::args.clip_step]]
@@ -423,6 +427,11 @@ def main():
             temporal.calibrate_hampel(_pool, clips)
         if args.cut_table:
             temporal.cut_table(_pool, clips)
+        if args.kalman_calib:
+            temporal.calibrate_kalman(_pool, clips)
+        if args.consequence_eval:
+            from src import consequence
+            consequence.evaluate_7(_pool, clips)
     if args.evaluate:
         evaluate(args.evaluate, args.splits)
     if args.shadow_sheet:
@@ -459,3 +468,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    exit_if_failed()

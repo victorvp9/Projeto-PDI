@@ -413,17 +413,47 @@ Etapa 8, no GSR. É a contribuição do projeto. Plano aprovado por Victor em
   Candidato: **verificação temporal da âncora**, rejeitando H inconsistente com o
   movimento medido por Lucas–Kanade em relação aos vizinhos (anotação de Victor).
 
-### Fatia 7 — Estabilidade, visibilidade e calibração (semana 6)
-- Métrica de estabilidade temporal pelos cantos projetados, **na série estimada**
-  — nunca como diferença contra a `H_gt`, que tem tremor próprio (ver
-  `01-metodo.md`).
-- **Taxa de inversão de visibilidade**: polígono de campo de visão projetado no
-  gramado com `shapely`, comparando gabarito e estimativa, sobre grade de pontos
-  de teste e sobre as posições reais dos jogadores do GSR (medida unilateral,
-  ver `01-metodo.md`).
-- Calibração sistemática dos parâmetros `[EMPÍRICO]` nas partições de treino
-  (WC14 e GSR separadamente).
-- Registrar a sensibilidade de cada parâmetro — quais importam e quais não.
+### Fatia 7 — Estabilidade, visibilidade e sensibilidade (semana 6)
+Plano aprovado por Victor em 2026-09-30 (`decisoes.md`). Roda sobre as séries em
+cache (detector, 6a, 6c), sem mexer no detector congelado. O desenvolvimento usa o
+train[::3], o relatório usa a `valid`, e o test fica intocado até a Fatia 8.
+
+- **7a. Estabilidade** na série estimada, pela grade de pontos visíveis
+  (alteração do `01-metodo`): tremor (segunda diferença) e deslize contra o
+  movimento real da imagem, medido por ECC (independente do Lucas–Kanade do
+  6c), com a taxa de convergência do ECC. Pares em que o ECC não converge ficam
+  fora do deslize. Variantes: detector, 6a Bassek, 6a robusto, Kalman, 6c com e
+  sem fluxo.
+- **7b. Kalman de velocidade constante + RTS (simplificado)** — **não é o
+  BHITK** do Bassek et al. É a terceira estratégia da pergunta 2 do
+  `00-problema`. Roda na representação por pontos, com porta de Mahalanobis
+  contra H erradas e predição nas lacunas. Uma rodada de calibração dos ruídos
+  de processo e de medição no train[::3], com a regra fixada antes: maior
+  LocSim@5 penalizado; empate a 0,01 pelo menor tremor mediano.
+- **7c. Taxa de inversão de visibilidade** com `shapely`:
+  - o polígono do campo de visão é a borda da imagem cortada no horizonte,
+    levada ao campo e recortada no campo mais uma margem;
+  - **medida principal:** jogadores reais do GSR, unilateral;
+  - **complemento:** grade de 1 m no campo, nos dois sentidos;
+  - duas versões, penalizada e só frames cobertos;
+  - o indicador na linha do Bassek: frames em que o registro deixa 0 jogadores
+    visíveis com pelo menos 1 no gabarito;
+  - depuração em vista de cima (`outputs/debug/visibilidade/`).
+- **7d. Sensibilidade descritiva, no lugar da calibração sistemática.** Os
+  parâmetros já foram calibrados fatia a fatia, e recalibrar o detector
+  refaria ~11 h de série por partição.
+  - Um parâmetro de cada vez, a ±25% e ±50%.
+  - Detector nos subconjuntos da regressão (GSR e WC14); parâmetros temporais
+    no subconjunto de 6 clipes, só com a variante 6c com fluxo.
+  - Resultado: gráficos de tornado, a tabela "importa / não importa" (|Δ| ≥
+    0,01 de LocSim@5 ou de cobertura) e a auditoria das constantes do config
+    ainda marcadas como "escolha".
+  - **Ganho ≥ 0,02 de LocSim vira proposta para Victor, sem mudar nada.**
+- **Paradas:**
+  1. definições, testes sintéticos e primeiros números no subconjunto;
+  2. calibração do Kalman;
+  3. tabelas de sensibilidade;
+  4. números da regressão.
 
 ### Fatia 8 — Experimento e relatório (semanas 7-8)
 - Rodada completa em WC14 e GSR, com e sem propagação.

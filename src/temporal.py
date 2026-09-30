@@ -15,16 +15,27 @@ from scipy.signal import savgol_filter
 
 from src.config import CFG, ROOT, path
 from src.io import gsr
+import src.assign, src.conics, src.evaluate, src.geometry, src.homography, src.lines, src.render, src.segment  # noqa: E401,E402,F401
+
+# Bytes dos fontes que entram nas chaves, lidos UMA vez, na importação, logo depois de
+# carregar os módulos (decisão de Victor, 2026-09-30): um trabalhador que nasça depois de
+# uma edição carrega o código novo e os bytes novos, a chave dele diverge da recebida do
+# processo principal e a tarefa falha, em vez de gravar com a chave antiga. Os módulos do
+# detector e o io/gsr.py não guardam os próprios bytes: editá-los mudaria a série do
+# detector (~11 h por partição) e o cache da H_gt.
+_KEY_SOURCES = ("segment.py", "lines.py", "conics.py", "assign.py", "homography.py", "geometry.py", "render.py")
+_SRC = {f: (ROOT / "src" / f).read_bytes() for f in _KEY_SOURCES + ("temporal.py", "evaluate.py", "io/gsr.py")}
 
 T = CFG["temporal"]
 SERIES_KEYS = ("ok", "img", "mod", "iou", "margem")
 
 
 def _series_key():
-    """Hash do config e do código de que a série do detector depende."""
+    """Hash do config e do código de que a série do detector depende (bytes lidos na
+    importação; mesmo valor da fórmula anterior)."""
     h = hashlib.sha1(json.dumps({k: CFG[k] for k in ("segment", "lines", "assign", "detector", "fit")}, sort_keys=True).encode())
-    for f in ("segment.py", "lines.py", "conics.py", "assign.py", "homography.py", "geometry.py", "render.py"):
-        h.update((ROOT / "src" / f).read_bytes())
+    for f in _KEY_SOURCES:
+        h.update(_SRC[f])
     return h.hexdigest()
 
 
@@ -33,9 +44,12 @@ def _series_path(clip):
 
 
 def series_chunk(args):
-    """Detector (Etapas 1-7) nos frames [i0, i1) de um clipe do GSR."""
+    """Detector (Etapas 1-7) nos frames [i0, i1) de um clipe do GSR; confere antes que o
+    trabalhador roda o código da chave da rodada."""
     from src.assign import detect_frame
-    clip, i0, i1 = args
+    from src.executor import check_key
+    clip, i0, i1, key = args
+    check_key(key, _series_key(), "série do detector")
     cv2.setNumThreads(1)
     out = []
     for s in gsr.load_clip(clip, fit="none")[i0:i1]:
@@ -57,9 +71,13 @@ def build_series(pool, clips):
     print(f"série do detector: {len(clips) - len(todo)} de {len(clips)} clipes já em cache", flush=True)
     n = T["series_chunk"]
     chunks = [(c, i, i + n) for c in todo for i in range(0, len(list((c / "img1").glob("*.jpg"))), n)]
-    left, acc, t0 = Counter(c for c, _, _ in chunks), {}, time.time()
+    chunks = [(c, i0, i1, key) for c, i0, i1 in chunks]
+    left, acc, t0 = Counter(c for c, _, _, _ in chunks), {}, time.time()
     with pool() as ex:
-        for clip, out in ex.map(series_chunk, chunks):
+        for res in ex.map(series_chunk, chunks):
+            if res is None:                               # trecho falhou (manifesto): o clipe fica para a próxima rodada
+                continue
+            clip, out = res
             acc.setdefault(clip, []).extend(out)
             left[clip] -= 1
             if left[clip]:
@@ -72,6 +90,7 @@ def build_series(pool, clips):
                                 **{k: info[:, j] for j, k in enumerate(SERIES_KEYS)})
             done = sum(1 for v in left.values() if v == 0)
             print(f"   {clip.parent.name}/{clip.name} salvo: {done} de {len(todo)}, {(time.time() - t0) / 60:.0f} min", flush=True)
+        ex.verify_keys(key, lambda a: str(np.load(_series_path(a[0]))["key"]) if _series_path(a[0]).exists() else None)
     return {c: dict(np.load(_series_path(c))) for c in clips}
 
 
@@ -175,13 +194,66 @@ def hampel_homographies(Hs, size, half, n_sigma):
     return out
 
 
+def kalman_series(X, q, r):
+    """Kalman de velocidade constante + suavizador RTS, simplificado (NÃO é o BHITK do
+    Bassek et al.), na série (N, D; linhas NaN = sem medida). Cada coordenada tem o seu
+    filtro [posição, velocidade], com aceleração branca de variância q e medição de
+    variância r; a porta de Mahalanobis é conjunta (a medida inteira entra ou sai) e,
+    depois de `kalman_reset` rejeições seguidas, o filtro reinicia na medida atual. Em
+    cada trecho com lacunas <= max_gap, as lacunas saem da predição; fora dos trechos,
+    NaN."""
+    Fm = np.array([[1.0, 1.0], [0.0, 1.0]])
+    Q = q * np.array([[0.25, 0.5], [0.5, 1.0]])
+    out = np.full_like(X, np.nan)
+    valid = np.isfinite(X).all(1)
+    for a, b in _runs(valid, T["max_gap"]):
+        n, D = b - a + 1, X.shape[1]
+        xf, Pf = np.zeros((n, D, 2)), np.zeros((n, D, 2, 2))    # filtrado
+        xp, Pp = np.zeros((n, D, 2)), np.zeros((n, D, 2, 2))    # previsto
+        x, P, misses = np.c_[X[a], np.zeros(D)], np.tile(np.diag([r, T["kalman_v0"]]), (D, 1, 1)), 0
+        for i in range(n):
+            if i:
+                x, P = x @ Fm.T, Fm @ P @ Fm.T + Q
+            xp[i], Pp[i] = x, P
+            z = X[a + i]
+            if np.isfinite(z).all():
+                y, S = z - x[:, 0], P[:, 0, 0] + r
+                if (y ** 2 / S).sum() <= T["kalman_gate_chi2"]:
+                    K = P[:, :, 0] / S[:, None]
+                    x = x + K * y[:, None]
+                    P = P - K[:, :, None] * P[:, None, 0, :]
+                    misses = 0
+                else:
+                    misses += 1
+                    if misses >= T["kalman_reset"]:           # o trecho seguido estava errado: reinicia
+                        x, P, misses = np.c_[z, np.zeros(D)], np.tile(np.diag([r, T["kalman_v0"]]), (D, 1, 1)), 0
+            xf[i], Pf[i] = x, P
+        xs = xf.copy()
+        for i in range(n - 2, -1, -1):                        # RTS
+            C = Pf[i] @ Fm.T @ np.linalg.inv(Pp[i + 1])
+            xs[i] = xf[i] + (C @ (xs[i + 1] - xp[i + 1])[:, :, None])[:, :, 0]
+        out[a:b + 1] = xs[:, :, 0]
+    return out
+
+
+def kalman_homographies(Hs, size, q, r):
+    """Kalman + RTS (kalman_series) na representação por pontos (m no campo)."""
+    return from_points_rep(kalman_series(to_points_rep(Hs, size), q, r), size)
+
+
+def _stability_grid():
+    """Grade de pontos do campo (m) das medidas de estabilidade."""
+    dX, dY = T["stability_grid_m"]
+    X, Y = np.meshgrid(np.arange(-50, 51, dX), np.arange(-32, 33, dY))
+    return np.c_[X.ravel(), Y.ravel()]
+
+
 def jitter(Hs, size):
     """Tremor da série: mediana, por frame, da segunda diferença (px) da grade do campo
     projetada, nos frames com H no frame e nos dois vizinhos, e só nos pontos dentro da
     imagem nos três. Medido na série estimada, nunca contra a H_gt."""
     from src.geometry import project
-    X, Y = np.meshgrid(np.arange(-50, 51, 5.0), np.arange(-32, 33, 4.0))
-    grid = np.c_[X.ravel(), Y.ravel()]
+    grid = _stability_grid()
     w, h = size
     uv = np.full((len(Hs), len(grid), 2), np.nan)
     for i, H in enumerate(Hs):
@@ -227,7 +299,7 @@ def evaluate_6a(pool, clips):
     penalizado e tremor, por série."""
     from src.evaluate import summarize
     with pool() as ex:
-        res = list(ex.map(_eval_clip_6a, clips))
+        res = [r for r in ex.map(_eval_clip_6a, clips) if r is not None]
     rows = [r for rs, _ in res for r in rs]
     print(f"{len(clips)} clipes, {len(rows) // len(VARIANTS_6A)} frames")
     print("série                        | cobertura | NPE med  média  | IoU_whole med | LocSim@5 pen | mAP pen | tremor med (px) p90")
@@ -264,7 +336,7 @@ def calibrate_cuts(pool, clips):
     pares ordenados (positivos; mesmo jogo à parte). Tabela e outputs/cortes_sinteticos.csv."""
     from src.run import _write_csv
     with pool() as ex:
-        hists = dict(zip(clips, ex.map(_clip_hists, clips)))
+        hists = {c: h for c, h in zip(clips, ex.map(_clip_hists, clips)) if h is not None}
     games = {c: gsr.game_id(c) for c in clips}
     neg = [(c.name, i + 1, hist_distance(h[i], h[i + 1])) for c, h in hists.items() for i in range(len(h) - 1)]
     pos = [(a.name, b.name, games[a] == games[b], hist_distance(hists[a][-1], hists[b][0]))
@@ -291,7 +363,7 @@ def cut_table(pool, clips):
     import csv
     from src.run import _write_csv
     with pool() as ex:
-        hists = dict(zip(clips, ex.map(_clip_hists, clips)))
+        hists = {c: h for c, h in zip(clips, ex.map(_clip_hists, clips)) if h is not None}
     calib = {c.name for c in sorted(clips[0].parent.glob("SNGS-*"))[::3]}
     neg = [dict(clipe=c.name, frame=i + 1, calibracao=c.name in calib, distancia=round(hist_distance(h[i], h[i + 1]), 4))
            for c, h in hists.items() for i in range(len(h) - 1)]
@@ -471,11 +543,16 @@ def propagate(cf, a, H_a, stop, step, lines=True, dbg=None):
         fld, img = fld[ok], p1[ok]
         if len(fld) >= 4:
             Hp, _ = cv2.findHomography(fld.astype(np.float32), img, 0)
-            H = Hp if Hp is not None else H
+            # pontos quase colineares dão H degenerada (SNGS-049: condição 5e19); fica a anterior
+            if Hp is not None and np.isfinite(Hp).all() and np.linalg.cond(Hp) <= T["h_cond_max"]:
+                H = Hp
         marks, keep = cf.masks(t)
         lines_uv = _guided_points(H, marks, list(POLYLINES)) if lines else {}
-        fit = fit_points_lines(H, lines_uv, (fld, img), size, T["alpha_points"])
-        if fit.ok:
+        try:
+            fit = fit_points_lines(H, lines_uv, (fld, img), size, T["alpha_points"])
+        except np.linalg.LinAlgError:             # o otimizador passou por uma H singular: ajuste não aceito
+            fit = None
+        if fit is not None and fit.ok:
             H = fit.H
         out[t] = H
         if dbg is not None and t % T["debug_every"] == 0:
@@ -556,8 +633,9 @@ VARIANTS_6C = ("detector", "6a Bassek", "6a robusto", "6c fluxo", "6c sem fluxo"
 
 
 def _eval_clip_6c(clip):
-    """Séries do 6c e ablações num clipe, métricas por frame, tremor e as âncoras
-    (candidatas, verificáveis, aceitas, com o NPE da H do detector nelas)."""
+    """Séries do 6c e ablações num clipe: métricas por frame, tremor, as âncoras
+    (candidatas, verificáveis, aceitas, com o NPE da H do detector nelas) e as séries
+    de H (campo -> imagem) de cada variante, para a Fatia 7."""
     import time
     from src.evaluate import frame_metrics, npe_re
     cv2.setNumThreads(1)
@@ -598,20 +676,18 @@ def _eval_clip_6c(clip):
                      npe=npe_re(ser["H"][t], H_gt[t], size)[0] if np.isfinite(H_gt[t]).all() else np.nan) for t in cand]
     print(f"{clip.name}: {n} frames, {int(cut.sum())} cortes, {len(cand)} candidatas, {len(verifiable)} verificáveis, "
           f"{len(anc)} âncoras, {time.time() - t0:.0f} s", flush=True)
-    return rows, jit, anc_rows
+    return rows, jit, anc_rows, {k: v.astype(np.float32) for k, v in series.items()}
 
 
 def _eval_6c_key():
     """Hash do que o resultado do 6c num clipe depende: config temporal, série do
-    detector, código do 6c e das métricas."""
-    import inspect
+    detector e os bytes (lidos na importação) do temporal.py, do evaluate.py e do
+    io/gsr.py. Não usa `inspect.getsource`, que lê o arquivo na hora com os números de
+    linha da importação (valid, 2026-09-30: 47 de 58 clipes gravados com chave errada).
+    O processo principal a calcula no início da rodada e cada trabalhador confere."""
     h = hashlib.sha1(json.dumps(T, sort_keys=True).encode() + _series_key().encode())
-    for f in (_runs, smooth_series, to_matrix_rep, from_matrix_rep, smooth_homographies, jitter, frame_hist, hist_distance,
-              fit_points_lines, _masks, _guided_points, _sample_grid, _lk, ClipFrames, propagate, anchors, fill_from_anchors,
-              _gap_lengths, _eval_clip_6c):
-        h.update(inspect.getsource(f).encode())
-    for f in ("evaluate.py", "io/gsr.py"):
-        h.update((ROOT / "src" / f).read_bytes())
+    for f in ("temporal.py", "evaluate.py", "io/gsr.py"):
+        h.update(_SRC[f])
     return h.hexdigest()
 
 
@@ -619,11 +695,14 @@ def _eval_6c_path(clip):
     return path("outputs") / "cache" / "eval_6c" / clip.parent.name / f"{clip.name}.pkl"
 
 
-def _eval_clip_6c_cached(clip):
+def _eval_clip_6c_cached(clip, key):
     """_eval_clip_6c com cache por clipe: interromper perde só os clipes em andamento, e o
-    mesmo comando retoma dos que faltam; refeito se `_eval_6c_key` mudar."""
+    mesmo comando retoma dos que faltam; refeito se a chave (`_eval_6c_key`, calculada no
+    início da rodada) mudar."""
     import pickle
-    p, key = _eval_6c_path(clip), _eval_6c_key()
+    from src.executor import check_key
+    check_key(key, _eval_6c_key(), "6c")
+    p = _eval_6c_path(clip)
     if p.exists():
         k, res = pickle.loads(p.read_bytes())
         if k == key:
@@ -635,9 +714,13 @@ def _eval_clip_6c_cached(clip):
 
 
 def evaluate_6c(pool, clips):
-    """Roda o 6c nos clipes (cache por clipe em outputs/cache/eval_6c/) e imprime as tabelas."""
+    """Roda o 6c nos clipes (cache por clipe em outputs/cache/eval_6c/), confere no fim a
+    chave gravada de cada clipe e imprime as tabelas."""
+    import pickle
     with pool() as ex:
-        res = list(ex.map(_eval_clip_6c_cached, clips))
+        key = _eval_6c_key()
+        res = [r for r in ex.map(_eval_clip_6c_cached, clips, [key] * len(clips)) if r is not None]
+        ex.verify_keys(key, lambda a: pickle.loads(_eval_6c_path(a[0]).read_bytes())[0] if _eval_6c_path(a[0]).exists() else None)
     return report_6c(res, f"{clips[0].parent.name}_{len(clips)}clipes")
 
 
@@ -646,14 +729,14 @@ def report_6c(res, tag):
     lacunas do detector (6a preenchendo por interpolação x 6c propagando)."""
     from src.evaluate import summarize
     from src.run import _write_csv
-    rows = [r for rs, _, _ in res for r in rs]
-    anc = [a for _, _, aa in res for a in aa]
+    rows = [r for x in res for r in x[0]]
+    anc = [a for x in res for a in x[2]]
     _write_csv(path("outputs") / f"ancoras_6c_{tag}.csv", anc)
     print(f"{len(res)} clipes, {len(rows) // len(VARIANTS_6C)} frames")
     print("série                    | cobertura | NPE med  média  | IoU_whole med | LocSim@5 pen | mAP pen | tremor med (px) p90")
     for name in VARIANTS_6C:
         t = summarize([r for r in rows if r["variante"] == name])["todos"]
-        j = np.concatenate([jj[name] for _, jj, _ in res])
+        j = np.concatenate([x[1][name] for x in res])
         print(f"{name:24} | {t['cobertura']:.3f}     | {t['npe'][1]:.4f} {t['npe'][0]:.3f} | {t['iou_whole'][1]:.3f}         | "
               f"{t.get('locsim@5 penalizado', np.nan):.3f}        | {t.get('mAP-locsim penalizado', np.nan):.3f}   | "
               f"{np.nanmedian(j):.2f} {np.nanpercentile(j, 90):.2f}")
@@ -723,7 +806,7 @@ def calibrate_hampel(pool, clips):
     from src.evaluate import summarize
     from src.run import _write_csv
     with pool() as ex:
-        res = list(ex.map(_eval_clip_hampel, clips))
+        res = [r for r in ex.map(_eval_clip_hampel, clips) if r is not None]
     rows = [r for rs, _ in res for r in rs]
     drops = [d for _, dd in res for d in dd]
     _write_csv(path("outputs") / "hampel_descartes.csv", drops)
@@ -745,4 +828,62 @@ def calibrate_hampel(pool, clips):
     tied = [c for c, t in table.items() if c is not None and t.get("locsim@5 penalizado", -1) >= best - 0.01]
     pick = min(tied, key=lambda c: table[c]["npe"][1])
     print(f"escolhido pela regra: meia janela {pick[0]}, limiar {pick[1]} (empatados a 0,01: {tied})")
+    return table, pick
+
+
+# ======================= 7b: calibração do Kalman =======================
+def _kalman_configs():
+    return ["Bassek", "6a robusto"] + [(q, r) for q in T["kalman_q_grid"] for r in T["kalman_r_grid"]]
+
+
+def _eval_clip_kalman(clip):
+    """Métricas por frame e tremor de cada (q, r) do Kalman + RTS e das referências
+    (6a Bassek, 6a robusto) num clipe."""
+    from src.evaluate import frame_metrics
+    cv2.setNumThreads(1)
+    ser = dict(np.load(_series_path(clip)))
+    samples = gsr.load_clip(clip)
+    assert [s.frame_idx for s in samples] == list(ser["frames"])
+    size = samples[0].size
+    rows, trem = [], {}
+    for c in _kalman_configs():
+        if c == "Bassek":
+            Hs = smooth_homographies(ser["H"], size, "matrix")
+        elif c == "6a robusto":
+            Hs = smooth_homographies(hampel_homographies(ser["H"], size, T["hampel_half"], T["hampel_sigma"]), size, "matrix")
+        else:
+            Hs = kalman_homographies(ser["H"], size, *c)
+        trem[c] = jitter(Hs, size)
+        for s, H in zip(samples, Hs):
+            rows.append(dict(**frame_metrics(H if np.isfinite(H).all() else None, s), variante=c,
+                             n_pessoas=0 if s.persons_XY is None else len(s.persons_XY)))
+    print(f"{clip.name} ok", flush=True)
+    return rows, trem
+
+
+def calibrate_kalman(pool, clips):
+    """Grade (q, r) do Kalman + RTS nos clipes de calibração; regra fixada antes de rodar
+    (decisoes.md, 2026-09-30): maior LocSim@5 penalizado, empate a 0,01 pelo menor
+    tremor mediano."""
+    from src.evaluate import summarize
+    with pool() as ex:
+        res = [r for r in ex.map(_eval_clip_kalman, clips) if r is not None]
+    rows = [r for rs, _ in res for r in rs]
+    configs = _kalman_configs()
+    print(f"{len(clips)} clipes, {len(rows) // len(configs)} frames")
+    print("config (q, r)          | cobertura | NPE med  média  | LocSim@5 pen | mAP pen | tremor med (px) p90")
+    table = {}
+    for c in configs:
+        t = summarize([r for r in rows if r["variante"] == c])["todos"]
+        j = np.concatenate([tt[c] for _, tt in res])
+        table[c] = (t.get("locsim@5 penalizado", -1), np.nanmedian(j))
+        name = c if isinstance(c, str) else f"q={c[0]:<6g} r={c[1]:<6g}"
+        print(f"{name:22} | {t['cobertura']:.3f}     | {t['npe'][1]:.4f} {t['npe'][0]:.3f} | "
+              f"{t.get('locsim@5 penalizado', np.nan):.3f}        | {t.get('mAP-locsim penalizado', np.nan):.3f}   | "
+              f"{np.nanmedian(j):.2f} {np.nanpercentile(j, 90):.2f}")
+    grid = [c for c in configs if not isinstance(c, str)]
+    best = max(table[c][0] for c in grid)
+    tied = [c for c in grid if table[c][0] >= best - 0.01]
+    pick = min(tied, key=lambda c: table[c][1])
+    print(f"escolhido pela regra: q={pick[0]}, r={pick[1]} (empatados a 0,01: {len(tied)} de {len(grid)})")
     return table, pick

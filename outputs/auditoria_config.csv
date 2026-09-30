@@ -1,0 +1,108 @@
+parametro,origem,na_sensibilidade,comentario
+fit.f_scale_px,fonte,False,"escala da perda robusta, px (decisão de Victor)"
+fit.resid_cap_px,escolha,False,distância infinita (classe inteira atrás da câmera) vira isto (escolha)
+fit.min_points,fonte,False,menos pontos que parâmetros (8): nem tenta
+fit.max_cond,calibrado,True,[EMPÍRICO] condição máxima do jacobiano; vão da distribuição no treino do GSR (docs/decisoes.md)
+fit.max_resid_px,calibrado,True,"[EMPÍRICO] resíduo mediano máximo para aceitar; acima disso, só ajustes errados no treino do GSR"
+segment.common.hsv_dh,calibrado,False,[EMPÍRICO] meia-largura em torno do pico de matiz; a varrer
+segment.common.hsv_s_min,calibrado,False,[EMPÍRICO] saturação mínima; a varrer
+segment.common.hsv_v_min,calibrado,False,[EMPÍRICO] valor mínimo; a varrer
+segment.common.lab_l_min,calibrado,True,"[EMPÍRICO] L* mínimo (abaixo, a cromaticidade é ruído); varredura no WC14 treino"
+segment.common.lab_r,calibrado,False,"[EMPÍRICO] raio cromático em (a*, b*) em torno do pico; a varrer"
+segment.common.lab_dhue_deg,calibrado,True,"[EMPÍRICO] lab_hue: meia-largura do ângulo de matiz em (a*, b*); varredura no WC14 treino"
+segment.common.lab_c_min,calibrado,True,[EMPÍRICO] lab_hue: croma mínimo; varredura no WC14 treino
+segment.common.open_frac,calibrado,True,"[EMPÍRICO] abertura, fração da altura; interior do platô 0,9855-0,9862 (decisão de Victor: menos dano às bordas finas)"
+segment.common.close_frac,calibrado,True,"[EMPÍRICO] fechamento, fração da altura; idem"
+segment.common.component_min_frac,calibrado,False,"[EMPÍRICO] área mínima de componente, fração da imagem (""components""); a varrer"
+segment.common.kmeans_k,calibrado,False,[EMPÍRICO] a calibrar (3-4) no WC14 train_val + GSR train (decisão de Victor)
+segment.common.kmeans_c_min,calibrado,False,[EMPÍRICO] croma mínimo do centro (tira grupos cinzentos); a calibrar (idem)
+segment.common.kmeans_step,escolha,False,amostra do k-means: 1 a cada 4 px em cada eixo (escolha; custo)
+segment.common.kmeans_attempts,escolha,False,reinícios do cv2.kmeans (escolha)
+segment.common.hyst_dhue_deg,calibrado,False,[EMPÍRICO] meia-largura da faixa do fraco: a mais permissiva das 10 (de 42) no ruído do atual no treino (docs/decisoes.md)
+segment.common.hyst_c_min,calibrado,False,[EMPÍRICO] croma mínimo do fraco; idem (igual ao das sementes: o fraco só alarga o matiz)
+segment.common.line_bands,escolha,False,faixas horizontais com escala própria (escolha)
+segment.common.line_k,calibrado,True,"[EMPÍRICO] escala = k·w(v); F1 máximo no WC14 treino (0,575; k = 0,75 dá 0,529)"
+segment.common.grass_dilate_w,escolha,True,gramado dilatado em larguras de linha antes de restringir as marcações (escolha)
+segment.common.line_pct,calibrado,False,"[EMPÍRICO] com α = 1,41 (eval_segment.variants): máximo do F1 médio WC14 train_val + GSR train (0,596; fixos 15/30: 0,575 e 0,611)"
+segment.wc14.line_thr,calibrado,True,[EMPÍRICO] contraste mínimo em L* (0-255); F1 a 3 px máximo no WC14 train_val
+segment.gsr.line_thr,calibrado,True,"[EMPÍRICO] idem, F1 (cobertura a 2 px x precisão a 3 px) máximo no GSR train (decisão de Victor: cada base no seu treino)"
+lines.tol_frac,fonte,False,"3/720: casamento e falso positivo a 3 px no WC14 (720p), 4,5 px no GSR (1080p)"
+lines.match_min,fonte,False,segmento casa com a classe se >= 80% dos seus pontos estão a <= tol dela (plano da Fatia 4)
+lines.visible_min_frac,escolha,False,"linha do gabarito conta como visível com >= 0,05·h de eixo na imagem (escolha)"
+lines.hough_rho_px,fonte,False,resolução radial do acumulador (plano da Fatia 4)
+lines.hough_theta_deg,fonte,False,resolução angular (idem)
+lines.hough_votes_frac,calibrado,True,"[EMPÍRICO] votos mínimos, fração da altura; varredura no GSR train (topo plano: 0,02 dá o mesmo F1)"
+lines.hough_min_len_frac,calibrado,True,"[EMPÍRICO] comprimento mínimo do segmento; varredura no GSR train (borda de cima da grade; não estendida, topo plano)"
+lines.hough_gap_frac,calibrado,True,[EMPÍRICO] vão máximo dentro de um segmento do Hough; varredura no GSR train (idem)
+lines.shape_elong_min,escolha,True,"alongamento mínimo (momentos) do componente, se shape_filter (escolha, pela amostra de falsos positivos)"
+lines.fuse_theta_deg,calibrado,True,[EMPÍRICO] diferença máxima de ângulo para fundir; varredura no GSR train (2° dá o mesmo)
+lines.fuse_d_frac,calibrado,True,"[EMPÍRICO] distância máxima dos extremos de um à reta do outro: 6/720·h pela varredura; EM ABERTO, 3/720 x 6/720 decidido na Fatia 5 pelo erro da homografia"
+lines.fuse_gap_frac,calibrado,True,[EMPÍRICO] vão máximo ao longo da reta (as linhas de cima das duas grandes áreas são colineares); varredura no GSR train
+lines.ellipse_tol_frac,calibrado,True,"[EMPÍRICO] τ: distância de apoio à elipse (3/720·h); rodada no GSR train (6/720: precisão 0,33)"
+lines.ellipse_arc_min_frac,calibrado,True,"[EMPÍRICO] perímetro apoiado mínimo, fração da altura; rodada única no GSR train (borda de cima da grade; sem nova rodada)"
+lines.ellipse_ratio_max,fonte,False,"razão máxima dos semieixos: oráculo do GSR train (círculo projetado pela H_gt), p90 5,7 no central e 7,6 nos arcos (decisão de Victor)"
+lines.anchor_cross_deg,fonte,False,"central: reta cruzando com ângulo >= isto ao eixo maior (oráculo: linha do meio >= 84,5°, p1)"
+lines.anchor_center_b,fonte,False,"central: ... e a <= isto·B do centro da elipse (oráculo: mediana 0,16, máximo 0,58)"
+lines.anchor_round_ratio,escolha,False,central: abaixo desta razão dos semieixos o teste de ângulo não vale (eixo maior sem direção; vista de cima) (escolha)
+lines.anchor_parallel_deg,fonte,False,"arco: reta a <= isto do eixo maior (oráculo: reta main a 9,5-13,7°)"
+lines.anchor_end_b,fonte,False,"arco: pontas do trecho apoiado a <= isto·B da reta (oráculo: 0, as pontas estão sobre ela)"
+lines.anchor_bulge_b,fonte,False,"arco: o arco se afasta da reta >= isto·B (oráculo: 0,71-0,81)"
+lines.ellipse_support_min,escolha,False,fração mínima do perímetro dentro da imagem apoiada: o arco da grande área é ~1/3 da elipse (escolha)
+lines.ellipse_chords_min,escolha,False,cordas mínimas (segmentos com a maior parte dos pontos sobre a elipse): evidência de curvatura (escolha)
+lines.ellipse_turn_min_deg,calibrado,True,[EMPÍRICO] leque mínimo de direções das cordas; rodada única no GSR train (borda de baixo da grade; sem nova rodada)
+lines.ellipse_b_min_frac,escolha,False,"semieixo menor mínimo, fração da altura (escolha)"
+lines.ellipse_a_max_frac,escolha,False,"semieixo maior máximo, fração da altura (escolha)"
+lines.ellipse_hough_min_len_frac,calibrado,False,[EMPÍRICO] comprimento mínimo (e votos) do Hough das candidatas: cordas curtas cobrem as pontas (oráculo: leque 36° -> 100°); rodada no GSR train (borda de baixo; sem nova rodada)
+lines.ellipse_neighbors,escolha,False,vizinhos por ponto médio nos trios de candidatas (escolha; custo)
+lines.ellipse_max,fonte,False,círculo central e um arco da grande área (plano da Fatia 4)
+lines.chord_min,fonte,False,segmento é corda de uma elipse com mais da metade dos pontos a <= τ dela (decisão de Victor)
+assign.vp_min_segs,escolha,False,ponto de fuga só com >= 3 segmentos (reforço; escolha)
+assign.vp_both_deg,calibrado,False,[EMPÍRICO] fronteira: segmento a <= isto do ponto de fuga de uma família entra nela também (= vp_tol_deg: desligado)
+assign.angle_split_deg,fonte,False,modo angle: família ao longo do comprimento com ângulo <= isto (erra >= 32% no GSR train: não serve)
+assign.vp_tol_deg,escolha,True,segmento pertence à família se aponta para o ponto de fuga a <= isto (escolha)
+assign.top_k,escolha,True,segmentos mais longos por família usados nas hipóteses (escolha; 6 não sobe o teto no GSR train)
+assign.pair_min_frac,escolha,False,duas retas da mesma família precisam estar a >= isto·h (escolha)
+assign.score_step_m,escolha,False,amostragem do modelo na verificação (escolha; custo)
+assign.score_tol_frac,escolha,True,apoio na verificação: a <= 6/720·h de uma marca (escolha; folga para a lente)
+assign.iou_scale,escolha,False,IoU campo projetado x gramado em 1/8 da resolução (escolha; custo)
+assign.verify_max_pts,escolha,False,"pontos dos segmentos na verificação, em passo fixo (escolha; custo)"
+assign.iou_prune,fonte,True,"poda barata: hipótese com IoU campo x gramado < isto nem é verificada (H_gt no GSR train: p5 0,889)"
+assign.gate_img,calibrado,True,"[EMPÍRICO] portão: fração explicada das marcas >= isto (H_gt no subconjunto do GSR train: p5 0,49); provisório"
+assign.gate_iou,calibrado,True,"[EMPÍRICO] portão: IoU campo projetado x gramado >= isto (H_gt: p5 0,889); provisório"
+assign.ambig_disp_frac,escolha,False,hipótese estruturalmente diferente: desloca a grade da imagem em > isto·h (escolha)
+assign.ambig_margin,calibrado,False,[EMPÍRICO] portão de ambiguidade: a melhor vence a diferente por >= isto; a calibrar no treino sem perder H certa
+assign.ellipse_check_frac,escolha,False,elipse confere com um círculo projetado pela H se a mediana <= 6/720·h (escolha: a H tem ~7 px de erro)
+assign.corr_beyond,fonte,False,interseção prolongada (pe) até 50% além da imagem (PnLCalib)
+assign.ransac_frac,fonte,False,"limiar de inlier do RANSAC, 8/720·h (Maglo et al., referência)"
+assign.band_frac,escolha,True,"faixa do caminho guiado (pixels da máscara em volta da linha projetada), 6/720·h (escolha)"
+assign.guided_max_pts,escolha,False,"pontos por classe no caminho guiado, subamostrados (escolha; custo)"
+assign.seg_step_px,escolha,False,amostragem dos segmentos classificados para o ajuste (escolha)
+assign.refine_iters,escolha,False,reclassificação/reseleção + ajuste (escolha)
+temporal.series_chunk,escolha,False,frames por tarefa na série do detector (escolha; paralelismo)
+temporal.max_gap,fonte,False,lacunas de até 25 frames preenchidas por interpolação linear antes do filtro (Bassek et al.)
+temporal.sg_window,fonte,False,Savitzky–Golay: janela 31 (Bassek et al.)
+temporal.sg_poly,fonte,False,grau 3 (Bassek et al.)
+temporal.hist_scale,escolha,False,6b: histograma numa imagem reduzida a 1/4 (escolha; custo)
+temporal.hampel_half,calibrado,False,"escolhida na grade: maior LocSim@5 penalizado (0,442, empate com 12/4 desfeito por cobertura, mAP e precisão dos descartes; decisoes.md 2026-09-29)"
+temporal.hampel_sigma,fonte,False,idem
+temporal.kalman_q,calibrado,False,"Kalman escolhido na grade do train[::3] pela regra fixada (maior LocSim@5 penalizado, empate a 0,01 pelo menor tremor; decisoes.md 2026-09-30)"
+temporal.kalman_r,fonte,False,idem
+temporal.kalman_v0,escolha,False,variância inicial da velocidade (m²/frame²) (escolha: panorâmica típica < 1 m/frame)
+temporal.kalman_gate_chi2,fonte,False,porta de Mahalanobis: χ² com 8 graus de liberdade a 99% (tabela)
+temporal.kalman_reset,escolha,False,medições rejeitadas seguidas que reiniciam o filtro (escolha)
+temporal.hampel_min_valid,escolha,False,janela com menos frames com H que isto não julga (escolha: mediana de 3 é o mínimo com maioria)
+temporal.cut_thr,calibrado,False,"[EMPÍRICO] 6b: corte se a distância > isto: logo acima do maior salto dentro dos clipes (0,201, placa de LED), 19 clipes do treino; folga mínima para o corte sintético do mesmo jogo (0,205)"
+temporal.anchor_window,escolha,True,âncora candidata: máximo local de (IoU com o gramado + fração explicada) em +-12 frames (escolha)
+temporal.verify_window,escolha,True,verificação: vizinhos com H do detector a até 10 frames (escolha)
+temporal.verify_tol_frac,fonte,True,... a H da âncora levada pelo movimento concorda com a do vizinho a <= 8/720·h (grade da imagem)
+temporal.verify_min,escolha,False,"... com pelo menos 2 vizinhos conferidos, maioria concordando (escolha)"
+temporal.border_frac,escolha,True,pontos a menos disto·h da borda da imagem ficam fora (escolha)
+temporal.compact_dilate_frac,escolha,True,"componentes compactos de não-gramado (jogadores, bola) dilatados em isto·h (escolha)"
+temporal.lk_win,escolha,True,janela do Lucas–Kanade piramidal (px) (escolha)
+temporal.lk_levels,escolha,False,níveis da pirâmide (escolha)
+temporal.lk_fb_px,fonte,True,erro ida-e-volta máximo (AuxFlow)
+temporal.resample_min,escolha,True,reamostra a grade pela H atual abaixo de 20 pontos... (escolha)
+temporal.resample_every,escolha,True,... ou a cada 25 frames (limita a deriva do rastreio) (escolha)
+temporal.alpha_points,escolha,True,peso dos pontos propagados contra os pixels das linhas na reestimativa (escolha)
+temporal.naive_step,fonte,False,âncora ingênua a cada 150 frames (AuxFlow)
+temporal.debug_every,fonte,False,depuração: um frame propagado a cada 50 em outputs/debug/propagacao/

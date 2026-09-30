@@ -35,6 +35,21 @@ def test_hampel_drops_spike_keeps_ramp():
     assert bad[30] and bad.sum() == 1
 
 
+def test_kalman_smooths_bridges_and_gates():
+    """Trajetória de velocidade constante com ruído: o Kalman + RTS reduz o erro, cobre a
+    lacuna de 10 frames e a porta de Mahalanobis descarta um salto de 20 m."""
+    from src.temporal import kalman_series
+    rng = np.random.default_rng(0)
+    truth = np.stack([np.linspace(0, 30, 120) * (k + 1) / 4 for k in range(8)], 1)
+    X = truth + rng.normal(0, 0.3, truth.shape)
+    X[50:60] = np.nan
+    X[80] += 20
+    Y = kalman_series(X, 0.01, 0.1)
+    assert np.median(np.abs(Y - truth)) < 0.5 * np.nanmedian(np.abs(X - truth))
+    assert np.isfinite(Y[50:60]).all()
+    assert np.abs(Y[80] - truth[80]).max() < 1
+
+
 def test_cut_distance_separates_cut_from_noise():
     from src.config import CFG
     from src.render import render_synthetic
@@ -61,6 +76,20 @@ def _synthetic_frame():
         color = (40, 40, 180) if rng.random() < 0.5 else (230, 230, 230)
         cv2.ellipse(img, (u, v), (int(rng.integers(4, 10)), int(rng.integers(12, 30))), 0, 0, 360, color, -1)
     return H, img
+
+
+def test_propagation_survives_degenerate_homography():
+    """Uma âncora com H singular (SNGS-049 derrubou o 6c na valid assim) não pode
+    quebrar a propagação: a H degenerada não é aceita e o ajuste que passa por ela falha
+    sem exceção."""
+    from types import SimpleNamespace
+    from src.temporal import ClipFrames, propagate
+    H, img = _synthetic_frame()
+    singular = H.copy()
+    singular[2] = 0.5 * singular[0] + 0.5 * singular[1]            # terceira linha dependente: posto 2
+    samples = [SimpleNamespace(image=img, size=(1280, 720), sequence_id="sint") for _ in range(3)]
+    out = propagate(ClipFrames(samples), 0, singular, 3, 1)
+    assert sorted(out) == [1, 2]
 
 
 def test_masks_equal_reference_formula():
@@ -142,3 +171,34 @@ def test_lk_propagates_known_pan_and_zoom():
     out = propagate(ClipFrames(samples), 0, Hs[0], 10, 1)
     assert image_grid_displacement(Hs[0], Hs[9], size) > 20            # sem fluxo, erraria muito
     assert image_grid_displacement(out[9], Hs[9], size) < 1.0
+
+
+def test_ecc_recovers_known_motion_and_slip_of_true_series_is_small():
+    """Panorâmica de 3 px/frame com zoom de 0,4%/frame sobre gramado texturizado: o ECC
+    recupera o movimento, o deslize da série verdadeira é ~0 e o de uma série com tremor
+    de 2 px aparece."""
+    import cv2
+    from src.pitch_model import LINE_WIDTH, POLYLINES
+    from src.render import R, TOP_SIZE, _to_top, _warp
+    from src.stability import ecc_motion, slip
+    from src.temporal import _stability_grid
+    noise = cv2.GaussianBlur(np.random.default_rng(0).normal(0, 1, TOP_SIZE[::-1]).astype(np.float32), (0, 0), 4)
+    top = np.clip(np.float32(R["grass_bgr"]) + 20 * noise[..., None] / noise.std(), 0, 255).astype(np.uint8)
+    for poly in POLYLINES.values():
+        cv2.polylines(top, [_to_top(poly)], False, (255, 255, 255), int(round(LINE_WIDTH * R["px_per_m"])))
+    size = (1280, 720)
+    H0 = np.array([[7, -6.4, 640], [0, 4, 300], [0, -0.01, 1]])
+    Hs = np.array([np.array([[1 + 0.004 * t, 0, 3 * t - 0.004 * t * 640], [0, 1 + 0.004 * t, -0.004 * t * 360], [0, 0, 1]]) @ H0
+                   for t in range(6)])
+    gray = [cv2.cvtColor(_warp(top, H, size, cv2.INTER_LINEAR, tuple(R["grass_bgr"])), cv2.COLOR_BGR2GRAY) for H in Hs]
+    motions, usable = [np.full((3, 3), np.nan)], [False]
+    for t in range(1, len(Hs)):
+        W, ok, _ = ecc_motion(gray[t - 1], gray[t], np.ones_like(gray[t], bool))
+        motions.append(W)
+        usable.append(ok)
+    assert all(usable[1:])
+    grid = _stability_grid()
+    assert np.nanmax(slip(Hs, motions, usable, size, grid)) < 1.0
+    shaky = Hs.copy()
+    shaky[2] = np.array([[1, 0, 2.0], [0, 1, 0], [0, 0, 1]]) @ Hs[2]
+    assert np.nanmax(slip(shaky, motions, usable, size, grid)) > 1.5

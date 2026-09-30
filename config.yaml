@@ -228,22 +228,31 @@ temporal:
   hampel_sigma_grid: [2, 3, 4, 6]    # ... limiar em desvios robustos (1,4826·MAD); grade calibrada no train[::3]
   hampel_half: 12                    # escolhida na grade: maior LocSim@5 penalizado (0,442, empate com 12/4 desfeito por cobertura, mAP e precisão dos descartes; decisoes.md 2026-09-29)
   hampel_sigma: 6                    # idem
-  hampel_min_valid: 3               # janela com menos frames com H que isto não julga (escolha: mediana de 3 é o mínimo com maioria)
+  stability_grid_m: [5.0, 4.0]             # grade de pontos do campo (X, Y, m) do tremor e do deslize (escolha; a do 6a)
+  kalman_q: 0.01           # Kalman escolhido na grade do train[::3] pela regra fixada (maior LocSim@5 penalizado, empate a 0,01 pelo menor tremor; decisoes.md 2026-09-30)
+  kalman_r: 10.0           # idem
+  kalman_q_grid: [0.001, 0.01, 0.1, 1.0]   # Kalman (7b): ruído de processo, aceleração branca (m²/frame⁴); grade calibrada no train[::3]
+  kalman_r_grid: [0.01, 0.1, 1.0, 10.0]    # ... ruído de medição (m²) das coordenadas dos pontos; grade calibrada no train[::3]
+  kalman_v0: 1.0                           # variância inicial da velocidade (m²/frame²) (escolha: panorâmica típica < 1 m/frame)
+  kalman_gate_chi2: 20.09                  # porta de Mahalanobis: χ² com 8 graus de liberdade a 99% (tabela)
+  kalman_reset: 5                          # medições rejeitadas seguidas que reiniciam o filtro (escolha)
+  hampel_min_valid: 3              # janela com menos frames com H que isto não julga (escolha: mediana de 3 é o mínimo com maioria)
   cut_thr: 0.202           # [EMPÍRICO] 6b: corte se a distância > isto: logo acima do maior salto dentro dos clipes (0,201, placa de LED), 19 clipes do treino; folga mínima para o corte sintético do mesmo jogo (0,205)
   # 6c: propagação por Lucas–Kanade a partir de âncoras (tudo escolha até a calibração)
-  anchor_window: 12        # âncora candidata: máximo local de (IoU com o gramado + fração explicada) em +-12 frames
-  verify_window: 10        # verificação: vizinhos com H do detector a até 10 frames
+  anchor_window: 12        # âncora candidata: máximo local de (IoU com o gramado + fração explicada) em +-12 frames (escolha)
+  verify_window: 10        # verificação: vizinhos com H do detector a até 10 frames (escolha)
   verify_tol_frac: 0.0111111   # ... a H da âncora levada pelo movimento concorda com a do vizinho a <= 8/720·h (grade da imagem)
-  verify_min: 2            # ... com pelo menos 2 vizinhos conferidos, maioria concordando
+  verify_min: 2            # ... com pelo menos 2 vizinhos conferidos, maioria concordando (escolha)
   grid_m: [2.5, 2.0]       # grade de pontos auxiliares do campo, X x Y (AuxFlow)
-  border_frac: 0.02        # pontos a menos disto·h da borda da imagem ficam fora
-  compact_dilate_frac: 0.01   # componentes compactos de não-gramado (jogadores, bola) dilatados em isto·h
-  lk_win: 21               # janela do Lucas–Kanade piramidal (px)
-  lk_levels: 3             # níveis da pirâmide
+  border_frac: 0.02        # pontos a menos disto·h da borda da imagem ficam fora (escolha)
+  compact_dilate_frac: 0.01   # componentes compactos de não-gramado (jogadores, bola) dilatados em isto·h (escolha)
+  lk_win: 21               # janela do Lucas–Kanade piramidal (px) (escolha)
+  lk_levels: 3             # níveis da pirâmide (escolha)
   lk_fb_px: 1.0            # erro ida-e-volta máximo (AuxFlow)
-  resample_min: 20         # reamostra a grade pela H atual abaixo de 20 pontos...
-  resample_every: 25       # ... ou a cada 25 frames (limita a deriva do rastreio)
-  alpha_points: 1.0        # peso dos pontos propagados contra os pixels das linhas na reestimativa
+  resample_min: 20         # reamostra a grade pela H atual abaixo de 20 pontos... (escolha)
+  resample_every: 25       # ... ou a cada 25 frames (limita a deriva do rastreio) (escolha)
+  h_cond_max: 1.0e+12      # H dos pontos rastreados só entra com condição <= isto: as 19.171 H aceitas pelo detector vão até 4,6e9 (mediana 1,3e5); a do SNGS-049 que derrubou o 6c na valid, 5e19 (empírico)
+  alpha_points: 1.0       # peso dos pontos propagados contra os pixels das linhas na reestimativa (escolha)
   naive_step: 150          # âncora ingênua a cada 150 frames (AuxFlow)
   use_gpu: true            # máscaras do 6c na GPU (src/gpu.py) se o extra `gpu` e uma placa existirem; mesma saída da CPU (decisão de Victor)
   debug_every: 50         # depuração: um frame propagado a cada 50 em outputs/debug/propagacao/
@@ -282,3 +291,66 @@ overlay:
   model_bgr: [0, 0, 255]        # modelo projetado pela H
   annotated_bgr: [0, 255, 255]  # pontos das linhas anotadas (GSR)
   thickness_px: 2
+
+visibility:
+  # Fatia 7c: taxa de inversão de visibilidade (src/visibility.py)
+  margin_m: 5.0            # campo de visão recortado no campo mais 5 m (escolha: jogadores fora disso não contam)
+  horizon_rel: 0.0001      # folga do horizonte no recorte da imagem, relativa ao maior |w| (escolha: numérica)
+  grid_m: 1.0              # grade de pontos de teste no gramado, 1 m (escolha)
+  debug_px_per_m: 8        # vista de cima da depuração (escolha)
+  debug_min_flips: 1       # depuração: salva a vista de cima dos frames (1 a cada 50) com pelo menos 1 jogador invertido
+
+stability:
+  # Fatia 7a: deslize contra o movimento real da imagem, por ECC (src/stability.py)
+  ecc_scale: 0.25          # ECC numa imagem reduzida a 1/4 (escolha: custo)
+  ecc_iters: 50            # iterações máximas do ECC (escolha)
+  ecc_eps: 0.00001         # critério de parada do ECC (escolha)
+  ecc_gauss: 5             # filtro gaussiano do ECC (padrão do OpenCV)
+
+sensitivity:
+  # Fatia 7d: sensibilidade descritiva, um parâmetro de cada vez (src/sensitivity.py; decisão de Victor)
+  steps: [-0.5, -0.25, 0.25, 0.5]   # passos relativos: ±25% e ±50% (plano aprovado)
+  matters: 0.01                     # "importa" se |Δ| de cobertura ou de LocSim@5 (IoU no WC14) >= 0,01 (plano aprovado)
+  bounded: [assign.gate_img, assign.gate_iou, assign.iou_prune, lines.match_min, lines.ellipse_arc_min_frac]   # frações limitadas a 1
+  audit_sections: [segment, lines, assign, fit, temporal]
+  detector:                         # [EMPÍRICO] e escolhas do detector que definem o que ele aceita
+    - segment.common.lab_dhue_deg
+    - segment.common.lab_c_min
+    - segment.common.lab_l_min
+    - segment.common.open_frac
+    - segment.common.close_frac
+    - segment.common.line_k
+    - segment.common.grass_dilate_w
+    - segment.gsr.line_thr
+    - segment.wc14.line_thr
+    - lines.hough_votes_frac
+    - lines.hough_min_len_frac
+    - lines.hough_gap_frac
+    - lines.shape_elong_min
+    - lines.fuse_theta_deg
+    - lines.fuse_d_frac
+    - lines.fuse_gap_frac
+    - lines.ellipse_tol_frac
+    - lines.ellipse_arc_min_frac
+    - lines.ellipse_turn_min_deg
+    - assign.vp_tol_deg
+    - assign.top_k
+    - assign.score_tol_frac
+    - assign.iou_prune
+    - assign.gate_img
+    - assign.gate_iou
+    - assign.band_frac
+    - fit.max_resid_px
+    - fit.max_cond
+  temporal:                         # parâmetros do 6c (escolhas até aqui)
+    - temporal.anchor_window
+    - temporal.verify_window
+    - temporal.verify_tol_frac
+    - temporal.grid_m
+    - temporal.border_frac
+    - temporal.compact_dilate_frac
+    - temporal.lk_win
+    - temporal.lk_fb_px
+    - temporal.resample_min
+    - temporal.resample_every
+    - temporal.alpha_points
