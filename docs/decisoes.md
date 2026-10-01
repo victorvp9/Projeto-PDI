@@ -821,3 +821,10 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Ensaio:** as tabelas foram ensaiadas na valid já pelo commit dos scripts, e os extras foram ensaiados num clipe da valid (SNGS-021: Kalman, cobertura das cinco séries e a propagação a partir da `H_gt_auxflow` nos dois sentidos).
   - **Reprodução:** o método no `418a3be` (`python -m src.run`), as tabelas no commit dos scripts; o `--all` chama esses scripts no fim.
 - 2026-10-01 | **Por que a etapa 2 roda o detector também no GSR test a cada 25 frames.** O `--detect` (Fatia 5) roda sempre o GSR das `--splits`, junto com o WC14, e só se tira isso mudando o `src/`. O `--splits test` é o menor recorte: são 1.470 frames, ~12 min com 15 processos. Ele dá o mesmo recorte das tabelas do detector das Fatias 5 e da confirmação (1 a cada 25) e serve de conferência gratuita: nesses frames, a H tem que ser bit a bit igual à da série da etapa 1, que usa o mesmo código. **A T1 e as demais tabelas usam a série completa da etapa 1.** | Esclarecimento a Victor.
+- 2026-10-01 | **Conferência de determinismo entre as etapas 1 e 2 do test** (regra de Victor).
+  - **O que se compara:** nos 1.470 frames do GSR test a cada 25, a H da etapa 2 (`--detect`) tem que ser bit a bit igual à da série da etapa 1 (`--detect-series`).
+  - **Se falhar, é divergência:** a rodada para antes do fechamento, com a lista dos frames, as duas H e a etapa, a tarefa e o manifesto de cada uma (os manifestos não guardam o PID do trabalhador).
+  - **Implementação:** `scripts/rodada_test/conferencia_det.py`, num processo próprio que espera a etapa 2. Ele grava o resultado nos manifestos das duas etapas (campo `conferencia_serie`) e em `outputs/runs/rodada_test/conferencia_det.json`; em divergência, registra PAROU no `rodada.log`, e o fechamento não roda. Como segunda trava, o `extras_test.py` recusa rodar sem a conferência aprovada.
+  - **Commit dos scripts:** passa a ser `be247d07f19b89caad67998b34c9f8ad98f3a4b1`, o hash que as tabelas vão gravar; o `src/` e o config continuam iguais ao `418a3be`.
+  - **Se tudo bater,** vai para o 8.7 como prova de determinismo entre rodadas.
+  | Regra de Victor.
