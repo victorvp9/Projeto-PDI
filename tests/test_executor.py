@@ -2,6 +2,7 @@
 para o manifesto e deixa o código de saída != 0. Com threads (sem pool de processos no
 pytest); o código de saída é conferido num subprocesso."""
 import json
+import os
 import subprocess
 import sys
 
@@ -78,3 +79,13 @@ def test_worker_with_other_fingerprint_fails_before_running():
     assert not ok and res is None and "código diferente do processo principal" in err["erro"] and ran == []
     ok, res, err, _ = executor._call(_task, (1,), executor.FINGERPRINT)
     assert ok and res == 10 and err is None
+
+
+def test_process_pool_sets_worker_blas_threads(monkeypatch):
+    """O pool põe OPENBLAS_NUM_THREADS no ambiente antes de criar os trabalhadores (que o
+    herdam). Sem tarefa, nenhum processo nasce: o teste não abre pool de processos."""
+    from src.config import CFG
+    monkeypatch.setenv("OPENBLAS_NUM_THREADS", "16")
+    with executor.SafeProcessPool(1) as ex:
+        assert os.environ["OPENBLAS_NUM_THREADS"] == str(CFG["executor"]["worker_blas_threads"])
+        assert not ex._processes

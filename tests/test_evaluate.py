@@ -62,3 +62,14 @@ def test_kpsfr_protocol_identity():
     m = kpsfr_metrics(H, H)
     assert m["iou_part"] == pytest.approx(1) and m["iou_whole"] == pytest.approx(1)
     assert m["proj_error_m"] == pytest.approx(0, abs=1e-6) and m["reproj_error"] == pytest.approx(0, abs=1e-6)
+
+
+def test_penalized_locsim_without_any_estimate_is_zero():
+    """Pessoa de frame sem H vale 0 (01-metodo), inclusive quando nenhum frame tem H: o
+    penalizado é 0, não NaN. Com uma H, o valor é a soma do LocSim sobre todas as pessoas."""
+    from src.evaluate import summarize
+    rows = [dict(has_gt=True, dubious=False, has_pred=False, has_lines=False, n_pessoas=4) for _ in range(3)]
+    t = summarize(rows)["todos"]
+    assert t["locsim@5 penalizado"] == 0.0 and t["mAP-locsim penalizado"] == 0.0 and "locsim@5" not in t
+    rows[0].update(has_pred=True, locsim_d=np.zeros(4))
+    assert summarize(rows)["todos"]["locsim@5 penalizado"] == pytest.approx(4 / 12)

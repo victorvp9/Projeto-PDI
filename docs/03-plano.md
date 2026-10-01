@@ -460,18 +460,24 @@ Plano detalhado para revisão de Victor (2026-09-30). **Nada do test roda antes 
 aprovação e do congelamento.**
 
 #### 8.0 Antes do congelamento
-- **Sensibilidade (7d) concluída** e as propostas (ganho ≥ 0,02 no LocSim@5
-  penalizado) **decididas por Victor antes do congelamento**. Uma proposta
-  aceita que mexa no detector invalida a série do detector no train e na
-  valid, e os números das Fatias 5 a 7. Nesse caso, as séries e as tabelas de
-  calibração são refeitas antes de congelar.
+- **Sensibilidade (7d): feita** (2026-10-01). Os candidatos foram confirmados
+  num subconjunto maior, com intervalo por bootstrap (`decisoes.md`). Só o
+  `segment.gsr.line_thr` 15 passou no critério, e **foi recusado por Victor**:
+  o efeito tem sinal oposto entre os 3 jogos do train. Nenhum parâmetro mudou,
+  e a série do detector, a do 6c e os números das Fatias 5 a 7 ficam como estão.
+- **Pendências resolvidas antes do congelamento** (2026-10-01):
+  - o LocSim@5 penalizado dava NaN quando nenhum frame tinha H; o `summarize`
+    foi corrigido e a chave do 6c foi regravada com conferência. Os valores que
+    não eram NaN ficaram idênticos;
+  - `OPENBLAS_NUM_THREADS=1` nos trabalhadores: adotado só se as H saírem
+    idênticas bit a bit com e sem a variável (`decisoes.md`).
 - **HSB:** feito. Transcrito por Victor da tabela 3 do AuxFlow para
   `data_splits/hsb.csv` (`02-dados`). Os 10 clipes estão no test e os
   intervalos cabem; as suposições registradas são a leitura do SNGS-128 e a
   numeração a partir de 0.
-- **Chave do cache da `H_gt` (`gsr._cache_key`), decisão de Victor: corrigir
-  antes do congelamento,** depois da sensibilidade e pelo mesmo procedimento da
-  troca da chave do 6c:
+- **Chave do cache da `H_gt` (`gsr._cache_key`): feita** (2026-10-01). Os 115
+  caches do train e da valid foram recalculados e saíram idênticos em 86.250
+  frames. O procedimento seguiu o da troca da chave do 6c:
   - hash dos bytes dos módulos lido na importação, conferido no trabalhador;
   - regravação da chave dos caches de gabarito do train e da valid, sem
     recalcular, só depois de conferir o código que os gerou;
@@ -528,24 +534,52 @@ de gabarito (teto).
 | T6 | GSR test, por jogo | cobertura; LocSim@5 penalizado do detector e do 6c |
 | T7 | Âncoras no test | candidatas; verificáveis; aceitas; erradas (NPE > 0,05); clipes sem âncora |
 | T8 | Lacunas do detector no test (1–3, 4–25, > 25 frames, pontas) | cobertura e NPE mediano do 6a, do 6c e do 6c sem linhas |
+| T9 | Custo, ao lado da tabela 6 do AuxFlow | perfil por etapa (detector 4,76 s por frame num núcleo no GSR e 2,90 s no WC14; 6c 127 ms por frame); vazão real da rodada do test com 15 processos; tempo por clipe de 750 frames; hardware de cada lado, com a ressalva de CPU contra GPU |
 
 - **T2 (HSB), três medições nos mesmos frames** (decisão de Victor):
-  1. **Propagação isolada:** o 6c iniciado pela H de gabarito no frame inicial
-     do intervalo, só com propagação. No SNGS-128, parte do frame 90 e vai para
-     trás até o 0.
-     - É comparável à tabela 4 do AuxFlow: NBJW sozinho com 43,15% de média e
-       35,93% de mediana; AuxFlow com 83,67% e 96,15%.
+  1. **Só propagação:** o passo normal do 6c (pontos de Lucas–Kanade mais as
+     linhas detectadas em cada frame), a partir da `H_gt_auxflow` no frame
+     inicial do intervalo, **sem nenhuma âncora do detector**. No SNGS-128,
+     parte do frame 90 e vai para trás até o 0.
+     - É o análogo da tabela 4 do AuxFlow (pontos-chave + auxiliares): NBJW
+       sozinho com 43,15% de média e 35,93% de mediana; AuxFlow com 83,67% e
+       96,15%.
      - A H inicial é a `H_gt_auxflow` (RANSAC sobre as pessoas), a mesma das
        métricas comparáveis ao AuxFlow, e a tabela diz isso.
   2. **O nosso detector puro** nos mesmos frames, lado a lado com a coluna do
      NBJW da tabela 3 (`locsim5_nbjw`).
-  3. **O pipeline completo:** o 6c com as nossas âncoras, nos mesmos frames.
+  3. **O pipeline completo:** o 6c com as nossas âncoras, rodado no **clipe
+     inteiro**; só a avaliação fica restrita ao intervalo.
 - **Ressalva obrigatória na T5:** o LocSim deles não tem frames sem H (os dois
   métodos devolvem H em todo frame). O nosso é penalizado (a pessoa de frame
   sem H vale 0), e boa parte do ganho vem da cobertura. Por isso, as colunas
   nos cobertos e no conjunto comum ficam ao lado.
+- **Agregação, dita na T5:** o nosso LocSim é agregado sobre pessoas-frame.
+  Agregar por frame quase não muda a média (conferência de 2026-09-25).
+- **Incerteza** (decisão de Victor): T1, T5 e a fração da distância ao teto
+  levam intervalo de 95% por bootstrap **sorteando jogos** (2.000
+  reamostragens, semente fixa), porque clipes do mesmo jogo não são
+  independentes (o caso do `line_thr`). A tabela diz o número de jogos do test.
+  Com menos de 5 jogos, os números por jogo (T6) vão ao lado, em vez de
+  confiar só no intervalo.
 - **Comparação com o Bassek** (indicador de 0 visíveis): só ordem de grandeza,
   porque os dados e o sistema são diferentes.
+- **T9, o lado do AuxFlow** (tabela 6 deles, transcrita por Victor): tempo por
+  clipe de 750 frames, num i7-8700K com RTX 4090. O "lote" é o tamanho do lote
+  na GPU ou o número de threads.
+
+  | etapa | lote | tempo | FPS |
+  |---|---|---|---|
+  | NBJW keypoints | 8 | 54 s | 13,9 |
+  | NBJW H estimation | 1 | 27 s | 27,8 |
+  | U-Net initialization | 1 | 61 s | 12,3 |
+  | Propagation | 1 | 150 s | 5 |
+  | Overall | – | 292 s | 2,6 |
+
+  Do nosso lado: o detector roda em CPU, em todo frame. Num núcleo, um clipe
+  de 750 frames custa ~3.570 s no detector (4,76 s por frame) mais ~95 s no 6c
+  (127 ms por frame, com GPU). A vazão real com 15 processos sai da rodada do
+  test.
 
 #### 8.4 Números de referência (calibração)
 - **A referência são os 19 clipes do train[::3]**, o conjunto de calibração da
@@ -612,6 +646,11 @@ de gabarito (teto).
   combinação, por jogo; `outputs/segment_variantes_gsr_train+valid.csv`),
   com a nota de que a `valid` serviu para escolha e o número da histerese é
   otimista.
+  - **Confirmação de ponta a ponta** (sensibilidade, 2026-10-01): o
+    `line_thr` 15 no GSR dá +0,127 de LocSim no jogo 4 (contraste baixo) e
+    −0,046 no jogo 9, onde o NPE mediano vai de 0,0056 para 0,0130. É o que a
+    Fatia 3 viu na segmentação: um limiar global contra o contraste de cada
+    jogo. **Trabalho futuro:** um limiar adaptado ao jogo ou ao frame.
 - **Saída:** `python -m src.run --all` reproduz tudo do zero, a partir do
   commit congelado.
 

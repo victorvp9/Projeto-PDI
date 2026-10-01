@@ -9,6 +9,7 @@ no fim da CLI) sai com código != 0 se houve alguma.
 """
 import hashlib
 import json
+import os
 import sys
 import threading
 import time
@@ -17,7 +18,7 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
-from src.config import ROOT, path
+from src.config import CFG, ROOT, path
 
 FAILURES = []            # falhas desta execução (processo principal)
 # Impressão digital do código: bytes de todos os src/*.py, lidos UMA vez, na importação
@@ -130,7 +131,13 @@ class SafeMap:
 
 
 class SafeProcessPool(SafeMap, ProcessPoolExecutor):
-    pass
+    """Os trabalhadores herdam o ambiente ao nascer, e o numpy lê OPENBLAS_NUM_THREADS na
+    importação: a variável vai para o ambiente antes do primeiro trabalhador (o processo
+    principal, que já importou o numpy, não muda)."""
+
+    def __init__(self, *a, **k):
+        os.environ["OPENBLAS_NUM_THREADS"] = str(CFG["executor"]["worker_blas_threads"])
+        super().__init__(*a, **k)
 
 
 class SafeThreadPool(SafeMap, ThreadPoolExecutor):

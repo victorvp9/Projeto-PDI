@@ -748,3 +748,39 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Não afetados:** os números agregados das Fatias 5 a 7 (o conjunto inteiro sempre tem alguma H) e a confirmação (nenhum candidato zera a cobertura).
   - **Correção proposta, a decidir:** o `summarize` passa a dar 0 quando há pessoas e nenhuma H. O `evaluate.py` entra na chave do 6c, então a correção pede a regravação conferida das 81 chaves (as linhas guardadas não mudam: só o `summarize` muda), refazer as 8 tarefas do `gate_iou` na sensibilidade do detector e gerar de novo as tabelas.
   | Defeito encontrado; aguarda Victor.
+- 2026-10-01 | **`segment.gsr.line_thr` 15: RECUSADO** (decisão de Victor). O candidato passa no critério (+0,034 [+0,003; +0,065]), mas o intervalo sorteou clipes, e clipes do mesmo jogo não são independentes. Com 3 jogos no train, um é a favor (jogo 4, +0,127), um é neutro (jogo 6, +0,017) e um é contra (jogo 9, −0,046, com o NPE mediano indo de 0,0056 para 0,0130). Não dá para prever os jogos do test, e o custo seria de ~17 h. O limiar fica em 30. O achado por jogo entra no 8.7 (limitações da segmentação por cor) como confirmação de ponta a ponta do que a Fatia 3 viu: um limiar global contra o contraste de cada jogo. O limiar adaptado ao jogo ou ao frame fica como trabalho futuro. | Decisão de Victor.
+- 2026-10-01 | **Bug do LocSim penalizado sem nenhuma H: corrigido** (decisão de Victor: pela definição, vale 0).
+  - **Diff:** só a condição do `summarize`, de `if len(d) and n_all` para `if n_all`. Teste: `test_penalized_locsim_without_any_estimate_is_zero`. O `_metric` da confirmação acompanha a correção.
+  - **Regravação conferida das 81 chaves do 6c:**
+    - antes da edição, git diff vazio nos arquivos da chave e as 81 chaves iguais à atual;
+    - depois, a única diferença nesses arquivos é a linha do `summarize`, que o conteúdo do cache não usa (o `_eval_clip_6c` guarda as linhas do `frame_metrics`, o tremor, as âncoras e as séries);
+    - chave `4c10b4cf1a1e` → `8c9599c7b961`.
+  - **Resumos refeitos a partir dos caches** (train[::3], valid e subconjunto; por variante, clipe, jogo, lacuna, conjunto comum e clipes com âncora; 1.464 resumos):
+    - os 84.444 valores que existiam antes ficaram **idênticos**, e nenhum valor fora de NaN mudou;
+    - em 186 recortes (372 contando as versões "todos" e "sem duvidosos"), o LocSim@5 penalizado e o mAP penalizado passaram a existir e **valem 0**. Todos são recortes sem nenhuma H por construção: o detector nas próprias lacunas (76) e fora do conjunto comum (3), os clipes sem âncora nas variantes do 6c (89 por clipe e 16 por lacuna) e dois clipes da valid em que o detector não acerta nenhum frame;
+    - nas tabelas, "sem H" ou NaN vira 0,000, e nenhum número agregado muda.
+  | Correção de defeito.
+- 2026-10-01 | **`OPENBLAS_NUM_THREADS=1` nos trabalhadores: adotado** (decisão de Victor, condicionada à identidade bit a bit).
+  - **Checagem:** H com e sem a variável, idênticas bit a bit:
+    - detector em 50 frames do GSR (subconjunto da regressão; 21 com H) e 50 imagens do WC14 (28 com H);
+    - 6c em 50 frames do SNGS-099 (300–349; âncoras 302 e 348, H nos 50).
+  - **Implementação:** `executor.worker_blas_threads: 1` no config. O `SafeProcessPool` põe a variável no ambiente antes de criar os trabalhadores, que a herdam e a leem ao importar o numpy. O processo principal não muda. Teste: `test_process_pool_sets_worker_blas_threads`.
+  - **Efeito medido:** a memória confirmada por trabalhador caiu de ~1.150 MB para ~160 MB, e o commit do sistema, com 10 trabalhadores, ficou em 55%, contra 85% antes.
+  | Decisão de Victor.
+- 2026-10-01 | **Plano da Fatia 8 aprovado por Victor, com ajustes** (aplicados no `03-plano`):
+  - (a) a medição 1 da T2 é "só propagação", o passo normal do 6c a partir da `H_gt_auxflow`, sem âncora do detector;
+  - (b) na medição 3 da T2, o 6c roda no clipe inteiro e só a avaliação fica no intervalo;
+  - (c) T1, T5 e a fração da distância ao teto levam intervalo de 95% por bootstrap sorteando jogos (2.000 reamostragens, semente fixa), com o número de jogos do test na tabela; com menos de 5 jogos, a T6 vai ao lado;
+  - (d) nova T9, de custo, ao lado da tabela 6 do AuxFlow, transcrita por Victor no `03-plano`;
+  - (e) a T5 diz que o LocSim é agregado sobre pessoas-frame;
+  - (f) o 8.0 foi atualizado.
+  | Decisão de Victor.
+- 2026-10-01 | **Checkpoints da confirmação depois da correção do NaN e do OpenBLAS.** A chave deles cobre os fontes de `src/` e o config fora da seção `sensitivity`, e mudou (`1c1f98a9e654` → `f207a359faa7`).
+  - **Recálculo:** foram recalculados pelo executor, com o código novo e o OpenBLAS em 1, o config atual do detector (78 tarefas: 57 clipes do GSR e 21 blocos do WC14) e o 6c inteiro (57 tarefas). Saíram **idênticos bit a bit** ao backup (`outputs/cache/confirm_antes_nan`), linhas e H.
+  - **Regravação:** com isso, a chave das outras 1.014 tarefas (candidatos do detector) foi regravada com conferência; cada arquivo só foi regravado com a chave antiga exata.
+  - **Tabelas refeitas:** as agregações (`--confirm 6c`, `--confirm detector`), as 10 tarefas do `gate_iou` na sensibilidade do detector (o config atual reproduz a referência) e a tabela "importa". Contra a versão commitada, mudaram só:
+    - o `gate_iou` +25% e +50% no GSR: Δ LocSim de NaN para −0,345;
+    - a coluna do LocSim do `gate_iou` na tabela "importa": 0,345, com a classificação inalterada;
+    - a tabela de âncoras do 6c: o SNGS-069 com `verify_window` −50% passa de NaN para −0,713 (o clipe perde todas as H), e o SNGS-060 e o 066, sem âncora no atual e no candidato, passam de NaN para Δ 0.
+  - **Sem mudança:** a confirmação do detector, a do 6c, o WC14 e a sensibilidade do 6c.
+  | Medição.

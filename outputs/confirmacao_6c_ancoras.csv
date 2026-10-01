@@ -1,7 +1,7 @@
 candidato,clipe,d_locsim_clipe,aceitas_atual,aceitas_candidato,entraram,sairam
-temporal.anchor_window +50%,SNGS-060,nan,0,0,,
+temporal.anchor_window +50%,SNGS-060,0.0,0,0,,
 temporal.anchor_window +50%,SNGS-063,0.0,1,1,,
-temporal.anchor_window +50%,SNGS-066,nan,0,0,,
+temporal.anchor_window +50%,SNGS-066,0.0,0,0,,
 temporal.anchor_window +50%,SNGS-069,-0.07694215828308437,2,1,,520
 temporal.anchor_window +50%,SNGS-072,-0.004631410084907972,5,3,,374 399
 temporal.anchor_window +50%,SNGS-075,-0.00035823180401783894,16,11,,68 136 151 260 441
@@ -18,10 +18,10 @@ temporal.anchor_window +50%,SNGS-159,-0.005078437243841383,15,10,,1 15 96 253 29
 temporal.anchor_window +50%,SNGS-162,0.001830113151834123,13,9,,195 325 401 712
 temporal.anchor_window +50%,SNGS-165,-0.0003628667914064021,6,4,,536 586
 temporal.anchor_window +50%,SNGS-168,0.0,2,2,,
-temporal.verify_window -50%,SNGS-060,nan,0,0,,
+temporal.verify_window -50%,SNGS-060,0.0,0,0,,
 temporal.verify_window -50%,SNGS-063,0.0,1,1,,
-temporal.verify_window -50%,SNGS-066,nan,0,0,,
-temporal.verify_window -50%,SNGS-069,nan,2,0,,520 568
+temporal.verify_window -50%,SNGS-066,0.0,0,0,,
+temporal.verify_window -50%,SNGS-069,-0.7134169750156235,2,0,,520 568
 temporal.verify_window -50%,SNGS-072,0.0,5,5,,
 temporal.verify_window -50%,SNGS-075,0.003244777730415205,16,15,,494
 temporal.verify_window -50%,SNGS-097,0.1692262447734656,7,7,48,183

@@ -7,6 +7,10 @@ paths:
   outputs: outputs
   debug: outputs/debug
 
+executor:
+  # trabalhadores do pool de processos (src/executor.py)
+  worker_blas_threads: 1   # OPENBLAS_NUM_THREADS dos trabalhadores: com o padrão (16), cada processo confirmava ~1 GB de buffers sem usar; H idênticas bit a bit com e sem (decisão de Victor, decisoes.md 2026-10-01)
+
 pitch:
   sample_step_m: 0.25   # passo de amostragem de toda polilinha, inclusive retas (docs/03-plano.md, Fatia 1)
 

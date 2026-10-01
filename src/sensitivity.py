@@ -377,12 +377,11 @@ def _confirm_task(args):
 
 def _arrays(rows):
     """Por frame/imagem: com H_gt, com H, soma do LocSim@5 das pessoas, nº de pessoas,
-    NPE e IoU_whole (NaN sem H); hasd: frame com distâncias do LocSim (com H e pessoas)."""
+    NPE e IoU_whole (NaN sem H)."""
     from src.evaluate import locsim
     g = lambda k: np.array([r.get(k, np.nan) for r in rows], float)
     return dict(gt=np.array([r["has_gt"] for r in rows], bool), pred=np.array([r["has_pred"] for r in rows], bool),
                 ls5=np.array([locsim(r["locsim_d"], 5).sum() if "locsim_d" in r else 0.0 for r in rows]),
-                hasd=np.array(["locsim_d" in r for r in rows], bool),
                 npers=np.array([r["n_pessoas"] for r in rows], float), npe=g("npe"), iou=g("iou_whole"))
 
 
@@ -393,7 +392,7 @@ def _metric(a, m, ix=None):
     if m == "cobertura":
         return (a["gt"] & a["pred"]).sum() / a["gt"].sum()
     if m == "locsim":
-        return a["ls5"].sum() / a["npers"].sum() if a["npers"].sum() and a["hasd"].any() else np.nan     # como summarize
+        return a["ls5"].sum() / a["npers"].sum() if a["npers"].sum() else np.nan     # como summarize: sem H, 0
     v = a[m][a["gt"] & a["pred"]]
     return np.nanmedian(v) if np.isfinite(v).any() else np.nan
 
