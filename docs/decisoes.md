@@ -784,3 +784,18 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
     - a tabela de âncoras do 6c: o SNGS-069 com `verify_window` −50% passa de NaN para −0,713 (o clipe perde todas as H), e o SNGS-060 e o 066, sem âncora no atual e no candidato, passam de NaN para Δ 0.
   - **Sem mudança:** a confirmação do detector, a do 6c, o WC14 e a sensibilidade do 6c.
   | Medição.
+- 2026-10-01 | **Congelamento (Fatia 8.1)**, registrado em `outputs/runs/congelamento.json`.
+  - **Commit congelado:** `418a3be7775cb499e698121a0738e0cd29053613`, com a árvore limpa e a suíte completa verde (91 testes). O commit seguinte só acrescenta este registro ao `decisoes.md`; o código e o config são os do `418a3be`.
+  - **SHA-1 do `config.yaml`:** `bc4ac43658074cbb1a92ebf88cd905877773e1cd`.
+  - **Chaves em vigor:**
+
+    | chave | valor |
+    |---|---|
+    | série do detector | `932cc12c3b78de1cd1a44633b64af7904453726f`, a mesma da Fatia 6: as séries do train e da valid valem |
+    | 6c | `8c9599c7b9618bd496ab68ad0845c476041e4af7` |
+    | ECC | `a3319c3462ad0345ca6cee12471aa7afa58ed704` |
+    | impressão digital do código (executor) | `6f5e2716449b2e69c83d7a09e07bd14199d6eba9` |
+    | H de gabarito do test (49 clipes) | `2e7f1186539972a50f62ba7b6831a2b04e49bd92` em 42 clipes; uma chave própria em cada um dos 7 com correção de rótulo (SNGS-119, 121, 133, 148, 149, 187, 199) |
+
+  - **Regras que valem a partir daqui:** uma rodada só no test e no HSB; nenhum parâmetro muda depois de ver um número do test. Se um defeito aparecer, corrigir, registrar e refazer o test inteiro, dizendo no relatório que houve uma segunda rodada. O test só começa com o ok de Victor.
+  | Decisão de Victor (plano da Fatia 8).
