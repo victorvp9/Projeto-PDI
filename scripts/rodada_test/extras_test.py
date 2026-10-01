@@ -72,7 +72,10 @@ if __name__ == "__main__":
     from src.config import path
     from src.executor import SafeProcessPool, exit_if_failed
     commit = scripts_commit()
-    hsb = {r["clipe"]: r for r in csv.DictReader(open("data_splits/hsb.csv", encoding="utf-8"))}
+    conf = path("outputs") / "runs" / "rodada_test" / "conferencia_det.json"   # determinismo etapa 1 x etapa 2 (regra de Victor)
+    assert conf.exists() and json.loads(conf.read_text(encoding="utf-8"))["aprovado"], \
+        "conferência de determinismo entre a etapa 1 e a etapa 2 ausente ou reprovada: o fechamento não roda"
+    hsb ={r["clipe"]: r for r in csv.DictReader(open("data_splits/hsb.csv", encoding="utf-8"))}
     clips = sorted((path("gsr") / "test").glob("SNGS-*"))
     assert set(hsb) <= {c.name for c in clips}
     with SafeProcessPool(int(sys.argv[1]), initializer=cv2.setNumThreads, initargs=(1,)) as ex:
