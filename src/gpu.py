@@ -26,14 +26,14 @@ try:                                   # sem o extra `gpu`, sem placa ou sem dri
 except Exception:
     AVAILABLE = False
 
-P = seg.params("gsr")
-
-
 class GPUMasks:
     """Máscaras de frames de um tamanho (w, h). Sincroniza só no pico do histograma de
-    matiz, no número de componentes e nos momentos do filtro de forma."""
+    matiz, no número de componentes e nos momentos do filtro de forma. Os parâmetros são
+    lidos do config na construção (self.P, k_compact); clip_masks guarda um objeto por
+    tamanho E por esses valores."""
 
     def __init__(self, size):
+        self.P = P = seg.params("gsr")
         assert P["grass_method"] == "lab_hue" and P["grass_steps"] == ["open", "close", "largest", "fill"]
         assert P["line_method"] == "filter" and P["line_alpha"] is None
         w, h = size
@@ -54,7 +54,8 @@ class GPUMasks:
 
     def _raw(self, lab):
         """segment._grass_raw (lab_hue)."""
-        da = lab[:, :, 1].astype(cp.float32) - 128
+        P = self.P
+        da =lab[:, :, 1].astype(cp.float32) - 128
         db = lab[:, :, 2].astype(cp.float32) - 128
         valid = lab[:, :, 0] >= P["lab_l_min"]
         hue, chroma = cp.degrees(cp.arctan2(db, da)), cp.hypot(da, db)
@@ -88,7 +89,7 @@ class GPUMasks:
             horiz = cp.minimum(c - p[d:-d, :-2 * d], c - p[d:-d, 2 * d:])
             vert = cp.minimum(c - p[:-2 * d, d:-d], c - p[2 * d:, d:-d])
             out[r0:r1] = cp.maximum(out[r0:r1], cp.maximum(horiz, vert)[r0 - a0:r1 - a0])
-        return (out > P["line_thr"]) & ndi.binary_dilation(grass, self.grow, border_value=0)
+        return (out > self.P["line_thr"]) & ndi.binary_dilation(grass, self.grow, border_value=0)
 
     def _shape_keep(self, nong):
         """lines.shape_filter: somas inteiras (uint64) dos momentos só nos pixels do
@@ -120,16 +121,19 @@ class GPUMasks:
         return tuple(cp.packbits(x.ravel()).get() for x in (grass, marks, grass & ~compact))
 
 
+# um objeto por (tamanho, parâmetros de que ele depende): com o objeto só por tamanho, a
+# perturbação de um parâmetro num processo que já tinha construído o seu era ignorada
+# (sensibilidade do compact_dilate_frac com Δ exatamente 0; decisoes.md, 2026-10-01)
 _cache = {}
 
 
 def clip_masks(samples):
     """{índice: (marcações, onde a grade pode ficar)} empacotadas, de todos os frames,
     lendo o próximo frame numa thread enquanto a GPU trabalha no atual."""
-    size = samples[0].size
-    if size not in _cache:
-        _cache[size] = GPUMasks(size)
-    G = _cache[size]
+    key = (samples[0].size, repr(sorted(seg.params("gsr").items())), CFG["temporal"]["compact_dilate_frac"])
+    if key not in _cache:
+        _cache[key] = GPUMasks(samples[0].size)
+    G = _cache[key]
     load =lambda s: cv2.cvtColor(s.image, cv2.COLOR_BGR2LAB)
     out = {}
     with ThreadPoolExecutor(1) as ex:

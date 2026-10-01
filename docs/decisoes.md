@@ -515,3 +515,121 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Consequência:** a única mudança na chave do 6c é a dos bytes de `io/gsr.py`. Os 81 caches do 6c foram regravados só na chave (`3dbd93090eab` → `4c10b4cf1a1e`), com a pré-conferência: `git diff` vazio contra o HEAD nos arquivos da chave e as 81 chaves guardadas iguais à atual. Os números da Fatia 6, os da Fatia 7 e as tabelas da sensibilidade ficam como estão.
   - **Test:** a H de gabarito do test será calculada uma única vez, depois do congelamento, com a chave nova.
   | Correção de defeito (decisão de Victor).
+- 2026-10-01 | **Regra da confirmação dos candidatos da sensibilidade** (decisão de Victor; gravada antes de rodar). Nenhuma proposta é aceita com os subconjuntos da regressão (60 frames no GSR, 35 imagens no WC14, 6 clipes no 6c): neles, um frame ou uma imagem vale de 0,017 a 0,029.
+  - **Candidatos** (lista fechada, sem acréscimos depois):
+    - **Detector, ganho no GSR:**
+      - `segment.gsr.line_thr` −50%;
+      - `lines.shape_elong_min` −25%;
+      - `segment.common.grass_dilate_w` +25%;
+      - `segment.common.lab_dhue_deg` +50%;
+      - `segment.common.open_frac` +25%;
+      - `lines.hough_min_len_frac` +25%;
+      - `segment.common.lab_c_min` +50%;
+      - `lines.hough_votes_frac` +25%;
+      - `segment.common.line_k` +25%;
+      - `lines.fuse_theta_deg` −50%.
+    - **Detector, ganho no WC14:** `segment.common.line_k` −25% (+0,0217) e `segment.common.grass_dilate_w` −50% (+0,0203). Conferido nos CSVs: são os únicos passos com ganho ≥ 0,02 no IoU do WC14.
+    - **6c:** `temporal.anchor_window` +50% e `temporal.verify_window` −50%.
+  - **Medição:**
+    - **Detector:** o config atual e cada candidato no GSR train, com 1 frame a cada 25 dos 57 clipes (~1.700 frames), e no WC14 train inteiro (`train_val`, 209 imagens), com as métricas da regressão.
+    - **6c:** os 19 clipes do train[::3], com o "6c fluxo" pelo mesmo caminho da produção. O atual tem que reproduzir o cache (0,708).
+    - **Incerteza:** Δ = candidato − atual, com intervalo de 95% por bootstrap pareado. O sorteio é por clipe no GSR e no 6c e por imagem no WC14, com 2.000 reamostragens e semente fixa.
+  - **Critério para virar proposta:**
+    - **Ganho no GSR:** Δ ≥ 0,02 no LocSim@5 penalizado, com o limite inferior do intervalo > 0, e perda ≤ 0,01 no IoU do WC14.
+    - **Ganho no WC14:** Δ ≥ 0,02 no IoU, com o limite inferior > 0, e perda ≤ 0,01 no LocSim@5 penalizado do GSR, onde o parâmetro for comum às duas bases.
+    - **6c:** Δ ≥ 0,02, com o limite inferior > 0, mais a lista das âncoras que mudaram de aceita para rejeitada (ou o contrário) por clipe.
+    - **Mais de um aprovado:** mede-se também a combinação dos aprovados, pelo mesmo critério.
+  - **Junto com cada proposta:**
+    - o custo: mudar o detector refaz a série do train e a da valid (~8,5 h cada) e as tabelas das Fatias 6 e 7;
+    - no `line_thr`, a comparação com o critério da calibração da Fatia 3 (qualidade da segmentação, não LocSim).
+  - **Tabela "importa / não importa":** ganha a coluna da resolução, o valor de um frame ou de uma imagem por métrica. |Δ| < 2× a resolução é marcado como "indistinguível". Os tornados ficam, com a faixa de 2× a resolução marcada.
+  | Decisão de Victor.
+- 2026-10-01 | **Bug: a máscara da GPU ignorava a perturbação do `compact_dilate_frac`** (achado pela checagem pedida por Victor: Δ exatamente 0 nos quatro passos).
+  - **Causa:** `gpu.clip_masks` guardava um `GPUMasks` por processo, indexado só pelo tamanho, e o objeto fixava na construção o `k_compact` e os parâmetros de segmentação, que eram lidos na importação do módulo. Na sensibilidade, cada trabalhador construiu o seu na primeira tarefa, sempre com o config atual, e as tarefas do `compact_dilate_frac` reaproveitaram esse objeto.
+  - **Na CPU, o valor sempre foi lido** (`temporal._masks`).
+  - **Alcance:**
+    - só a sensibilidade do `compact_dilate_frac` (os outros 10 parâmetros do 6c não passam pela máscara);
+    - as rodadas de produção usam o config fixo, então não são afetadas;
+    - o detector não usa GPU, e os parâmetros dele são lidos a cada chamada (`A`, `F` e `params()` referenciam o próprio CFG), então os zeros exatos dele são reais.
+  - **Correção:** o `GPUMasks` lê os parâmetros na construção (`self.P`), e o cache é indexado por tamanho e pelos valores de que o objeto depende. Com o config atual, a saída é a mesma; o `gpu.py` não entra na chave do 6c, e os caches continuam válidos.
+  - **Teste:** `test_compact_dilate_frac_changes_exclusion_mask`. Na CPU e na GPU, dobrar o valor exclui mais pixels no frame sintético com "jogadores", inclusive depois de um objeto já construído no processo. O teste falha com o `gpu.py` antigo.
+  - **A refazer:** as 24 tarefas dele na sensibilidade do 6c.
+  | Correção de defeito.
+- 2026-10-01 | **Confirmação: só o melhor passo de cada parâmetro** (decisão de Victor). A lista fica fechada nos 12 candidatos: os 10 passos do GSR, mais `line_k` −25% e `grass_dilate_w` −50% do WC14. Os outros 11 passos com ganho ≥ 0,02 no GSR não entram.
+  - Os 11 são dos mesmos parâmetros: os 4 de `lab_c_min`, −50% e −25% de `lab_dhue_deg`, −25% e +50% de `line_k`, −25% de `grass_dilate_w` e +50% de `open_frac`, `hough_votes_frac` e `shape_elong_min`.
+  - **Motivo:** a confirmação pergunta se o parâmetro tem efeito real, e o melhor passo responde isso. Medir todos os passos viraria busca de ótimo no treino.
+  | Decisão de Victor.
+- 2026-10-01 | **Auditoria dos caches por processo e por módulo** (pedido de Victor, depois do bug da GPU). O padrão procurado é "objeto guardado com chave incompleta". Fora das varreduras da Fatia 3 (`sweep_*.py`), o `src/` tem **um único cache explícito**: o `gpu._cache`, já corrigido. Não há `lru_cache`, `functools.cache` nem atributo de memória.
+  - **O caminho do detector não usa GPU:** nenhum módulo do detector importa `gpu`.
+  - **Valores derivados do config na importação** (calculados uma vez, sem chave):
+
+    | valor | depende de | situação |
+    |---|---|---|
+    | `temporal.GRID` | `temporal.grid_m` | perturbado; o `_with` recalcula |
+    | `assign.MODEL`, `MODEL_NEXT` | `assign.score_step_m` | não perturbado |
+    | `pitch_model.POLYLINES`, `homography._t`/`FULL_CIRCLES`, `assign.LINES_COARSE`/`X_LINES`/`Y_LINES`, `evaluate.STRAIGHT`/`CIRCLES` | `pitch.sample_step_m` | não perturbado |
+    | `evaluate.FIELD_GRID`, `_T`, `_TOP`, `_FIELD_TOP` | `eval.grid_*`, `iou_px_per_m`, `iou_margin_m` | não perturbado (métrica) |
+    | `render.T`, `TOP_SIZE` | `render.px_per_m`, `margin_m` | não perturbado |
+    | `visibility._EXTENT`, `GRID` | `visibility.margin_m`, `grid_m` | não perturbado |
+    | `io/gsr.PERSONS`, `LABEL_FIXES` | `gsr.person_categories`, `gsr_label_fixes` | não perturbado (gabarito) |
+    | `consequence.V_DEBUG_MIN` | `visibility.debug_min_flips` | só depuração |
+    | `A`, `F`, `T`, `R`, `E`, `ES`, `S`, `V`, `GSR`, `SENS`, `CONF` | — | referências ao próprio dicionário do CFG: veem a troca |
+    | `ClipFrames._m` | parâmetros das máscaras | por instância, criada dentro da troca |
+    | `_SRC`, `FINGERPRINT`, `_CODE`, `_CODE_CONF` | bytes dos fontes | lidos na importação de propósito |
+
+  - **Guarda:** nenhum valor congelado depende de um parâmetro perturbado, salvo o `grid_m`, que é tratado. Para não depender disso, o `_with` recusa (`ValueError`) parâmetro lido só na importação e parâmetro sombreado por uma variante do detector. Teste: `test_guard_refuses_shadowed_and_import_time_params`.
+  | Auditoria.
+- 2026-10-01 | **Bug: a sensibilidade perturbava `lines.fuse_d_frac`, que o detector não lê.** A variante `td6_e1` fixa `lines: {fuse_d_frac: 0.0083333}`, e `detect_frame` mescla `{**CFG["lines"], **variante}`. O parâmetro estava sombreado, e o Δ exatamente 0 nas duas bases vinha daí.
+  - **Prova:** com o valor da variante perturbado, os segmentos mudam (SNGS-099#0: de 13 para 14 segmentos, com a poda e a margem mudando; WC14 7: de 33 para 19 segmentos). Com o valor de `lines`, nada muda.
+  - **Correção:**
+    - a lista da sensibilidade perturba `detector.variants.td6_e1.lines.fuse_d_frac`;
+    - o `_with` recusa parâmetro sombreado;
+    - teste sistêmico: todo parâmetro do detector na sensibilidade e na confirmação muda o config efetivo de `detect_frame`, e cada `line_thr` só na sua base (`test_every_listed_detector_param_reaches_the_detector`).
+  - **Os candidatos da confirmação não são afetados:** a variante só sombreia `line_scales` e `fuse_d_frac`.
+  - **A refazer:** as 8 tarefas dele na sensibilidade do detector.
+  | Correção de defeito.
+- 2026-10-01 | **Bug: a perturbação de `fit.*` chegava à H de gabarito.**
+  - **Mecanismo:**
+    - `fit.max_cond` e `fit.max_resid_px` são o aceite do `fit_point_line`, que o detector usa no refinamento guiado e o gabarito do GSR usa no ajuste;
+    - a seção `fit` entra na chave do cache da H de gabarito;
+    - a sensibilidade carregava as amostras dentro da troca, então nessas 8 tarefas do GSR o gabarito era recalculado com o limiar perturbado, e o cache dele era regravado com a chave perturbada.
+  - **Alcance:**
+    - só esses dois, entre todos os parâmetros perturbados e os candidatos; conferido pela chave do cache, que nenhum outro muda;
+    - o resultado foi Δ = 0, então nem o gabarito nem o detector mudaram nos 60 frames;
+    - o cache terminou certo, conferido na troca da chave da H de gabarito.
+  - **Correção:** as amostras, com o gabarito, são carregadas antes da troca, na sensibilidade (detector e 6c) e na confirmação. Teste: `test_ground_truth_is_loaded_outside_the_perturbation`.
+  - **A refazer:** as 8 tarefas do GSR.
+  | Correção de defeito.
+- 2026-10-01 | **Prova dos zeros exatos da sensibilidade.** Para cada parâmetro com Δ = 0 em todas as métricas nos quatro passos, um frame em que o valor muda uma saída intermediária do detector. Teste lento: `test_zero_delta_params_change_an_intermediate_output`, com frames reais.
+  - **Lidos, sem efeito no subconjunto:**
+    - **GSR:** `ellipse_arc_min_frac` −50% muda as elipses no SNGS-099#300. `fit.max_resid_px` e `fit.max_cond` mudam o `fit_ok` com o limiar abaixo do valor do ajuste (resíduo 1,07 px no SNGS-099#0); o resíduo do detector fica perto de 1 px, longe de 5–15.
+    - **WC14:**
+      - `close_frac` −50% muda o gramado (918 px);
+      - `ellipse_arc_min_frac` ±50% muda as elipses;
+      - `iou_prune` −50% muda a poda (921 → 1.452 hipóteses);
+      - `gate_img` muda o aceite com o valor acima do termo da imagem: no GSR ele não deu zero, e nos dois frames do WC14 o portão nem é alcançado;
+      - `fit.max_resid_px`, como no GSR.
+  - **Por base, como esperado:** `segment.wc14.line_thr` no GSR e `segment.gsr.line_thr` no WC14. Cada um muda as marcações na sua base.
+  - **Não lido (bug):** `lines.fuse_d_frac`, sombreado pela variante (entrada acima).
+  - **6c:** `compact_dilate_frac` era o bug da GPU, já corrigido e testado.
+  | Medição.
+- 2026-10-01 | **Chaves sombreadas do config** (pedido de Victor).
+  - **Mesclas no código:**
+    1. `segment.params()`, com a seção da base (gsr/wc14) por cima de `common`;
+    2. a variante do detector em `detect_frame`, sobre `segment` e `lines`;
+    3. a troca local de `hough_min_len_frac`/`hough_votes_frac` no pool de elipses (`conics.py:244`), que só vale naquela chamada;
+    4. as variantes de `eval_segment` nas ferramentas da Fatia 3.
+  - **Sobreposição de verdade:** nenhuma chave de gsr/wc14 repete uma de `common`. A variante `td6_e1` sobrepõe duas, e **repete em ambas o valor da base**: `segment.common.line_scales` = [1.0] e `lines.fuse_d_frac` = 0,0083333.
+  - **As duas versões de base são lidas,** então nada foi apagado:
+    - `line_scales`: pelas máscaras do 6c (`temporal._masks` e `gpu.py`, via `params("gsr")`, sem a variante) e pelas varreduras da Fatia 3;
+    - `fuse_d_frac`: pelo `conics.detect()` sem config e pelas varreduras da Fatia 4.
+  - **Config efetivo** do detector (GSR e WC14) e do 6c: idêntico entre o commit e o estado atual. Só a seção `sensitivity` mudou, então as chaves da série, do 6c e da H de gabarito ficam como estão.
+  - **Teste novo:** `test_6c_masks_use_the_detector_segment_params`. As máscaras do 6c e o detector têm que usar os mesmos parâmetros de segmentação; o teste falha se a variante divergir da base.
+  - **Auditoria refeita:** 28 de fonte, 38 calibradas, 42 escolhas, sem mudança de contagem. `lines.fuse_d_frac` sai da sensibilidade, onde entra a cópia da variante. O comentário dele, que ainda dizia "EM ABERTO", foi corrigido (decidido na Fatia 5).
+  | Auditoria.
+- 2026-10-01 | **`fit.*` compartilhado entre o gabarito e o detector: as seções não serão separadas agora** (decisão de Victor).
+  - **O acoplamento:** `fit.max_cond`, `fit.max_resid_px` (e o resto de `fit`) são o aceite e a perda do `fit_point_line`, usado pelo ajuste da H de gabarito do GSR e pelo refinamento guiado do detector. A seção `fit` entra na chave do cache do gabarito.
+  - **Por que não separar:** mudaria a chave do gabarito sem ganho, e nenhum candidato da confirmação toca em `fit.*`. A sensibilidade agora carrega o gabarito antes da troca.
+  - **Regra:** qualquer proposta futura que mexa em `fit.*` exige, antes, separar o ajuste do gabarito do ajuste do detector, com a regravação conferida da chave do gabarito.
+  | Decisão de Victor.
+- 2026-10-01 | **Sensibilidade do 6c sem cortes (`seg` = 0) é equivalente no subconjunto.** A tabela de cortes da produção (`outputs/cortes_negativos.csv`, todas as distâncias entre frames consecutivos do GSR train) não tem par acima de `cut_thr` = 0,202 em nenhum dos 6 clipes (060, 070, 099, 109, 154, 164). A maior distância é 0,172 (SNGS-154), e as outras ficam entre 0,077 e 0,132. A tabela da sensibilidade do 6c não precisa de ressalva. A confirmação do 6c usa o caminho da produção, com os cortes. | Medição.

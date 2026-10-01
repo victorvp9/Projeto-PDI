@@ -148,6 +148,27 @@ def test_gpu_masks_equal_cpu():
             assert np.array_equal(np.unpackbits(packed)[:w * h].reshape(h, w).astype(bool), ref)
 
 
+def test_compact_dilate_frac_changes_exclusion_mask(monkeypatch):
+    """compact_dilate_frac é lido no caminho do 6c: no frame sintético (com componentes
+    compactos), mudar o valor muda a máscara de exclusão na CPU e na GPU. Na GPU, mesmo
+    depois de um objeto construído no processo com o valor antigo (o defeito que zerou a
+    sensibilidade dele; decisoes.md, 2026-10-01)."""
+    from types import SimpleNamespace
+    from src import gpu
+    from src.temporal import T, _masks
+    _, img = _synthetic_frame()
+    samples = [SimpleNamespace(image=img, size=(1280, 720))]
+    unpack = lambda x: np.unpackbits(x)[:1280 * 720].reshape(720, 1280).astype(bool)
+    keep0 = _masks(img)[2]
+    g0 = unpack(gpu.clip_masks(samples)[0][1]) if gpu.AVAILABLE else None
+    monkeypatch.setitem(T, "compact_dilate_frac", 2 * T["compact_dilate_frac"])
+    keep1 = _masks(img)[2]
+    assert (keep0 & ~keep1).sum() > 0 and not (keep1 & ~keep0).any()     # dilata mais: exclui mais
+    if gpu.AVAILABLE:
+        assert np.array_equal(g0, keep0)
+        assert np.array_equal(unpack(gpu.clip_masks(samples)[0][1]), keep1)
+
+
 def test_lk_propagates_known_pan_and_zoom():
     """Gramado com textura presa ao campo, panorâmica de 3 px/frame e zoom de 0,4%/frame
     conhecidos: a H propagada por 9 frames concorda com a verdadeira a < 1 px."""
@@ -202,3 +223,14 @@ def test_ecc_recovers_known_motion_and_slip_of_true_series_is_small():
     shaky = Hs.copy()
     shaky[2] = np.array([[1, 0, 2.0], [0, 1, 0], [0, 0, 1]]) @ Hs[2]
     assert np.nanmax(slip(shaky, motions, usable, size, grid)) > 1.5
+
+
+def test_6c_masks_use_the_detector_segment_params():
+    """As máscaras do 6c (temporal._masks, gpu.py) usam params("gsr") sem a variante do
+    detector. Hoje a variante só repete o valor da base (line_scales [1.0]); se um dia
+    divergir, o 6c passaria a usar marcações diferentes das do detector sem aviso."""
+    from src.config import CFG
+    from src.segment import params
+    v = next(iter(CFG["detector"]["variants"].values()))
+    P = params("gsr")
+    assert {**P, **v.get("segment", {})} == P

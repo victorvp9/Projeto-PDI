@@ -36,7 +36,7 @@ lines.hough_min_len_frac,calibrado,True,"[EMPÍRICO] comprimento mínimo do segm
 lines.hough_gap_frac,calibrado,True,[EMPÍRICO] vão máximo dentro de um segmento do Hough; varredura no GSR train (idem)
 lines.shape_elong_min,escolha,True,"alongamento mínimo (momentos) do componente, se shape_filter (escolha, pela amostra de falsos positivos)"
 lines.fuse_theta_deg,calibrado,True,[EMPÍRICO] diferença máxima de ângulo para fundir; varredura no GSR train (2° dá o mesmo)
-lines.fuse_d_frac,calibrado,True,"[EMPÍRICO] distância máxima dos extremos de um à reta do outro: 6/720·h pela varredura; EM ABERTO, 3/720 x 6/720 decidido na Fatia 5 pelo erro da homografia"
+lines.fuse_d_frac,calibrado,False,"[EMPÍRICO] distância máxima dos extremos de um à reta do outro: 6/720·h pela varredura; 3/720 x 6/720 decidido na Fatia 5 pelo NPE (td6); o detector lê a cópia em detector.variants.td6_e1, e esta é lida pelas varreduras da Fatia 4"
 lines.fuse_gap_frac,calibrado,True,[EMPÍRICO] vão máximo ao longo da reta (as linhas de cima das duas grandes áreas são colineares); varredura no GSR train
 lines.ellipse_tol_frac,calibrado,True,"[EMPÍRICO] τ: distância de apoio à elipse (3/720·h); rodada no GSR train (6/720: precisão 0,33)"
 lines.ellipse_arc_min_frac,calibrado,True,"[EMPÍRICO] perímetro apoiado mínimo, fração da altura; rodada única no GSR train (borda de cima da grade; sem nova rodada)"

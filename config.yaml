@@ -157,7 +157,7 @@ lines:
   shape_elong_min: 4      # alongamento mínimo (momentos) do componente, se shape_filter (escolha, pela amostra de falsos positivos)
   fuse: true              # [EMPÍRICO] fusão de colineares; ablação: fragmentação 4,70 -> 1,17
   fuse_theta_deg: 1.0     # [EMPÍRICO] diferença máxima de ângulo para fundir; varredura no GSR train (2° dá o mesmo)
-  fuse_d_frac: 0.0083333  # [EMPÍRICO] distância máxima dos extremos de um à reta do outro: 6/720·h pela varredura; EM ABERTO, 3/720 x 6/720 decidido na Fatia 5 pelo erro da homografia
+  fuse_d_frac: 0.0083333  # [EMPÍRICO] distância máxima dos extremos de um à reta do outro: 6/720·h pela varredura; 3/720 x 6/720 decidido na Fatia 5 pelo NPE (td6); o detector lê a cópia em detector.variants.td6_e1, e esta é lida pelas varreduras da Fatia 4
   fuse_gap_frac: 0.3      # [EMPÍRICO] vão máximo ao longo da reta (as linhas de cima das duas grandes áreas são colineares); varredura no GSR train
   # Etapa 4 (src/conics.py): elipses ajustadas na máscara inteira; as cordas das aceitas saem das retas (decisão de Victor)
   ellipse_tol_frac: 0.0041667   # [EMPÍRICO] τ: distância de apoio à elipse (3/720·h); rodada no GSR train (6/720: precisão 0,33)
@@ -328,7 +328,7 @@ sensitivity:
     - lines.hough_gap_frac
     - lines.shape_elong_min
     - lines.fuse_theta_deg
-    - lines.fuse_d_frac
+    - detector.variants.td6_e1.lines.fuse_d_frac   # o valor que o detector lê: a variante sombreia lines.fuse_d_frac (decisoes.md, 2026-10-01)
     - lines.fuse_gap_frac
     - lines.ellipse_tol_frac
     - lines.ellipse_arc_min_frac
@@ -354,3 +354,30 @@ sensitivity:
     - temporal.resample_min
     - temporal.resample_every
     - temporal.alpha_points
+  confirm:                          # confirmação dos candidatos num subconjunto maior (decisão de Victor, 2026-10-01; regra em docs/decisoes.md)
+    gsr_frame_step: 25              # GSR train: 1 frame a cada 25 dos 57 clipes, ~1.700 frames (decisão de Victor)
+    wc14_split: train_val           # WC14 train inteiro, 209 imagens (decisão de Victor)
+    wc14_chunk: 10                  # imagens do WC14 por tarefa (escolha; paralelismo)
+    n_boot: 2000                    # reamostragens do bootstrap pareado (decisão de Victor)
+    seed: 20261001                  # semente fixa do bootstrap (escolha)
+    ci: 0.95                        # intervalo do Δ (decisão de Victor)
+    min_gain: 0.02                  # Δ mínimo para virar proposta (decisão de Victor)
+    max_loss: 0.01                  # perda máxima tolerada na outra base (decisão de Victor)
+    resolution_factor: 2            # |Δ| < isto × a resolução (um frame/imagem) = "indistinguível" (decisão de Victor)
+    detector:                       # lista fechada (decisão de Victor): [parâmetro, passo, base em que ganhou]
+      - [segment.gsr.line_thr, -0.5, gsr]
+      - [lines.shape_elong_min, -0.25, gsr]
+      - [segment.common.grass_dilate_w, 0.25, gsr]
+      - [segment.common.lab_dhue_deg, 0.5, gsr]
+      - [segment.common.open_frac, 0.25, gsr]
+      - [lines.hough_min_len_frac, 0.25, gsr]
+      - [segment.common.lab_c_min, 0.5, gsr]
+      - [lines.hough_votes_frac, 0.25, gsr]
+      - [segment.common.line_k, 0.25, gsr]
+      - [lines.fuse_theta_deg, -0.5, gsr]
+      - [segment.common.line_k, -0.25, wc14]
+      - [segment.common.grass_dilate_w, -0.5, wc14]
+    temporal:                       # lista fechada (decisão de Victor): [parâmetro, passo]
+      - [temporal.anchor_window, 0.5]
+      - [temporal.verify_window, -0.5]
+    combos: []                      # combinação dos aprovados, se mais de um passar (regra): [[base, [[parâmetro, passo], ...]], ...]
