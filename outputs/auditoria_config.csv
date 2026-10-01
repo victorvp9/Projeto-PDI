@@ -103,6 +103,7 @@ temporal.lk_levels,escolha,False,níveis da pirâmide (escolha)
 temporal.lk_fb_px,fonte,True,erro ida-e-volta máximo (AuxFlow)
 temporal.resample_min,escolha,True,reamostra a grade pela H atual abaixo de 20 pontos... (escolha)
 temporal.resample_every,escolha,True,... ou a cada 25 frames (limita a deriva do rastreio) (escolha)
+temporal.h_cond_max,calibrado,False,"H dos pontos rastreados só entra com condição <= isto: as 19.171 H aceitas pelo detector vão até 4,6e9 (mediana 1,3e5); a do SNGS-049 que derrubou o 6c na valid, 5e19 (empírico)"
 temporal.alpha_points,escolha,True,peso dos pontos propagados contra os pixels das linhas na reestimativa (escolha)
 temporal.naive_step,fonte,False,âncora ingênua a cada 150 frames (AuxFlow)
 temporal.debug_every,fonte,False,depuração: um frame propagado a cada 50 em outputs/debug/propagacao/

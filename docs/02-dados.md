@@ -86,6 +86,35 @@ SoccerNet Game State Reconstruction (Somers et al., 2024). **200 clipes de 30 s*
 - É onde **AuxFlow, BroadTrack e o baseline GSR** reportam números. O AuxFlow
   publica os IDs e intervalos de frames do subconjunto difícil (HSB), o que
   permite comparação direta.
+- **HSB (Hard Sequence Benchmark do AuxFlow, tabela 3)** em
+  `data_splits/hsb.csv`, versionado e fora de `data/`, transcrito por Victor
+  do PDF (2026-09-30). São 10 clipes com o intervalo de frames e o LocSim@5 do
+  NBJW na tabela 3:
+
+  | clipe | início | fim | LocSim@5 do NBJW |
+  |---|---|---|---|
+  | SNGS-117 | 350 | 500 | 0,2784 |
+  | SNGS-123 | 100 | 200 | 0,3793 |
+  | SNGS-124 | 250 | 320 | 0,6801 |
+  | SNGS-128 | 90 | 0 | 0,1578 |
+  | SNGS-136 | 60 | 280 | 0,4573 |
+  | SNGS-138 | 130 | 230 | 0,4246 |
+  | SNGS-150 | 150 | 280 | 0,4462 |
+  | SNGS-187 | 300 | 400 | 0,5946 |
+  | SNGS-191 | 450 | 500 | 0,1302 |
+  | SNGS-193 | 550 | 650 | 0,7025 |
+
+  - **SNGS-128:** o artigo traz "90–0", e o arquivo guarda o valor do artigo.
+    Lê-se como o intervalo 0–90, propagado de trás para frente a partir do
+    frame 90.
+  - **Numeração (suposição):** o artigo não diz se os frames contam a partir
+    de 0 ou de 1, e as nossas imagens começam em `000001.jpg`. Adota-se a
+    contagem a partir de 0, como no código deles: o frame N do artigo é o
+    arquivo `000(N+1).jpg`.
+  - **Conferido sem calcular nenhuma métrica:** os 10 clipes estão na
+    partição **test** do GSR, cada um com 750 imagens, e todos os intervalos
+    cabem (o maior vai até o frame 650 = `000651.jpg`).
+  - O que se mede no HSB está no plano da Fatia 8 (`03-plano`, tabela T2).
 - Liga suíça, poucos estádios: menos variedade visual que Copas do Mundo. Os
   parâmetros `[EMPÍRICO]` calibrados no WC14 podem não transferir — recalibre no
   treino do GSR e reporte os dois.

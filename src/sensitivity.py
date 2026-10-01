@@ -4,6 +4,8 @@ Detector nos subconjuntos da regressão (GSR: 60 frames; WC14: train_val[::6]); 
 fluxo no subconjunto de 6 clipes do treino. O 6a (Hampel) e o Kalman já têm as
 tabelas das grades de calibração. Mais a auditoria da origem das constantes do config.
 """
+import hashlib
+import pickle
 import re
 
 import cv2
@@ -12,6 +14,8 @@ import numpy as np
 from src.config import CFG, ROOT, path
 
 SENS = CFG["sensitivity"]
+# código e config lidos UMA vez, na importação: chave do checkpoint por tarefa do 6c
+_CODE = hashlib.sha1(b"".join(p.read_bytes() for p in sorted((ROOT / "src").rglob("*.py"))) + (ROOT / "config.yaml").read_bytes()).hexdigest()
 
 
 def _get(p):
@@ -98,11 +102,19 @@ def _flow_metrics(clip):
 
 
 def _temporal_task(args):
+    """Uma tarefa do 6c (parâmetro, passo, clipe), com checkpoint em
+    outputs/cache/sensitivity/: a rodada interrompida retoma das tarefas que faltam."""
     p, step, clip = args
     cv2.setNumThreads(1)
-    if p is None:
-        return args, _flow_metrics(clip)
-    return args, _with(p, perturbed(p, step), lambda: _flow_metrics(clip))
+    f = path("outputs") / "cache" / "sensitivity" / f"{(p or 'base').replace('.', '_')}_{step:+.2f}_{clip.name}.pkl"
+    if f.exists():
+        k, rows = pickle.loads(f.read_bytes())
+        if k == _CODE:
+            return args, rows
+    rows = _flow_metrics(clip) if p is None else _with(p, perturbed(p, step), lambda: _flow_metrics(clip))
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_bytes(pickle.dumps((_CODE, rows)))
+    return args, rows
 
 
 def _tornado(rows, metric, title, out):

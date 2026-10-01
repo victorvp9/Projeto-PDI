@@ -25,8 +25,13 @@ GSR = CFG["gsr"]
 PERSONS = set(GSR["person_categories"])
 LABEL_FIXES = CFG.get("gsr_label_fixes") or {}
 _BASE = ("bottom_left", "bottom_middle", "bottom_right")
-# o cache do ajuste depende destes fontes e das seções do config em _cache_key
+# o cache do ajuste depende destes fontes e das seções do config em _cache_key. Os bytes
+# são lidos UMA vez, na importação (os módulos acima já estão carregados), e não na hora
+# da chamada: uma edição no meio da rodada não muda a chave sem mudar o código carregado
+# (decisão de Victor, 2026-09-30; ver temporal._SRC). Que o trabalhador rode o código do
+# processo principal é conferido pelo executor (impressão digital do código).
 _CACHE_SOURCES = ("src/homography.py", "src/io/gsr.py", "src/geometry.py", "src/pitch_model.py")
+_SRC = {s: (ROOT / s).read_bytes() for s in _CACHE_SOURCES}
 
 
 def _persons(anns):
@@ -127,10 +132,10 @@ def fit_clip(samples: list[Sample]) -> list[Fit]:
 
 
 def _cache_key(clip: str) -> str:
-    """Hash dos fontes e da configuração de que o ajuste depende."""
+    """Hash dos fontes (bytes lidos na importação) e da configuração de que o ajuste depende."""
     h = hashlib.sha1()
     for src in _CACHE_SOURCES:
-        h.update((ROOT / src).read_bytes())
+        h.update(_SRC[src])
     cfg = {k: CFG[k] for k in ("pitch", "gsr", "fit")} | {"fixes": LABEL_FIXES.get(clip)}
     h.update(json.dumps(cfg, sort_keys=True, default=str).encode())
     return h.hexdigest()

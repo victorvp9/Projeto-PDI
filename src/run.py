@@ -383,6 +383,8 @@ def main():
     ap.add_argument("--smooth-eval", action="store_true", help="Fatia 6 (6a): tabela do Savitzky-Golay nos clipes com série em cache")
     ap.add_argument("--cut-calib", action="store_true", help="Fatia 6 (6b): calibração da detecção de corte com cortes sintéticos nos clipes escolhidos")
     ap.add_argument("--cut-table", action="store_true", help="Fatia 6 (6b): precisão/recall do corte, falsos positivos em todos os clipes escolhidos")
+    ap.add_argument("--sensitivity", action="store_true", help="Fatia 7 (7d): sensibilidade descritiva (auditoria do config; detector nos subconjuntos da regressão; 6c no subconjunto)")
+    ap.add_argument("--sensitivity-part", choices=["all", "detector", "temporal"], default="all", help="parte da sensibilidade (a do 6c tem checkpoint por tarefa)")
     ap.add_argument("--consequence-eval", action="store_true", help="Fatia 7: estabilidade (tremor, deslize por ECC) e inversão de visibilidade das séries (pede os caches do 6c)")
     ap.add_argument("--kalman-calib", action="store_true", help="Fatia 7 (7b): grade (q, r) do Kalman + RTS (use com --clip-step 3 --splits train)")
     ap.add_argument("--hampel-calib", action="store_true", help="Fatia 6 (6a robusto): grade do Hampel antes do SG (use com --clip-step 3 --splits train)")
@@ -399,7 +401,7 @@ def main():
             or args.segment_sweep or args.segment_sweep_lines or args.segment_eval
             or args.segment_variants_calib is not None or args.segment_variants
             or args.lines_fp_sheet or args.lines_fp_table or args.lines_sweep or args.lines_sweep_ellipses or args.detect
-            or args.detect_series or args.smooth_eval or args.cut_calib or args.propagate_eval or args.hampel_calib or args.cut_table or args.kalman_calib or args.consequence_eval):
+            or args.detect_series or args.smooth_eval or args.cut_calib or args.propagate_eval or args.hampel_calib or args.cut_table or args.kalman_calib or args.consequence_eval or args.sensitivity):
         ap.print_help()
     for spec in args.overlay or []:
         overlay(spec)
@@ -432,6 +434,13 @@ def main():
         if args.consequence_eval:
             from src import consequence
             consequence.evaluate_7(_pool, clips)
+    if args.sensitivity:
+        from src import sensitivity
+        if args.sensitivity_part in ("all", "detector"):
+            sensitivity.audit()
+            sensitivity.run_detector(_pool)
+        if args.sensitivity_part in ("all", "temporal"):
+            sensitivity.run_temporal(_pool, [path("gsr") / "train" / c for c in CFG["temporal"]["subset_clips"]])
     if args.evaluate:
         evaluate(args.evaluate, args.splits)
     if args.shadow_sheet:

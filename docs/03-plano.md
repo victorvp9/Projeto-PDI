@@ -455,45 +455,165 @@ train[::3], o relatório usa a `valid`, e o test fica intocado até a Fatia 8.
   3. tabelas de sensibilidade;
   4. números da regressão.
 
-### Fatia 8 — Experimento e relatório (semanas 7-8)
-- Rodada completa em WC14 e GSR, com e sem propagação.
-- Comparação do ganho relativo com o que o AuxFlow reporta sobre detector
-  treinado (tabelas 4, 5 e 7 dele, no mesmo teste do GSR).
-  - **No GSR test e no HSB:** o ganho da propagação sobre o nosso detector
-    (no subconjunto de treino da Fatia 6: +0,35 em LocSim@5 penalizado, de
-    0,333 para 0,683) contra o ganho do AuxFlow sobre o NBJW (+0,044 em
-    LocSim@5, de 0,885 para 0,929, tabela 7 dele).
-  - **Ressalva obrigatória:** o LocSim deles não tem frames sem H (os dois
-    métodos devolvem H em todo frame). O nosso é penalizado (pessoa de frame
-    sem H vale 0, `01-metodo`), e boa parte do nosso ganho vem da cobertura
-    (0,413 → 0,833). Reportar também o LocSim@5 só nos frames cobertos e no
-    conjunto comum (frames com H do detector), onde a comparação fica mais
-    perto da deles.
-  - **Medida principal do ganho:** a fração da distância fechada entre o
-    detector e o teto da âncora de gabarito, (6c − detector) / (teto −
-    detector). Nos 19 clipes de calibração: (0,708 − 0,364) / (0,771 − 0,364)
-    ≈ 85%.
-  - No conjunto comum, o 6c supera o detector também em NPE (0,0049 × 0,0052).
-  - **Linhas:** pesam nas lacunas longas (+53% de NPE sem elas acima de 25
-    frames; 1,8× nas pontas) e quase nada nas curtas. Como o nosso detector
-    pisca, a maioria das lacunas é curta; isso explica a diferença em relação
-    ao AuxFlow, onde tirar as linhas custa 5,4 pontos.
-  - **Limitação:** nos clipes em que o detector erra de forma sistemática
-    (SNGS-060, 066), nenhuma âncora passa, e a propagação não tem de onde
-    partir. Ao rejeitar todas, a verificação evita que H erradas se espalhem.
+### Fatia 8 — Rodada final e relatório (semanas 7-8)
+Plano detalhado para revisão de Victor (2026-09-30). **Nada do test roda antes da
+aprovação e do congelamento.**
+
+#### 8.0 Antes do congelamento
+- **Sensibilidade (7d) concluída** e as propostas (ganho ≥ 0,02 no LocSim@5
+  penalizado) **decididas por Victor antes do congelamento**. Uma proposta
+  aceita que mexa no detector invalida a série do detector no train e na
+  valid, e os números das Fatias 5 a 7. Nesse caso, as séries e as tabelas de
+  calibração são refeitas antes de congelar.
+- **HSB:** feito. Transcrito por Victor da tabela 3 do AuxFlow para
+  `data_splits/hsb.csv` (`02-dados`). Os 10 clipes estão no test e os
+  intervalos cabem; as suposições registradas são a leitura do SNGS-128 e a
+  numeração a partir de 0.
+- **Chave do cache da `H_gt` (`gsr._cache_key`), decisão de Victor: corrigir
+  antes do congelamento,** depois da sensibilidade e pelo mesmo procedimento da
+  troca da chave do 6c:
+  - hash dos bytes dos módulos lido na importação, conferido no trabalhador;
+  - regravação da chave dos caches de gabarito do train e da valid, sem
+    recalcular, só depois de conferir o código que os gerou;
+  - a conferência exige as duas condições juntas: o `git diff` vazio contra a
+    fotografia do código da rodada que gerou o cache **e** o hash guardado
+    igual ao dos bytes atuais. O hash guardado é complemento, não prova: foi
+    lido na hora da gravação, que é o próprio defeito;
+  - se qualquer uma divergir, recalcula-se só esse cache, comparando frame a
+    frame com o antigo.
+
+  Não se mantém o defeito contando com uma rodada sem edições no meio.
+- **Suíte completa verde e árvore limpa** no commit do congelamento.
+
+#### 8.1 Congelamento
+- **Registrar antes da rodada**, em `outputs/runs/congelamento.json` e no
+  `decisoes.md`:
+  - o hash do commit (`git rev-parse HEAD`, árvore limpa);
+  - o SHA-1 do `config.yaml`;
+  - as chaves de cache em vigor (série do detector, 6c, ECC).
+
+  O executor confere essas chaves em cada tarefa.
+- **Uma rodada só no test e no HSB.** Nenhum parâmetro muda depois de ver um
+  número do test.
+- **Se um defeito aparecer no meio:** corrigir, registrar e refazer o test
+  inteiro, dizendo no relatório que houve uma segunda rodada e por quê. O
+  número da primeira não é descartado em silêncio.
+
+#### 8.2 Ordem e custo
+1. Sensibilidade (em andamento) → decisão de Victor sobre as propostas.
+2. Pendências do 8.0 → congelamento (8.1).
+3. **Série do detector no GSR test** (49 clipes, ~7–8,5 h; checkpoint por
+   clipe, pausável) e **detector no WC14 test** (186 imagens, frame a frame).
+   Só começam depois do congelamento.
+4. `H_gt` do GSR test (ajuste ponto-linha, em cache).
+5. 6a (Bassek e robusto), Kalman + RTS e 6c no GSR test (~3–4 h com a GPU).
+6. Estabilidade (ECC) e visibilidade no GSR test.
+7. Tabelas (8.3), análise de falhas (8.6), `--all`.
+
+#### 8.3 Tabelas do relatório (definidas antes; preenchidas só na rodada)
+As séries das linhas são sempre as mesmas: detector, 6a Bassek, 6a robusto,
+Kalman + RTS, 6c com fluxo, 6c sem linhas, 6c sem fluxo, âncora ingênua e âncora
+de gabarito (teto).
+
+| tabela | conteúdo | colunas |
+|---|---|---|
+| T1 | GSR test, 49 clipes | cobertura; NPE mediano (média); IoU_whole mediano; LocSim@5 penalizado; LocSim@5 nos cobertos; mAP-LocSim penalizado; **LocSim@5 penalizado só nos clipes com ≥ 1 âncora aceita**; fração da distância ao teto |
+| T1b | GSR test, conjunto comum (frames com H do detector) | NPE mediano; LocSim@5 |
+| T2 | HSB à parte: 10 clipes do test, intervalos de `data_splits/hsb.csv`; ver abaixo | LocSim@5 por frame (**média e mediana**), penalizado e só nos frames cobertos; cobertura |
+| T3 | WC14 test, 186 imagens, só o detector (sem série temporal) | cobertura; IoU_whole; IoU_part; NPE; RE (média e mediana) |
+| T3b | WC14 test no **protocolo KpSFR** (`src/eval_kpsfr.py` sem mudança, molde 100 × 60 m declarado) | as colunas do protocolo |
+| T4 | Estabilidade e visibilidade no GSR test (detector, 6a Bassek, 6a robusto, Kalman, 6c com e sem fluxo) | tremor e deslize (mediana, p90; convergência e correlação do ECC); jogadores invertidos, grade e 0 visíveis (penalizada e só cobertos) |
+| T4b | Idem, na interseção dos frames cobertos pelas cinco séries | as mesmas; nº de frames, trios e pares |
+| T5 | Comparação com a tabela 7 do AuxFlow | linhas NBJW (0,885) e AuxFlow (0,929), nosso detector e nosso 6c; LocSim@5 deles; nosso penalizado, nos cobertos e no conjunto comum; ganho (6c − detector) ao lado de (AuxFlow − NBJW) |
+| T6 | GSR test, por jogo | cobertura; LocSim@5 penalizado do detector e do 6c |
+| T7 | Âncoras no test | candidatas; verificáveis; aceitas; erradas (NPE > 0,05); clipes sem âncora |
+| T8 | Lacunas do detector no test (1–3, 4–25, > 25 frames, pontas) | cobertura e NPE mediano do 6a, do 6c e do 6c sem linhas |
+
+- **T2 (HSB), três medições nos mesmos frames** (decisão de Victor):
+  1. **Propagação isolada:** o 6c iniciado pela H de gabarito no frame inicial
+     do intervalo, só com propagação. No SNGS-128, parte do frame 90 e vai para
+     trás até o 0.
+     - É comparável à tabela 4 do AuxFlow: NBJW sozinho com 43,15% de média e
+       35,93% de mediana; AuxFlow com 83,67% e 96,15%.
+     - A H inicial é a `H_gt_auxflow` (RANSAC sobre as pessoas), a mesma das
+       métricas comparáveis ao AuxFlow, e a tabela diz isso.
+  2. **O nosso detector puro** nos mesmos frames, lado a lado com a coluna do
+     NBJW da tabela 3 (`locsim5_nbjw`).
+  3. **O pipeline completo:** o 6c com as nossas âncoras, nos mesmos frames.
+- **Ressalva obrigatória na T5:** o LocSim deles não tem frames sem H (os dois
+  métodos devolvem H em todo frame). O nosso é penalizado (a pessoa de frame
+  sem H vale 0), e boa parte do ganho vem da cobertura. Por isso, as colunas
+  nos cobertos e no conjunto comum ficam ao lado.
+- **Comparação com o Bassek** (indicador de 0 visíveis): só ordem de grandeza,
+  porque os dados e o sistema são diferentes.
+
+#### 8.4 Números de referência (calibração)
+- **A referência são os 19 clipes do train[::3]**, o conjunto de calibração da
+  Fatia 6. O subconjunto de 6 clipes serviu só para desenvolvimento e não entra
+  nas comparações.
+- **Nos 19 clipes:** LocSim@5 penalizado 0,364 (detector) → **0,708** (6c),
+  teto 0,771. **Fração da distância fechada: (0,708 − 0,364) / (0,771 −
+  0,364) ≈ 85%.**
+- **No conjunto comum:** o 6c supera o detector também em NPE (0,0049 ×
+  0,0052).
+- **O ganho a comparar com o AuxFlow no test** é o do 6c sobre o nosso
+  detector. Nos 19 clipes, +0,344 em LocSim@5 penalizado. O deles é +0,044
+  sobre o NBJW, tabela 7.
+- **Linhas:** pesam nas lacunas longas (+53% de NPE sem elas acima de 25
+  frames; 1,8× nas pontas) e quase nada nas curtas. Como o nosso detector
+  pisca, a maioria das lacunas é curta; isso explica a diferença em relação ao
+  AuxFlow, onde tirar as linhas custa 5,4 pontos.
+
+#### 8.5 "Sem âncora" × "propagação pior" (valid e test)
+- Reportar o LocSim@5 penalizado completo e, ao lado, só nos clipes com ≥ 1
+  âncora aceita (coluna da T1).
+- **Na valid, já medido** (`decisoes.md`):
+
+  | conjunto | detector | 6c | teto | fração da distância |
+  |---|---|---|---|---|
+  | 58 clipes | 0,173 | 0,436 | — | — |
+  | 40 com âncora | 0,253 | 0,639 | 0,776 | 74% |
+  | 18 sem âncora | 0,002 | sem H | — | — |
+
+  Nos clipes sem âncora, o detector quase nunca acerta.
+
+#### 8.6 Análise de falhas
+- **Piores casos por clipe** (LocSim@5 do 6c e distância ao teto) e **por
+  frame** (NPE e jogadores invertidos), com a causa de cada um e figuras (vista
+  de cima dos campos de visão, sobreposição na imagem e a M = H_gt⁻¹·H_det das
+  âncoras).
+- **Categorias de causa:**
+  1. âncora errada aceita, com o tipo:
+     - troca de reta, como o SNGS-164 (171 e 187: grande área + linha do meio
+       encaixadas como pequena área + grande área, com o círculo central tomado
+       como o arco);
+     - simetria de 180°;
+     - friso da placa.
+  2. clipe sem âncora: SNGS-060 e 066 no treino, os 18 da valid e os do test.
+     Na valid, 13 dos 18 são do jogo 3 (diurno, sombra azulada, 62% dos clipes
+     do jogo), 2 do jogo 2 e 3 do jogo 5 (contraste baixo). **A queda da valid
+     se explica, na maior parte, pelas limitações de segmentação já conhecidas
+     da Fatia 3.** Sem gramado e marcações confiáveis, o detector erra quase
+     sempre (LocSim@5 0,002 nos 18 clipes), e a verificação não aceita âncora
+     nenhuma.
+     O detector erra de forma sistemática, e a verificação rejeita tudo.
+  3. deriva da propagação em lacunas longas e nas pontas.
+  4. gabarito duvidoso.
+
+#### 8.7 Demais seções do relatório
 - **Frames difíceis isolados.** Bassek et al. apontam que o efeito do
-  pós-processamento temporal sobre frames com grande zoom nunca foi testado.
-  Reporte o subconjunto HSB do AuxFlow (IDs e intervalos na tabela 3 dele) à
-  parte — é a lacuna declarada que este projeto pode fechar.
-- **Qualidade do gabarito do GSR** como seção curta: quantos frames discordam
+  pós-processamento temporal sobre frames com grande zoom nunca foi testado. O
+  HSB (T2) reportado à parte é a lacuna declarada que este projeto pode
+  fechar.
+- **Qualidade do gabarito do GSR,** como seção curta: quantos frames discordam
   das linhas, e o caso da bola no ar como exemplo de correspondência falsa.
-- Análise de falhas com imagens: os piores casos, e a causa de cada um.
 - **Ablação de limitações da segmentação por cor:** a tabela da rodada das
   variantes da Fatia 3 na GSR `valid` (atual, histerese, limiar relativo e a
   combinação, por jogo; `outputs/segment_variantes_gsr_train+valid.csv`),
   com a nota de que a `valid` serviu para escolha e o número da histerese é
   otimista.
-- **Saída:** `python -m src.run --all` reproduz tudo do zero.
+- **Saída:** `python -m src.run --all` reproduz tudo do zero, a partir do
+  commit congelado.
 
 ---
 

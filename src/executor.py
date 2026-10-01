@@ -7,6 +7,7 @@ rótulo, a duração e, se falhou, o erro e o traceback — atualizado a cada ta
 o vigia ler durante a rodada. As falhas vão para FAILURES, e `exit_if_failed` (chamado
 no fim da CLI) sai com código != 0 se houve alguma.
 """
+import hashlib
 import json
 import sys
 import threading
@@ -16,15 +17,23 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
-from src.config import path
+from src.config import ROOT, path
 
 FAILURES = []            # falhas desta execução (processo principal)
+# Impressão digital do código: bytes de todos os src/*.py, lidos UMA vez, na importação
+# deste módulo (no processo principal, no início da CLI; no trabalhador, quando ele nasce).
+# Cada tarefa leva a do processo principal, e o trabalhador que nasceu depois de uma edição
+# falha antes de rodar, em vez de rodar código diferente (decisão de Victor, 2026-09-30).
+FINGERPRINT = hashlib.sha1(b"".join(p.read_bytes() for p in sorted((ROOT / "src").rglob("*.py")))).hexdigest()
 
 
-def _call(fn, args):
-    """Roda fn(*args) no trabalhador; nunca propaga exceção: (ok, resultado, erro, s)."""
+def _call(fn, args, fingerprint):
+    """Roda fn(*args) no trabalhador, se ele roda o código do processo principal; nunca
+    propaga exceção: (ok, resultado, erro, s)."""
     t = time.time()
     try:
+        if fingerprint != FINGERPRINT:
+            raise RuntimeError(f"trabalhador com código diferente do processo principal: impressão digital {FINGERPRINT[:12]} != {fingerprint[:12]}")
         return True, fn(*args), None, time.time() - t
     except Exception as e:
         return False, None, dict(erro=repr(e), traceback=traceback.format_exc()), time.time() - t
@@ -80,7 +89,7 @@ class SafeMap:
         if not items:
             man["status"] = "concluída"
         write()
-        futs = [self.submit(_call, fn, args) for args in items]     # submete já, como o map original
+        futs = [self.submit(_call, fn, args, FINGERPRINT) for args in items]     # submete já, como o map original
         for args, f in zip(items, futs):
             f.add_done_callback(lambda f, label=_label(args): record(f, label))
 

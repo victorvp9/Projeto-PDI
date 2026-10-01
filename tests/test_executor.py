@@ -68,3 +68,13 @@ def test_exit_code_is_nonzero_when_a_task_fails(tmp_path):
     good = subprocess.run([sys.executable, "-c", script, "99"], capture_output=True, text=True)
     assert bad.returncode == 1 and "[0, None, 2]" in bad.stdout, bad.stdout + bad.stderr
     assert good.returncode == 0 and "[0, 1, 2]" in good.stdout, good.stdout + good.stderr
+
+
+def test_worker_with_other_fingerprint_fails_before_running():
+    """Impressão digital do código (bytes de src/*.py na importação): a tarefa que chega
+    com a de outro código falha sem rodar; com a do processo principal, roda."""
+    ran = []
+    ok, res, err, _ = executor._call(ran.append, (1,), "impressao-de-outro-codigo")
+    assert not ok and res is None and "código diferente do processo principal" in err["erro"] and ran == []
+    ok, res, err, _ = executor._call(_task, (1,), executor.FINGERPRINT)
+    assert ok and res == 10 and err is None

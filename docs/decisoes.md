@@ -350,10 +350,89 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Tremor e deslize medem coisas diferentes.** A H congelada do "sem fluxo" tem tremor zero e deslize de 6 px. O Kalman tem o menor tremor, mas desliza mais que o 6c, porque suaviza atrasando nas panorâmicas.
   - **O 6c é o único que segue o movimento real,** com deslize p90 de 3,9 px, contra 22 a 77 px nos outros.
   - **Inversão de jogadores, penalizada:** cai de 61,5% (detector) para 23,6% (6c), puxada pela cobertura. Só nos frames cobertos, cai de 9,5% para 6,8%.
-  - **Indicador do Bassek** (o registro deixa 0 jogadores visíveis com ≥ 1 no gabarito): 3,8% (detector) e 4,1% (6c) só nos cobertos, na mesma ordem dos 3% do pipeline deles. Na versão penalizada, 60% e 20%.
+  - **Indicador do Bassek** (o registro deixa 0 jogadores visíveis com ≥ 1 no gabarito): 3,8% (detector) e 4,1% (6c) só nos cobertos. Na versão penalizada, 60% e 20%. **Os ~4% contra os 3% do Bassek são só uma comparação de ordem de grandeza:** os dados e o sistema são diferentes (feed de scouting e TVCalib lá; broadcast do GSR e pipeline clássico aqui).
   - **Depuração** em `outputs/debug/visibilidade/`: por exemplo, SNGS-099/400, com os campos de visão quase coincidentes, e SNGS-164/150, com o 6c errado e quase todos os jogadores invertidos.
 
   | Medição (subconjunto de desenvolvimento).
+- 2026-09-30 | **SNGS-164: limitação registrada, sem mudar a verificação** (decisão de Victor). Endurecer a regra por causa de um clipe seria ajustar no caso que já vimos, e fora dele a inversão do 6c fica em 0,7%.
+  - **Tipo de erro das âncoras 171 e 187, visto só pelos caches:** M = H_gt⁻¹·H_det leva o ponto do campo que o detector vê no pixel ao que o gabarito vê. Nas duas âncoras:
+    - a frente da grande área do detector (X = −36) cai sobre a linha do meio (X ≈ 0,1);
+    - a frente da pequena área do detector (X = −47) cai sobre a frente da grande área real (X ≈ −35,5);
+    - o arco da grande área do detector cai sobre a metade direita do círculo central (figura em `outputs/debug/falhas/SNGS-164_ancora171_det_no_campo_gt.png`).
+  - **É uma troca de reta na família longitudinal,** "grande área + linha do meio" encaixadas como "pequena área + grande área". O círculo central, tomado como o arco da grande área, deixa a âncora geométrica do arco passar. Não é simetria de 180° (sem inversão de sinal em M) nem o friso da placa.
+  - O mesmo erro nos dois frames é o erro sistemático que a verificação por poucos vizinhos não pega.
+  - Entra na análise de falhas da Fatia 8, com a figura.
+  | Decisão de Victor; o tipo de erro é medição.
+- 2026-09-30 | **Os 18 clipes sem âncora da valid × as limitações da Fatia 3** (pedido de Victor).
+
+  | jogo | limitação da Fatia 3 | sem âncora / clipes do jogo | clipes |
+  |---|---|---|---|
+  | **3** | diurno, sombra azulada | **13 / 21 (62%)** | SNGS-040, 041, 043, 045, 046, 047, 050, 051, 052, 055, 056, 058, 059 |
+  | 2 | contraste baixo | 2 / 18 (11%) | SNGS-021, 029 |
+  | 5 | contraste baixo | 3 / 19 (16%) | SNGS-094, 095, 096 |
+
+  - Os 18 coincidem com as limitações da Fatia 3, porque os três jogos da valid estão nelas.
+  - A concentração é no jogo 3: 13 dos 18 (72%). É o mesmo jogo em que a máscara de gramado cobre ~52% do campo e o detector sozinho já tinha cobertura 0,091 e NPE 0,144 (Fatia 5).
+  - Entra na análise de falhas da Fatia 8.
+  | Medição.
+- 2026-09-30 | **HSB registrado** (`data_splits/hsb.csv`; `02-dados`): 10 clipes da tabela 3 do AuxFlow, transcritos por Victor. Os 10 estão na partição test, com 750 imagens, e os intervalos cabem (conferido sem nenhuma métrica). A leitura do SNGS-128 ("90–0" = intervalo 0–90, propagado de trás para frente) e a numeração a partir de 0 (frame N = `000(N+1).jpg`) são suposições registradas. | Transcrição de Victor.
+- 2026-09-30 | **Chave da H_gt: corrigir antes do congelamento** (decisão de Victor): mesmo procedimento da troca da chave do 6c, com hash dos bytes na importação, conferência no trabalhador e regravação dos caches do train e da valid sem recalcular, só com a conferência do código que os gerou. Se a conferência falhar num cache, recalcula-se só esse, comparando frame a frame. Não manter o defeito contando com "uma rodada sem edições no meio", que é a premissa que já falhou. Feito depois da sensibilidade, sem editar `src/` enquanto ela roda.
+  - **A conferência exige as duas condições juntas:**
+    1. o `git diff` vazio, nos arquivos da chave, contra a fotografia do código da rodada que gerou o cache;
+    2. o hash guardado no cache igual ao hash dos bytes atuais.
+  - Se qualquer uma divergir, recalcula-se aquele cache e compara-se frame a frame com o antigo.
+  - **O hash guardado é complemento, não prova.** Ele foi calculado lendo os arquivos na hora da gravação, que é o próprio defeito corrigido: um arquivo editado no meio da rodada e depois revertido bate com os bytes atuais, embora o código executado tenha sido outro.
+  | Decisão de Victor.
+- 2026-09-30 | **Valid: separar "sem âncora" de "propagação pior"** (pedido de Victor; a partir dos caches, só relatório).
+
+  | série | 58 clipes | 40 com ≥ 1 âncora aceita | 18 sem âncora |
+  |---|---|---|---|
+  | detector | 0,173 | 0,253 | 0,002 |
+  | 6a Bassek | 0,196 | 0,285 | 0,005 |
+  | 6a robusto | 0,212 | 0,309 | 0,005 |
+  | **6c com fluxo** | 0,436 | **0,639** | sem H |
+  | âncora de gabarito (teto) | 0,529 | 0,776 | sem H |
+
+  - **Nos 18 clipes sem âncora, o próprio detector quase nunca acerta** (0,002).
+  - **Nos 40 com âncora,** o 6c fecha (0,639 − 0,253) / (0,776 − 0,253) ≈ 74% da distância ao teto, contra 85% nos 19 clipes do treino.
+  - **A queda do 6c na valid (0,436 contra 0,708 no treino) tem duas partes:** os clipes sem âncora, onde o detector falha em quase tudo, e uma propagação um pouco pior nos clipes com âncora, com o detector mais fraco (0,253 contra 0,364) e 10% de âncoras erradas.
+
+  | Medição, só relatório.
+- 2026-09-30 | **Fatia 7, complementos do ponto de parada 1** (pedido de Victor; a partir dos caches, sem recalcular; `scratchpad/stop1_extras.py`).
+  1. **Interseção comum.** As colunas "atual" da tabela do ponto de parada 1 comparam conjuntos de frames diferentes: o detector cobre 41%, os frames fáceis, e o 6c cobre 83%. Aqui, as mesmas medidas ficam restritas aos frames cobertos pelas **cinco** séries (detector, 6a Bassek, 6a robusto, Kalman + RTS, 6c com fluxo; o 6c sem fluxo tem a mesma cobertura do 6c com fluxo). São **1.714 frames (38,1%)**, ~1.340 trios para o tremor e ~1.460 pares para o deslize.
+
+     | série | tremor mediano / p90 (px), atual → comum | deslize mediano / p90 (px), atual → comum | invertidos só cobertos, atual → comum | 0 visíveis só cobertos, atual → comum |
+     |---|---|---|---|---|
+     | detector | 1,51 / 107 → 1,33 / 67 | 2,31 / 68 → 2,17 / 30 | 0,095 → 0,064 | 0,038 → 0,018 |
+     | 6a Bassek | 1,29 / 24 → 0,30 / 6,1 | 4,97 / 77 → 2,15 / 15 | 0,169 → 0,066 | 0,050 → 0,011 |
+     | 6a robusto | 0,55 / 8,0 → 0,22 / 1,5 | 2,84 / 47 → 1,70 / 5,4 | 0,136 → 0,061 | 0,046 → 0,013 |
+     | Kalman + RTS | 0,26 / 3,1 → **0,14 / 0,66** | 2,52 / 22 → 1,73 / 5,4 | 0,133 → 0,058 | 0,054 → 0,018 |
+     | 6c com fluxo | 0,57 / 1,9 → 0,40 / 1,5 | 1,37 / 3,9 → **1,29 / 3,6** | 0,068 → **0,043** | 0,041 → 0,039 |
+
+     - Nos mesmos frames, o Kalman é o mais liso.
+     - O 6c é o que menos desliza e o que menos inverte jogadores.
+     - Mas o 6c tem mais frames com 0 visíveis (3,9% contra 1–2%), puxados pelo SNGS-164 (item 2).
+  2. **Inversão de jogadores do 6c por clipe** (penalizada / só cobertos):
+
+     | clipe | penalizada | só cobertos | invertidos / visíveis no gabarito |
+     |---|---|---|---|
+     | SNGS-060 | 1,000 | — | sem âncora e sem H |
+     | SNGS-070 | 0,020 | 0,020 | — |
+     | SNGS-099 | 0,007 | 0,007 | — |
+     | SNGS-109 | 0,001 | 0,001 | — |
+     | SNGS-154 | 0,003 | 0,003 | — |
+     | **SNGS-164** | **0,283** | **0,283** | 3.618 de 12.783 |
+
+     - **Os 6,8% se concentram no SNGS-164.** Sem ele, os outros 4 clipes cobertos dão 0,7%.
+     - **A causa são duas âncoras erradas que passaram pela verificação:** a 171 (NPE da H do detector 14,0) e a 187 (NPE 16,7).
+       - Os trechos delas (frames 0–213) somam 3.557 das 3.618 inversões, com o NPE mediano do 6c em 8,4 e 14,5.
+       - A 171 propaga a H errada para trás até o frame 0.
+       - As outras 7 âncoras do clipe estão certas (NPE ≤ 0,009), com ≤ 2% de inversão nos trechos delas.
+     - **Por que passaram:** a 171 tinha só 2 vizinhos com H (o mínimo) e a 187, 3. As H desses vizinhos concordavam com a âncora (11–44 px antes de descontar o movimento). É o erro sistemático do detector em frames seguidos, que a verificação por maioria de poucos vizinhos não pega (limite já registrado na Fatia 6). Esses vizinhos não têm gabarito.
+     - Só diagnóstico: nada mudou no 6c.
+  3. **6c na valid:** tabela no registro "6c na GSR valid inteira, só relatório" logo abaixo (58 clipes, chave conferida nos 58, 18 sem âncora).
+
+  | Medição; diagnóstico.
 - 2026-09-30 | **Comparação frame a frame, no train[::3], do 6c antes × depois da correção da H degenerada** (pedido de Victor; `scratchpad/compare_hfix.py`).
   - **Método:** as propagações antiga (sem as duas proteções) e nova foram reproduzidas em float64, com os mesmos insumos e registro dos eventos degenerados. A reprodução antiga foi conferida contra o cache antigo e bateu em todos os frames: mesmo NPE e mesmas distâncias do LocSim.
   - **Resultado,** em 19 clipes, 5 variantes que propagam e 14.250 frames por variante:
@@ -419,3 +498,20 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Custo:** a chave do cache do 6c mudou, e os caches refazem: 56 clipes da valid já prontos, mais o subconjunto e o train[::3] quando forem pedidos. Os números da Fatia 6 no train[::3] e no subconjunto foram medidos antes da correção; ela só muda o caminho degenerado, mas a igualdade será conferida na próxima rodada deles.
   | Correção de defeito; limite empírico.
 - 2026-09-29 | **Incidente da pausa.** Depois de `pausa.ps1 continuar`, dois processos (o principal do 6c e um trabalhador da série) continuaram congelados, e a CPU somada dos outros escondeu isso. O pool travou: os trabalhadores do 6c ficaram bloqueados enviando resultados a um principal que não lia. O diagnóstico veio do `py-spy dump` e do estado das threads no Windows. Retomados à mão, os dois seguiram sem perda. **Correção:** o `continuar` repete a retomada até não sobrar thread suspensa, o `pausar` nunca suspende duas vezes, e o `estado` conta os congelados processo por processo. | Lição operacional: conferir processo por processo, não a CPU somada.
+- 2026-10-01 | **Incidente: procedimento da H de gabarito disparado com a sensibilidade do 6c no ar.** Às 00:30, ao testar as funções do script que encadeia a noite, executei o script inteiro por engano, e com ele o procedimento da chave da H de gabarito.
+  - **O que ele fez:** a pré-conferência, o patch em `src/io/gsr.py` e `src/executor.py` e o backup dos 115 caches. Também chegou a regravar 5 caches do train com a chave nova (SNGS-060, 061, 065, 066, 069).
+  - **Contenção:** foi parado em ~2 min. Os dois arquivos voltaram, por `git checkout`, aos bytes que a rodada tinha carregado: não tinham outra alteração, e a impressão digital da sensibilidade confere (`8ff63545d9a1`). Os 5 caches foram restaurados do backup, conferidos pelo sha1 do arquivo. O backup estava íntegro, com os 115 na chave do HEAD.
+  - **Efeito:** a sensibilidade fechou com 270/270 e 0 falhas, e os caches do 6c não foram tocados. As 20 falhas `BrokenProcessPool` do manifesto `fit_clip_cache_20261001_003022` são desse incidente.
+  - **Correção:** o procedimento passou a ser retomável (estado em `outputs/cache/hgt_estado.json`, backup que nunca é sobrescrito, cópias e regravações atômicas) e foi rodado de novo do zero, na ordem, depois da sensibilidade.
+  - **Lição:** não executar script com efeito colateral para "testar funções".
+  | Lição operacional.
+- 2026-10-01 | **Chave da H_gt corrigida; recálculo idêntico.**
+  - **Correção:** `gsr._SRC` guarda os bytes dos fontes da chave, lidos na importação. A chave usa esses bytes, e não os do arquivo na hora da gravação. O executor leva a impressão digital do código, o sha1 de todos os `src/*.py` lidos na importação, para cada tarefa: um trabalhador com código diferente do processo principal falha antes de rodar (teste `test_worker_with_other_fingerprint_fails_before_running`).
+  - **Por que recalcular, e não só regravar a chave:** os caches da H de gabarito do train (57) e da valid (58) não tinham fotografia do código. A `game_id` foi escrita antes do commit `b913517`, então a primeira condição da conferência não podia ser satisfeita. Pela regra, os 115 foram recalculados pelo executor (115/115, 0 falhas) e comparados frame a frame com o backup (`outputs/cache/gsr_antes_chave/`).
+  - **Comparação** (`outputs/runs/comparacao_hgt.json`), em 86.250 frames:
+    - 0 deslocados ≥ 1e-6 px na grade;
+    - 0 que ganharam ou perderam H com aceite;
+    - 0 que mudaram de classe "duvidoso".
+  - **Consequência:** a única mudança na chave do 6c é a dos bytes de `io/gsr.py`. Os 81 caches do 6c foram regravados só na chave (`3dbd93090eab` → `4c10b4cf1a1e`), com a pré-conferência: `git diff` vazio contra o HEAD nos arquivos da chave e as 81 chaves guardadas iguais à atual. Os números da Fatia 6, os da Fatia 7 e as tabelas da sensibilidade ficam como estão.
+  - **Test:** a H de gabarito do test será calculada uma única vez, depois do congelamento, com a chave nova.
+  | Correção de defeito (decisão de Victor).
