@@ -490,9 +490,9 @@ def run_confirm(pool, part):
 def _resolution(v, kind):
     """O valor de um frame/imagem numa métrica: média ou proporção sobre N unidades -> 1/N;
     mediana -> quanto uma unidade a mais, acima ou abaixo, desloca a mediana."""
-    v = np.asarray(v, float)
     if kind == "proporcao":
         return 1 / len(v)
+    v = np.asarray(v, float)
     v = v[np.isfinite(v)]
     m = np.median(v)
     return max(abs(np.median(np.r_[v, np.inf]) - m), abs(np.median(np.r_[v, -np.inf]) - m))

@@ -633,3 +633,118 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Regra:** qualquer proposta futura que mexa em `fit.*` exige, antes, separar o ajuste do gabarito do ajuste do detector, com a regravação conferida da chave do gabarito.
   | Decisão de Victor.
 - 2026-10-01 | **Sensibilidade do 6c sem cortes (`seg` = 0) é equivalente no subconjunto.** A tabela de cortes da produção (`outputs/cortes_negativos.csv`, todas as distâncias entre frames consecutivos do GSR train) não tem par acima de `cut_thr` = 0,202 em nenhum dos 6 clipes (060, 070, 099, 109, 154, 164). A maior distância é 0,172 (SNGS-154), e as outras ficam entre 0,077 e 0,132. A tabela da sensibilidade do 6c não precisa de ressalva. A confirmação do 6c usa o caminho da produção, com os cortes. | Medição.
+- 2026-10-01 | **Exceção à lista fechada da confirmação** (decisão de Victor; gravada antes da etapa 4).
+  - **Regra:** entram na lista fechada, depois de fechada, só os parâmetros cuja primeira medição foi invalidada por bug, com o melhor passo e o mesmo critério (≥ 0,02).
+  - **Por que não viola a lista fechada:** a lista fechada impede acrescentar candidatos depois de olhar os números de parâmetros já medidos. Estes nunca tinham sido medidos de verdade.
+  - **Aplicação:**
+    - **`detector.variants.td6_e1.lines.fuse_d_frac`** (o `lines.fuse_d_frac` estava sombreado): **entra** na confirmação do detector, com o melhor passo, +25%. Medido de novo nos 60 frames do GSR: LocSim +0,036 em +25%, +0,027 em +50%, +0,013 em −25% e +0,003 em −50%.
+    - **`temporal.compact_dilate_frac`** (o bug da GPU): **fica de fora** da confirmação do 6c. Medido de novo nos 6 clipes: o melhor passo é +50%, com LocSim +0,0109 < 0,02 (os outros: −50% −0,0075, −25% +0,0018, +25% +0,0093), e a cobertura não muda em nenhum passo.
+    - **`fit.max_resid_px` e `fit.max_cond`** (o gabarito chegava a mudar com eles): no GSR, medidos de novo com o gabarito fixo, dão 0 nos quatro passos e não entram. No WC14, o `fit.max_cond` dá +0,029 de cobertura (uma imagem) em +25% e +50%, mas não é candidato: a métrica do critério no WC14 é o IoU, que fica em +0,0002.
+  - **Cadeia:** o candidato novo é acrescentado à etapa 4 antes de ela começar. O que já foi medido não é refeito, porque os checkpoints levam o candidato e a unidade no nome.
+  | Decisão de Victor.
+- 2026-10-01 | **Confirmação dos candidatos da sensibilidade: resultado** (regra gravada antes de rodar; `outputs/confirmacao_detector.csv`, `confirmacao_6c.csv`, `confirmacao_6c_ancoras.csv`). Δ = candidato − atual, com intervalo de 95% por bootstrap pareado (2.000 reamostragens, semente 20261001).
+  - **Rodadas:** detector com 14 configurações em 1.697 frames do GSR train (57 clipes, 1 a cada 25) e nas 209 imagens do WC14 `train_val`; 6c com 3 configurações nos 19 clipes do train[::3]. 1.092 + 57 tarefas, 0 falhas.
+  - **Conferências:**
+    - na etapa 3, o config foi editado com a rodada no ar (só a seção `sensitivity`). Depois do fato: as chaves dos checkpoints são todas a da rodada (`1c1f98a9e654`), o `src/` está igual ao `d8a5176`, e o config efetivo do 6c e do detector também;
+    - o "6c fluxo" do atual reproduz o cache da produção H a H nos 19 clipes;
+    - a base do detector, recortada nos subconjuntos da regressão, reproduz a da sensibilidade (GSR 0,4333 / 0,0058 / 0,3448; WC14 0,5143 / 0,9101 / 0,0098).
+  - **Atual** no subconjunto maior: GSR LocSim@5 penalizado 0,333, cobertura 0,418, NPE 0,0063; WC14 IoU 0,929, cobertura 0,517, NPE 0,0106; 6c LocSim 0,708, cobertura 0,894.
+  - **Passa só o `segment.gsr.line_thr` −50%** (30 → 15): Δ LocSim +0,034 [+0,003; +0,065], cobertura +0,055. O WC14 não muda, porque o parâmetro é só do GSR. Por jogo, porém, o efeito tem sinal contrário:
+
+    | jogo | LocSim | NPE |
+    |---|---|---|
+    | 4 | +0,127 | 0,0116 → 0,0078 |
+    | 6 | +0,017 | 0,0050 → 0,0053 |
+    | 9 | **−0,046** | 0,0056 → **0,0130** |
+
+    Por clipe, 29 melhoram e 23 pioram (|Δ| > 0,01). O sinal acompanha o contraste por jogo da Fatia 3: no jogo 4, só 64% dos pontos anotados passavam do limiar 30.
+  - **Não passam no detector:**
+    - `open_frac` +25%: +0,018 [+0,005; +0,033], abaixo de 0,02;
+    - variante `fuse_d_frac` +25%: +0,008 [+0,000; +0,018];
+    - `lab_c_min` +50%: +0,008;
+    - `hough_min_len_frac` +25%: +0,005;
+    - `hough_votes_frac` +25%: +0,004;
+    - `shape_elong_min` −25%: +0,001;
+    - `line_k` +25%: −0,003, com IoU no WC14 −0,013 [−0,028; −0,001];
+    - `lab_dhue_deg` +50%: −0,008;
+    - `grass_dilate_w` +25%: −0,010;
+    - `fuse_theta_deg` −50%: **−0,023** [−0,034; −0,013];
+    - do WC14: `line_k` −25%, IoU −0,017 [−0,033; +0,001] e cobertura −0,081; `grass_dilate_w` −50%, IoU +0,003.
+
+    Os ganhos de +0,03 a +0,08 dos 60 frames não se sustentam, e dois deles trocam de sinal: `line_k` −25% no WC14 (+0,022 → −0,017) e `fuse_theta_deg` −50% no GSR (+0,030 → −0,023).
+  - **6c, nenhum passa:**
+    - `anchor_window` +50%: +0,019 [−0,016; +0,078]. Vem de um clipe só: no SNGS-106, a âncora 692 sai e rende +0,53. Nos outros, o parâmetro só tira âncoras, de 20 para 11 no SNGS-103, por exemplo. Perdem o SNGS-069 (−0,077) e o SNGS-153 (−0,074).
+    - `verify_window` −50%: −0,028 [−0,111; +0,025], cobertura −0,053. O SNGS-069 perde as 2 âncoras.
+  - **Zero exato explicado:** o `open_frac` +25% dá Δ = 0 no WC14 porque o elemento estruturante arredonda para ímpar. Com 720 px de altura, 7,2 px e 9,0 px viram o mesmo núcleo de 9×9.
+  - **Combinação:** não se aplica, porque só um passou.
+  | Medição.
+- 2026-10-01 | **Tabela "importa / não importa" com a resolução** (`outputs/sensibilidade_importa.csv`; tornados com a faixa de 2× a resolução).
+  - **Resolução de uma unidade:**
+
+    | base | cobertura | métrica do critério |
+    |---|---|---|
+    | GSR, 60 frames | 0,0167 | LocSim@5 penalizado 0,0167 |
+    | WC14, 35 imagens | 0,0286 | IoU mediano 0,0033 (quanto uma imagem a mais desloca a mediana) |
+    | 6c, 4.500 frames | 0,0002 | 0,0002 |
+
+  - **Contagens:**
+
+    | base | importa | indistinguível | não importa |
+    |---|---|---|---|
+    | GSR | 14 | 9 | 5 |
+    | WC14 | 13 | 9 | 6 |
+    | 6c | 7 | 0 | 4 |
+
+  - **Ressalvas:**
+    - a resolução é o menor passo, não o ruído. A da mediana do IoU subestima o ruído, porque a cobertura muda o conjunto de imagens;
+    - no 6c, os frames não são independentes: a unidade efetiva é a âncora. A confirmação mediu o ruído real: o `anchor_window` foi de +0,044 em 6 clipes para +0,019 [−0,016; +0,078] em 19.
+  | Medição.
+- 2026-10-01 | **Memória durante a confirmação do detector** (medida só por leitura, com 10 trabalhadores; pedido de Victor).
+  - **Física:** RAM de 15,9 GB, 6,4 GB livres; os 11 processos da rodada têm 1,6 GB residentes, ~150 MB cada.
+  - **Commit:** o do sistema está em 27,8 de 32,7 GB (85%); o da rodada é de 12,3 GB.
+  - **Paginação:** nenhuma página gravada; páginas lidas em média 17/s (máximo 102/s); arquivo de paginação a 4%.
+  - **Causa do commit alto:** a OpenBLAS do numpy e a do scipy reservam buffers para 16 threads ao importar. Um processo confirma 1.053 MB com 84 MB residentes; com `OPENBLAS_NUM_THREADS=1`, confirma 89 MB.
+  - **Risco:** chegar ao limite de commit. Isso daria `MemoryError`, que vira falha no manifesto, não erro silencioso.
+  - **Proposta, nada mudado:** `OPENBLAS_NUM_THREADS=1` nos trabalhadores, que já usam 1 thread no OpenCV. Medir o efeito no tempo antes.
+  | Medição.
+- 2026-10-01 | **Perfil de tempo do detector e do 6c** (pedido de Victor; seção de custo do relatório; nada otimizado).
+  - **Medição:** um processo, config atual, `cv2.setNumThreads(1)` como nos trabalhadores, numa máquina de 16 threads lógicas. Tempo por etapa com um cronômetro nas funções de entrada, contando só a chamada mais externa; numa segunda passada, o cProfile, que soma ~25% de sobrecarga. Saídas em `outputs/runs/perfil_custo.out` e `perfil_custo_6c.out`. A leitura e a decodificação de um frame do GSR (JPEG 1920×1080) custam 6–7 ms e ficam fora do detector.
+  - **Detector, em ms por frame:**
+
+    | etapa | GSR (5 frames, 1920×1080) | WC14 (5 imagens, 1280×720) |
+    |---|---|---|
+    | **total** | **4.762** | **2.899** |
+    | pontuação (`Evidence`, `field_iou`, `verify`, ambiguidade) | 2.587 (54%) | 1.295 (45%) |
+    | hipóteses | 917 (19%) | 663 (23%) |
+    | refino (guiado + `fit_point_line`) | 604 (13%) | 410 (14%) |
+    | elipses | 432 (9%) | 443 (15%) |
+    | segmentação | 183 (4%) | 68 (2%) |
+    | Hough/linhas | 30 (0,6%) | 15 (0,5%) |
+
+    **O gargalo é a verificação das hipóteses** em Python. Em cada frame do GSR, ~11 mil hipóteses passam pelo `valid_orientation` (52.920 chamadas nos 5 frames, ~1,3 s por frame, quase todo o tempo das hipóteses), ~1.100 vão ao `verify` e ~9 mil ao `field_iou`. O tempo vai para `project`, `project_segments` e `point_segment_distance` (geometria em numpy, chamada centenas de milhares de vezes). A operação de imagem em si (segmentação e Hough) fica em ~5% do total, o que confirma o motivo de não usar GPU no detector.
+  - **6c fluxo, 100 frames do SNGS-099 (300–399), com GPU:** 3 âncoras aceitas (as mesmas da produção) e H em todos os frames.
+
+    | etapa | ms por frame |
+    |---|---|
+    | **total** | **127** |
+    | reestimativa (`fit_points_lines`: `least_squares` + distâncias) | 56 (44%) |
+    | máscaras em lote na GPU | 25 (20%) |
+    | verificação das âncoras por Lucas–Kanade | 13 (10%) |
+    | Lucas–Kanade da propagação | 12 (9%) |
+    | leitura e conversão para cinza | 8 (6%) |
+    | desempacotar as máscaras | 3 |
+    | histograma dos cortes | 2 |
+    | outros | 7 |
+
+    Uma janela sem âncora (frames 0–99) custa 69 ms por frame, quase tudo das máscaras.
+  - **Para o relatório:** a propagação custa ~1/37 do detector por frame. O 6c, porém, usa a série do detector em todos os frames para escolher as âncoras, então o custo do pipeline completo é o do detector em todo frame, ~4,8 s por frame em um núcleo, mais ~0,13 s.
+  - **Pendente:** a comparação com a tabela 6 do AuxFlow, que ainda não está transcrita.
+  | Medição.
+- 2026-10-01 | **Bug (pendente de decisão): o LocSim@5 penalizado vira NaN quando nenhum frame tem H.** O `evaluate.summarize` só calcula o penalizado se houver alguma distância. Pela definição (`01-metodo`: a pessoa de frame sem H vale 0), o valor nesse caso é 0. O `_metric` da confirmação reproduz o mesmo comportamento, de propósito, para bater com o `summarize`.
+  - **Afetados:**
+    - na sensibilidade do GSR, o `gate_iou` +25% e +50% (aceite impossível com 1,0) sai com Δ NaN, quando o certo é −0,345. Na tabela "importa", a coluna do LocSim dele mostra 0,000; a classificação "importa" vem da cobertura (−0,433) e está certa. O tornado fica sem a barra;
+    - na tabela de âncoras do 6c, o Δ do SNGS-069 com `verify_window` −50% sai NaN; o clipe perde todas as H.
+    - no WC14, o IoU NaN do `gate_iou` é legítimo: não há imagem coberta para a mediana.
+  - **Não afetados:** os números agregados das Fatias 5 a 7 (o conjunto inteiro sempre tem alguma H) e a confirmação (nenhum candidato zera a cobertura).
+  - **Correção proposta, a decidir:** o `summarize` passa a dar 0 quando há pessoas e nenhuma H. O `evaluate.py` entra na chave do 6c, então a correção pede a regravação conferida das 81 chaves (as linhas guardadas não mudam: só o `summarize` muda), refazer as 8 tarefas do `gate_iou` na sensibilidade do detector e gerar de novo as tabelas.
+  | Defeito encontrado; aguarda Victor.

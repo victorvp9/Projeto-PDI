@@ -377,6 +377,7 @@ sensitivity:
       - [lines.fuse_theta_deg, -0.5, gsr]
       - [segment.common.line_k, -0.25, wc14]
       - [segment.common.grass_dilate_w, -0.5, wc14]
+      - [detector.variants.td6_e1.lines.fuse_d_frac, 0.25, gsr]   # exceção: primeira medição invalidada pelo sombreamento (decisão de Victor, 2026-10-01)
     temporal:                       # lista fechada (decisão de Victor): [parâmetro, passo]
       - [temporal.anchor_window, 0.5]
       - [temporal.verify_window, -0.5]
