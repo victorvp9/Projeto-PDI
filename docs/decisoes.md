@@ -799,3 +799,18 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
 
   - **Regras que valem a partir daqui:** uma rodada só no test e no HSB; nenhum parâmetro muda depois de ver um número do test. Se um defeito aparecer, corrigir, registrar e refazer o test inteiro, dizendo no relatório que houve uma segunda rodada. O test só começa com o ok de Victor.
   | Decisão de Victor (plano da Fatia 8).
+- 2026-10-01 | **Rodada única do test iniciada** (ok de Victor, ordem do 8.2), às 19:55. A orquestração (`rodada_test.py`) e os executores pequenos ficam fora do `src/`, que está congelado. Uma cópia deles fica em `outputs/runs/rodada_test/scripts/`.
+  - **Etapas:**
+    1. série do detector no GSR test (15 processos);
+    2. detector no WC14 test e no GSR test a cada 25 frames;
+    3. H de gabarito do test, com a chave registrada conferida clipe a clipe;
+    4. avaliação do detector;
+    5. 6c, com 6a Bassek, 6a robusto e as ablações (10 processos, GPU);
+    6. estabilidade, visibilidade e Kalman + RTS, pela `consequence.evaluate_7` sem mudança, guardando os resultados por clipe para a T4b.
+  - **Conferência do congelamento:** é feita antes e depois de cada etapa e gravada em cada manifesto da etapa (campo `congelamento`): `git diff --quiet 418a3be -- src config.yaml` (árvore) e `git diff --quiet 418a3be HEAD -- src config.yaml` vazios, o SHA-1 do config e as chaves (série, 6c, ECC, impressão digital) iguais às de `congelamento.json`. Ela fica na orquestração, e não no executor, porque mudar o `src/` quebraria o próprio congelamento. Se algo não bater, a rodada para.
+  - **Depois das 6 etapas, com a mesma conferência:**
+    - os extras (`extras_test.py`): as métricas por frame do Kalman + RTS (a etapa 6 só guarda estabilidade e visibilidade dele), a cobertura das cinco séries da T4b e a medição 1 do HSB ("só propagação", a partir da `H_gt_auxflow`, sem âncora do detector);
+    - as tabelas T1–T9 (`tabelas_test.py`), que só leem os caches e os pickles da rodada, com bootstrap por jogo.
+  - **Ensaio:** o script das tabelas foi ensaiado na valid antes do test. Reproduziu os números registrados (0,173 → 0,436, teto 0,529; âncoras 827 / 635 / 295), e os valores pontuais batem com o `summarize`.
+  - **Os caches da H de gabarito do test da Fatia 2** (49, chave antiga) vão para `outputs/cache/gsr_test_fatia2` antes do recálculo.
+  | Decisão de Victor (8.1 e 8.2).

@@ -641,6 +641,11 @@ de gabarito (teto).
   fechar.
 - **Qualidade do gabarito do GSR,** como seção curta: quantos frames discordam
   das linhas, e o caso da bola no ar como exemplo de correspondência falsa.
+  - **Correções de rótulo** (`gsr_label_fixes`, Fatia 1): 7 clipes do test têm
+    correção, e por isso uma chave própria da H de gabarito (SNGS-119, 121, 133,
+    148, 149, 187, 199). Dizer no texto que essas correções vieram da varredura do
+    gabarito, sem nenhuma saída do método, e que não afetam o LocSim (que usa as
+    posições anotadas das pessoas), só o NPE e o IoU contra a `H_gt` das linhas.
 - **Ablação de limitações da segmentação por cor:** a tabela da rodada das
   variantes da Fatia 3 na GSR `valid` (atual, histerese, limiar relativo e a
   combinação, por jogo; `outputs/segment_variantes_gsr_train+valid.csv`),
