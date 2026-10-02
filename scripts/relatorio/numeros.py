@@ -73,7 +73,7 @@ C("0,897", "cobertura da âncora de gabarito (teto)", "T1", {"serie": "6c âncor
 C("0,0064", "NPE mediano do teto", "T1", {"serie": "6c âncora de gabarito"}, "npe_med", sec="6")
 C("0,763", "LocSim@5 penalizado do teto", "T1", {"serie": "6c âncora de gabarito"}, "locsim_pen", sec="6")
 C("0,849", "LocSim@5 do teto nos cobertos", "T1", {"serie": "6c âncora de gabarito"}, "locsim_cob", sec="6")
-X("49", "clipes do GSR test", V2, "GSR test: 49 clipes", sec=S)
+X("49", "clipes do GSR test", V2, "GSR test: 49 clipes", key="n_test", sec=S)
 X("3", "jogos do GSR test", V2, "GSR test: 49 clipes, 3 jogos", sec=S)
 X("10", "reamostragens distintas do bootstrap com 3 jogos", V2, "10 reamostragens distintas", sec="5")
 X("44", "clipes com >= 1 âncora aceita", V2, "44 clipes com", sec="6")
@@ -211,8 +211,14 @@ C("0,0242", "NPE mediano do 6a Bassek com as duas bordas certas", LR, {"conjunto
 C("8,58", "parede da série do detector (h)", "T9", {"etapa": "série do detector (todos os frames)"}, "parede_h", sec="6")
 C("15", "processos da série do detector", "T9", {"etapa": "série do detector (todos os frames)"}, "processos", sec="6")
 C("1,19", "vazão da série (frames/s)", "T9", {"etapa": "série do detector (todos os frames)"}, "frames_por_s", sec="6")
-C("9.344", "s por clipe num processo, série", "T9", {"etapa": "série do detector (todos os frames)"}, "s_por_clipe_processo", sec="6")
-C("630", "s de parede por clipe com 15 processos, série", "T9", {"etapa": "série do detector (todos os frames)"}, "s_por_clipe_parede", sec="6")
+C("630", "s de parede por clipe com 15 processos, série (máquina inteira)", "T9", {"etapa": "série do detector (todos os frames)"}, "s_por_clipe_parede",
+  key="ser_clip", sec="6, 9")
+C("126", "s de parede por clipe com 10 processos, 6c com as ablações", "T9", {"etapa": "6c com as ablações"}, "s_por_clipe_parede", key="c6_clip", sec="6")
+D("756", "s de parede por clipe: série + 6c", "630 + 126 (T9, s_por_clipe_parede)", lambda v: v["ser_clip"] + v["c6_clip"], sec="9")
+D("10", "o --all do zero só no test passa disto (h): 49 clipes × 756 s = 10,3 h", "49 × (série + 6c) / 3600 > 10",
+  lambda v: 10 if v["n_test"] * (v["ser_clip"] + v["c6_clip"]) / 3600 > 10 else math.nan, sec="9")
+D("30", "o --all do zero nas três partições passa disto (h): 164 clipes × 756 s = 34,4 h", "(57 + 58 + 49) × (série + 6c) / 3600 > 30",
+  lambda v: 30 if (v["n_train"] + v["n_valid"] + v["n_test"]) * (v["ser_clip"] + v["c6_clip"]) / 3600 > 30 else math.nan, sec="9")
 C("1,71", "parede do 6c (h)", "T9", {"etapa": "6c com as ablações"}, "parede_h", sec="6")
 C("10", "processos do 6c", "T9", {"etapa": "6c com as ablações"}, "processos", sec="6")
 C("292", "AuxFlow, s por clipe (tabela 6)", "T9", {"etapa": "AuxFlow Overall"}, "s_por_clipe", sec="6, 9")
@@ -340,8 +346,10 @@ X("720", "resolução do WC14", D2, "da Copa do Mundo de 2014, 1280×720", sec="
 X("25", "fps do GSR", D2, "(750 frames, 25 fps, 1920×1080)", sec="4")
 X("1920", "resolução do GSR", D2, "(750 frames, 25 fps, 1920×1080)", sec="4")
 X("1080", "resolução do GSR", D2, "(750 frames, 25 fps, 1920×1080)", sec="4")
-X("57", "clipes de treino do GSR", D2, "**57 treino,", sec="4")
-X("58", "clipes de validação do GSR", D2, "58 validação, 49 teste**", sec="4")
+X("57", "clipes de treino do GSR", D2, "**57 treino,", key="n_train", sec="4")
+X("58", "clipes de validação do GSR", D2, "58 validação, 49 teste**", key="n_valid", sec="4")
+X("0,8852", "BHITK no GSR, tabela 7 do AuxFlow (conferido por Victor)", DEC, "BHITK 0,8852 × NBJW 0,8851", sec="2")
+X("0,8851", "NBJW no GSR, tabela 7 do AuxFlow (conferido por Victor)", DEC, "BHITK 0,8852 × NBJW 0,8851", sec="2")
 X("3", "RANSAC a 3 px da H_gt_auxflow", M1, "`H_gt_auxflow` = RANSAC (3 px)", sec="4")
 X("10", "clipes do HSB", D2, "São 10 clipes com o intervalo de frames", sec="4")
 X("0", "numeração dos frames a partir de 0", D2, "contagem a partir de 0", sec="4")
@@ -425,7 +433,7 @@ def resolve(e, values):
 
 # ------------------------------------------------------------------ completude
 IGNORE = [r"`[^`]*`", r"SNGS-\d+", r"\bf\d+\b", r"\bT\d+b?\b", r"\b\d[a-c]\b", r"@\d+", r"\bFiguras? \d+", r"\b[Tt]abelas? \d+(?: e \d+)?",
-          r"\bTabela A\d+", r"\bSeç(?:ão|ões) \d+(?:\.\d+)?(?: e \d+(?:\.\d+)?)?", r"\bApêndice [AB]", r"\bFatias? \d+", r"\b[Ee]tapas? \d+(?:-\d+)?",
+          r"\bTabela A\d+", r"\b[Ss]eç(?:ão|ões) \d+(?:\.\d+)?(?: e \d+(?:\.\d+)?)?", r"\bApêndice [AB]", r"\bFatias? \d+", r"\b[Ee]tapas? \d+(?:-\d+)?",
           r"\bjogo \d+", r"\bframe \d+", r"\b(?:19|20)\d\d\b", r"\(\d\)", r"HRNetv\d", r"i\d-\d+K", r"\d+X\b", r"\bd²", r"τ²"]
 
 
@@ -591,9 +599,11 @@ def numeros_md(res):
 
 
 if __name__ == "__main__":
-    values, res = {}, []
-    for e in NUMEROS:
-        res.append(resolve(e, values))
+    values, res = {}, [None] * len(NUMEROS)
+    for derived in (False, True):                        # as contas por último: usam valores de qualquer entrada
+        for k, e in enumerate(NUMEROS):
+            if (e["tipo"] == "der") == derived:
+                res[k] = resolve(e, values)
     bad = [(e, r) for e, r in zip(NUMEROS, res) if not r[0]]
     for e, r in bad:
         print(f"ORIGEM NÃO CONFERE: {e['txt']!r} ({e['desc']}): {r[4]}")

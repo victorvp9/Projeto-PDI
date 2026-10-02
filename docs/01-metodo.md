@@ -230,9 +230,10 @@ Referência: BHITK (Claasen & de Villiers), que relaciona a homografia de um fra
 à do seguinte por transformação afim, com filtro de Kalman em dois estágios e
 modelagem explícita da incerteza dos keypoints.
 
-> Achado relevante para calibrar expectativa: o BHITK melhorou levemente no TSWC
-> e **não melhorou nada** no SoccerNet GSR, segundo a tabela 7 do AuxFlow
-> (implementação deles sobre o NBJW). Ganhos de consistência temporal parecem
+> Achado relevante para calibrar expectativa: o BHITK melhorou levemente no TSWC,
+> segundo o texto do AuxFlow (seção 5.6), e **não melhorou nada** no SoccerNet GSR,
+> segundo a tabela 7 do AuxFlow (implementação deles sobre o NBJW: 0,8852 × 0,8851;
+> conferido por Victor, `decisoes.md` 2026-10-02). Ganhos de consistência temporal parecem
 > depender de dataset. Se você observar o mesmo, é resultado, não fracasso.
 
 ### 8c — Propagação por fluxo óptico (a contribuição principal)
@@ -309,7 +310,8 @@ está em `decisoes.md`.
 - **Erro de reprojeção** — sobre a grade do **campo** de 2,5 m em X × 2 m em Y,
   só os pontos cuja projeção pela `H_gt` cai dentro do quadro e à frente da
   câmera: **NPE** = ‖`H_est·X − H_gt·X`‖ / altura da imagem; **RE** (m) =
-  ‖`H_est⁻¹(H_gt·X) − X`‖. Média por frame. No GSR, o BroadTrack tem o maior
+  ‖`H_est⁻¹(H_gt·X) − X`‖. Média por frame. No GSR, segundo a avaliação do
+  AuxFlow (tabela 7), o BroadTrack tem o maior
   `IoU_entire` (0,8397 contra 0,8352 do AuxFlow), mas perde no `IoU_part`
   (0,9224 contra 0,9426) e sobretudo no erro de reprojeção em metros (1,34 contra
   0,84 m): otimizar contra as marcações negligencia a superfície como um todo.

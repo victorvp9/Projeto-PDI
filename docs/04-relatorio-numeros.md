@@ -210,148 +210,153 @@ O Apêndice A (tabelas T1 a T9) é gerado pelo mesmo script a partir de `outputs
 | 202 | 8,58 | parede da série do detector (h) | 6 | `outputs/runs/rodada_test/tabelas/T9.csv` | 2 | parede_h | 8.575277777777778 |
 | 203 | 15 | processos da série do detector | 6 | `outputs/runs/rodada_test/tabelas/T9.csv` | 2 | processos | 15 |
 | 204 | 1,19 | vazão da série (frames/s) | 6 | `outputs/runs/rodada_test/tabelas/T9.csv` | 2 | frames_por_s | 1.1904376275468886 |
-| 205 | 9.344 | s por clipe num processo, série | 6 | `outputs/runs/rodada_test/tabelas/T9.csv` | 2 | s_por_clipe_processo | 9343.991836734693 |
-| 206 | 630 | s de parede por clipe com 15 processos, série | 6 | `outputs/runs/rodada_test/tabelas/T9.csv` | 2 | s_por_clipe_parede | 630.0204081632653 |
-| 207 | 1,71 | parede do 6c (h) | 6 | `outputs/runs/rodada_test/tabelas/T9.csv` | 3 | parede_h | 1.7094444444444445 |
-| 208 | 10 | processos do 6c | 6 | `outputs/runs/rodada_test/tabelas/T9.csv` | 3 | processos | 10 |
-| 209 | 292 | AuxFlow, s por clipe (tabela 6) | 6, 9 | `outputs/runs/rodada_test/tabelas/T9.csv` | 8 | s_por_clipe | 292 |
-| 210 | 2,6 | AuxFlow, FPS (tabela 6) | 6 | `outputs/runs/rodada_test/tabelas/T9.csv` | 8 | fps | 2.6 |
-| 211 | 4,76 | detector, s por frame num núcleo, GSR | 6, 9 | `outputs/runs/rodada_test/tabelas_v2.out` | 106 | — | (no texto da linha) |
-| 212 | 3.570 | detector, s por clipe de 750 frames num núcleo (perfil) | 9 | `docs/03-plano.md` | 580 | — | (no texto da linha) |
-| 213 | 2,90 | detector, s por frame num núcleo, WC14 | 6 | `outputs/runs/rodada_test/tabelas_v2.out` | 106 | — | (no texto da linha) |
-| 214 | 127 | 6c fluxo, ms por frame | 6, 9 | `outputs/runs/rodada_test/tabelas_v2.out` | 106 | — | (no texto da linha) |
-| 215 | 750 | frames por clipe | 4, 6 | `docs/02-dados.md` | 74 | — | (no texto da linha) |
-| 216 | 7 | hardware (Ryzen 7 5700X, 8 núcleos, 16 threads, RTX 5060; AuxFlow: RTX 4090) | 6 | `outputs/runs/rodada_test/tabelas_v2.out` | 107 | — | (no texto da linha) |
-| 217 | 8 | hardware (Ryzen 7 5700X, 8 núcleos, 16 threads, RTX 5060; AuxFlow: RTX 4090) | 6 | `outputs/runs/rodada_test/tabelas_v2.out` | 107 | — | (no texto da linha) |
-| 218 | 16 | hardware (Ryzen 7 5700X, 8 núcleos, 16 threads, RTX 5060; AuxFlow: RTX 4090) | 6 | `outputs/runs/rodada_test/tabelas_v2.out` | 107 | — | (no texto da linha) |
-| 219 | 5060 | hardware (Ryzen 7 5700X, 8 núcleos, 16 threads, RTX 5060; AuxFlow: RTX 4090) | 6 | `outputs/runs/rodada_test/tabelas_v2.out` | 107 | — | (no texto da linha) |
-| 220 | 4090 | hardware (Ryzen 7 5700X, 8 núcleos, 16 threads, RTX 5060; AuxFlow: RTX 4090) | 6 | `outputs/runs/rodada_test/tabelas_v2.out` | 107 | — | (no texto da linha) |
-| 221 | 0,252 | LocSim@5 penalizado do 6c, SNGS-149 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 35 | c6 | 0.25245385124828923 |
-| 222 | 0,458 | LocSim@5 penalizado do 6c, SNGS-119 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 5 | c6 | 0.45772018093220884 |
-| 223 | 0,495 | LocSim@5 penalizado do 6c, SNGS-143 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 29 | c6 | 0.4952325656550445 |
-| 224 | 0,495 | LocSim@5 penalizado do teto, SNGS-143 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 29 | teto | 0.49477118746227106 |
-| 225 | 0,506 | LocSim@5 penalizado do 6c, SNGS-144 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 30 | c6 | 0.5055174044700732 |
-| 226 | 0,508 | LocSim@5 penalizado do teto, SNGS-144 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 30 | teto | 0.5077625470280754 |
-| 227 | 0,587 | LocSim@5 penalizado do 6c, SNGS-148 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 34 | c6 | 0.5873981000471749 |
-| 228 | 0,635 | LocSim@5 penalizado do 6c, SNGS-126 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 12 | c6 | 0.634512353785477 |
-| 229 | 0,954 | LocSim@5 penalizado do teto, SNGS-126 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 12 | teto | 0.9541771572553578 |
-| 230 | 6 | piores clipes inspecionados | 7 | `docs/03-plano.md` | 664 | — | (no texto da linha) |
-| 231 | 12 | âncoras erradas inspecionadas | 7 | `docs/03-plano.md` | 664 | — | (no texto da linha) |
-| 232 | 5 | clipes sem âncora inspecionados | 7 | `docs/03-plano.md` | 636 | — | (no texto da linha) |
-| 233 | 3 | lacunas de exemplo inspecionadas | 7 | `docs/03-plano.md` | 636 | — | (no texto da linha) |
-| 234 | 1,355 | NPE da âncora SNGS-126 f588 | 7 | `outputs/runs/rodada_test/falhas/ancoras_erradas_test.csv` | 3 | npe | 1.3550949476054246 |
-| 235 | 0,060 | menor NPE das âncoras de encaixe parcial (SNGS-122 f657) | 7 | `outputs/runs/rodada_test/falhas/ancoras_erradas_test.csv` | 2 | npe | 0.0596927737995924 |
-| 236 | 0,235 | maior NPE das âncoras de encaixe parcial (SNGS-190 f525) | 7 | `outputs/runs/rodada_test/falhas/ancoras_erradas_test.csv` | 12 | npe | 0.23549481829491842 |
-| 237 | 0,063 | NPE da âncora SNGS-132 f721 | 7 | `outputs/runs/rodada_test/falhas/ancoras_erradas_test.csv` | 4 | npe | 0.0633359702238581 |
-| 238 | 10 | âncoras de encaixe parcial: as aceitas erradas menos a troca de reta (SNGS-126 f588) e a quase certa (SNGS-132 f721) | 7 | `derivado: linhas de outputs/runs/rodada_test/falhas/ancoras_erradas_test.csv sem SNGS-126 e SNGS-132` | — | — | 10 |
-| 239 | 13 | clipes sem âncora da valid no jogo 3 | 7, 8 | `docs/decisoes.md` | 370 | — | (no texto da linha) |
-| 240 | 18 | clipes sem âncora da valid | 7, 8 | `docs/decisoes.md` | 374 | — | (no texto da linha) |
-| 241 | 1 | diagnóstico da segmentação em 1 frame a cada 75 | 7 | `outputs/runs/rodada_test/analise_falhas.out` | 61 | — | (no texto da linha) |
-| 242 | 75 | diagnóstico da segmentação em 1 frame a cada 75 | 7 | `outputs/runs/rodada_test/analise_falhas.out` | 61 | — | (no texto da linha) |
-| 243 | 0,988 | menor fração do campo como grama nos sem âncora (SNGS-138) | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 5 | campo_grama | 0.9881636617093701 |
-| 244 | 0,81 | cobertura das marcações a 2 px, SNGS-127 | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 2 | cobertura_2px | 0.8090467516697024 |
-| 245 | 0,85 | cobertura das marcações a 2 px, SNGS-128 | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 3 | cobertura_2px | 0.8461538461538461 |
-| 246 | 0,98 | cobertura das marcações a 2 px, SNGS-138 | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 5 | cobertura_2px | 0.9770642201834863 |
-| 247 | 0,89 | cobertura das marcações a 2 px, clipes com âncora do jogo 7 | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 7 | cobertura_2px | 0.8863636363636364 |
-| 248 | 0,79 | cobertura das marcações a 2 px, referência da Fatia 3 (GSR train) | 7 | `outputs/runs/rodada_test/analise_falhas.out` | 71 | — | (no texto da linha) |
-| 249 | 2 | cobertura das marcações a 2 px | 7 | `outputs/runs/rodada_test/analise_falhas.out` | 71 | — | (no texto da linha) |
-| 250 | 52 | SNGS-147: pontos anotados acima do limiar (%) | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 6 | acima_limiar × 100 | 0.5192307692307692 |
-| 251 | 68 | clipes com âncora do jogo 8: pontos acima do limiar (%) | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 8 | acima_limiar × 100 | 0.6809593023255813 |
-| 252 | 11 | candidatas verificáveis do SNGS-147 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 33 | verificaveis | 11 |
-| 253 | 0,7 | menor cobertura do detector nos sem âncora (SNGS-138, %) | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 24 | cob_det × 100 | 0.007194244604316547 |
-| 254 | 15,9 | maior cobertura do detector nos sem âncora (SNGS-147, %) | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 33 | cob_det × 100 | 0.15930388219544847 |
-| 255 | 0,0059 | NPE mediano do 6c a <= 25 frames da âncora, frames com H do detector | 7 | `outputs/runs/rodada_test/falhas/deriva_6c.csv` | 2 | npe_med | 0.005897785590997996 |
-| 256 | 0,0101 | NPE mediano do 6c a <= 25 frames da âncora, pontas | 7 | `outputs/runs/rodada_test/falhas/deriva_6c.csv` | 14 | npe_med | 0.010138998451541235 |
-| 257 | 0,208 | NPE mediano do 6c nas pontas a > 250 frames da âncora | 7, 8 | `outputs/runs/rodada_test/falhas/deriva_6c.csv` | 17 | npe_med | 0.207852393306958 |
-| 258 | 250 | faixa de distância à âncora (> 250 frames) | 7, 8 | `outputs/runs/rodada_test/analise_falhas.out` | 45 | — | (no texto da linha) |
-| 259 | 7,1 | NPE do 6a Bassek no meio da lacuna da Figura 7 (SNGS-121, f14) | 7 | `outputs/runs/rodada_test/falhas/lacunas_4a25_test.csv` | 521 | npe | 7.107828310199786 |
-| 260 | 2 | lacuna da Figura 7 (2-26) | 7 | `outputs/runs/rodada_test/falhas/lacunas_figuras.csv` | 4 | — | (no texto da linha) |
-| 261 | 26 | lacuna da Figura 7 (2-26) | 7 | `outputs/runs/rodada_test/falhas/lacunas_figuras.csv` | 4 | — | (no texto da linha) |
-| 262 | 25 | passos da sensibilidade (±25%) | 8 | `docs/03-plano.md` | 445 | — | (no texto da linha) |
-| 263 | 50 | passos da sensibilidade (±50%) | 8 | `docs/03-plano.md` | 445 | — | (no texto da linha) |
-| 264 | 0,017 | valor de um frame ou imagem nos subconjuntos | 8 | `docs/decisoes.md` | 518 | — | (no texto da linha) |
-| 265 | 0,029 | valor de um frame ou imagem nos subconjuntos | 8 | `docs/decisoes.md` | 518 | — | (no texto da linha) |
-| 266 | 14 | configurações da confirmação do detector (atual + 13 candidatos) | 8 | `docs/decisoes.md` | 646 | — | (no texto da linha) |
-| 267 | 3 | configurações da confirmação do 6c (atual + 2 candidatos) | 8 | `docs/decisoes.md` | 646 | — | (no texto da linha) |
-| 268 | 15 | candidatos confirmados (13 do detector + 2 do 6c) | 8 | `derivado: (14 − 1) + (3 − 1)` | — | — | 15 |
-| 269 | 0,02 | ganho mínimo para virar candidato | 8 | `docs/decisoes.md` | 538 | — | (no texto da linha) |
-| 270 | 30 | limiar de contraste das marcações no GSR, atual | 3, 8 | `docs/decisoes.md` | 652 | — | (no texto da linha) |
-| 271 | 15 | limiar candidato (recusado) | 8 | `docs/decisoes.md` | 652 | — | (no texto da linha) |
-| 272 | +0,034 | Δ LocSim do line_thr 15 | 8 | `docs/decisoes.md` | 652 | — | (no texto da linha) |
-| 273 | +0,003 | IC inferior do Δ do line_thr 15 | 8 | `docs/decisoes.md` | 652 | — | (no texto da linha) |
-| 274 | +0,065 | IC superior do Δ do line_thr 15 | 8 | `docs/decisoes.md` | 652 | — | (no texto da linha) |
-| 275 | +0,127 | Δ LocSim do line_thr 15 no jogo 4 | 8 | `docs/decisoes.md` | 751 | — | (no texto da linha) |
-| 276 | −0,046 | Δ LocSim do line_thr 15 no jogo 9 | 8 | `docs/decisoes.md` | 751 | — | (no texto da linha) |
-| 277 | 0,0056 | NPE mediano do jogo 9, limiar 30 | 8 | `docs/decisoes.md` | 751 | — | (no texto da linha) |
-| 278 | 0,0130 | NPE mediano do jogo 9, limiar 15 | 8 | `docs/decisoes.md` | 751 | — | (no texto da linha) |
-| 279 | 52 | fração do campo coberta pelo gramado no jogo 3 da valid (%) | 8 | `docs/decisoes.md` | 114 | — | (no texto da linha) |
-| 280 | 2,33 | frames do test sem H_gt na geração do gabarito (Fatia 2, %) | 8 | `docs/decisoes.md` | 63 | — | (no texto da linha) |
-| 281 | 3 | homografia 3 × 3 | 1 | `docs/00-problema.md` | 8 | — | (no texto da linha) |
-| 282 | 2 | 2 + 2 retas de duas famílias | Resumo, 3, 7, 8 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 283 | 0,5 | BroadTrack reinicia com IoU < 0,5 | 2 | `docs/01-metodo.md` | 285 | — | (no texto da linha) |
-| 284 | 0,8397 | BroadTrack × AuxFlow no GSR (01-metodo) | 2 | `docs/01-metodo.md` | 313 | — | (no texto da linha) |
-| 285 | 0,8352 | BroadTrack × AuxFlow no GSR (01-metodo) | 2 | `docs/01-metodo.md` | 313 | — | (no texto da linha) |
-| 286 | 0,9224 | BroadTrack × AuxFlow no GSR (01-metodo) | 2 | `docs/01-metodo.md` | 314 | — | (no texto da linha) |
-| 287 | 0,9426 | BroadTrack × AuxFlow no GSR (01-metodo) | 2 | `docs/01-metodo.md` | 314 | — | (no texto da linha) |
-| 288 | 1,34 | BroadTrack × AuxFlow no GSR (01-metodo) | 2 | `docs/01-metodo.md` | 314 | — | (no texto da linha) |
-| 289 | 0,84 | BroadTrack × AuxFlow no GSR (01-metodo) | 2 | `docs/01-metodo.md` | 315 | — | (no texto da linha) |
-| 290 | 2,5 | grade de pontos auxiliares 2,5 × 2 m | 2, 3, 5 | `docs/01-metodo.md` | 251 | — | (no texto da linha) |
-| 291 | 2 | grade de pontos auxiliares 2,5 × 2 m | 2, 3, 5 | `docs/01-metodo.md` | 251 | — | (no texto da linha) |
-| 292 | 1 | erro de ida e volta <= 1 px | 2, 3 | `docs/01-metodo.md` | 256 | — | (no texto da linha) |
-| 293 | 23,42 | AuxFlow sem fluxo no HSB | 2 | `docs/00-problema.md` | 40 | — | (no texto da linha) |
-| 294 | 78,30 | AuxFlow sem pontos-chave do detector no HSB | 2 | `docs/01-metodo.md` | 258 | — | (no texto da linha) |
-| 295 | 78,71 | RAFT no lugar do Lucas–Kanade | 2 | `docs/00-problema.md` | 42 | — | (no texto da linha) |
-| 296 | 39,68 | amostragem geométrica no AuxFlow | 2 | `docs/01-metodo.md` | 253 | — | (no texto da linha) |
-| 297 | 83,39 | amostragem aleatória no AuxFlow | 2 | `docs/01-metodo.md` | 254 | — | (no texto da linha) |
-| 298 | 150 | âncoras ingênuas a cada 150 frames | 2, 3 | `docs/01-metodo.md` | 265 | — | (no texto da linha) |
-| 299 | 82,48 | âncoras ingênuas no AuxFlow | 2 | `docs/01-metodo.md` | 266 | — | (no texto da linha) |
-| 300 | 83,48 | detector sem propagação no AuxFlow | 2 | `docs/01-metodo.md` | 266 | — | (no texto da linha) |
-| 301 | 90,65 | âncoras por heurística no AuxFlow | 2 | `docs/01-metodo.md` | 267 | — | (no texto da linha) |
-| 302 | 91,88 | âncora de gabarito no AuxFlow | 2 | `docs/01-metodo.md` | 267 | — | (no texto da linha) |
-| 303 | 54,74 | AuxFlow com a H inicial perturbada | 2 | `docs/00-problema.md` | 48 | — | (no texto da linha) |
-| 304 | 31 | janela do Savitzky–Golay (Bassek et al.) | 2, 3 | `docs/00-problema.md` | 59 | — | (no texto da linha) |
-| 305 | 3 | grau do Savitzky–Golay (Bassek et al.) | 2, 3 | `config.yaml` | 225 | — | (no texto da linha) |
-| 306 | 25 | lacunas preenchidas por interpolação (Bassek et al.) | 2, 3 | `docs/01-metodo.md` | 212 | — | (no texto da linha) |
-| 307 | 981 | cortes por partida (Bassek et al.) | 2 | `docs/01-metodo.md` | 276 | — | (no texto da linha) |
-| 308 | 10,9 | cortes por minuto (Bassek et al.) | 2 | `docs/01-metodo.md` | 276 | — | (no texto da linha) |
-| 309 | 115 | molde do PnLCalib no WC14 (115 × 74 jardas) | 2 | `docs/01-metodo.md` | 32 | — | (no texto da linha) |
-| 310 | 74 | molde do PnLCalib no WC14 (115 × 74 jardas) | 2 | `docs/01-metodo.md` | 32 | — | (no texto da linha) |
-| 311 | 100 | molde do KpSFR e de Maglo et al. (100 × 60 m) | 2 | `docs/01-metodo.md` | 32 | — | (no texto da linha) |
-| 312 | 60 | molde do KpSFR e de Maglo et al. (100 × 60 m) | 2 | `docs/01-metodo.md` | 32 | — | (no texto da linha) |
-| 313 | 105 | modelo do campo 105 × 68 m | 3 | `docs/01-metodo.md` | 19 | — | (no texto da linha) |
-| 314 | 68 | modelo do campo 105 × 68 m | 3 | `docs/01-metodo.md` | 19 | — | (no texto da linha) |
-| 315 | 20 | faixa de matiz do gramado (±20°) | 3 | `docs/decisoes.md` | 73 | — | (no texto da linha) |
-| 316 | 0,9861 | IoU médio do gramado no WC14 train_val | 3 | `docs/decisoes.md` | 75 | — | (no texto da linha) |
-| 317 | 15 | limiar das marcações no WC14 | 3 | `docs/decisoes.md` | 74 | — | (no texto da linha) |
-| 318 | 30 | limiar das marcações no GSR | 3 | `docs/decisoes.md` | 74 | — | (no texto da linha) |
-| 319 | 180 | simetria de 180° do campo | 3, 7 | `docs/03-plano.md` | 310 | — | (no texto da linha) |
-| 320 | 0,45 | portão: fração explicada | 3 | `config.yaml` | 201 | — | (no texto da linha) |
-| 321 | 0,85 | portão: IoU com o gramado | 3 | `config.yaml` | 202 | — | (no texto da linha) |
-| 322 | 5 | portões logo abaixo do percentil 5 da H_gt | 3 | `config.yaml` | 202 | — | (no texto da linha) |
-| 323 | 12 | janela das âncoras candidatas (±12 frames) | 3 | `config.yaml` | 246 | — | (no texto da linha) |
-| 324 | 2 | vizinhos mínimos da verificação | 3 | `config.yaml` | 249 | — | (no texto da linha) |
-| 325 | 209 | imagens de treino do WC14 | 4 | `docs/02-dados.md` | 35 | — | (no texto da linha) |
-| 326 | 1280 | resolução do WC14 | 4 | `docs/02-dados.md` | 36 | — | (no texto da linha) |
-| 327 | 720 | resolução do WC14 | 4 | `docs/02-dados.md` | 36 | — | (no texto da linha) |
-| 328 | 25 | fps do GSR | 4 | `docs/02-dados.md` | 74 | — | (no texto da linha) |
-| 329 | 1920 | resolução do GSR | 4 | `docs/02-dados.md` | 74 | — | (no texto da linha) |
-| 330 | 1080 | resolução do GSR | 4 | `docs/02-dados.md` | 74 | — | (no texto da linha) |
-| 331 | 57 | clipes de treino do GSR | 4 | `docs/02-dados.md` | 74 | — | (no texto da linha) |
-| 332 | 58 | clipes de validação do GSR | 4 | `docs/02-dados.md` | 75 | — | (no texto da linha) |
-| 333 | 3 | RANSAC a 3 px da H_gt_auxflow | 4 | `docs/01-metodo.md` | 332 | — | (no texto da linha) |
-| 334 | 10 | clipes do HSB | 4 | `docs/02-dados.md` | 91 | — | (no texto da linha) |
-| 335 | 0 | numeração dos frames a partir de 0 | 4 | `docs/02-dados.md` | 112 | — | (no texto da linha) |
-| 336 | 90 | intervalo "90–0" do SNGS-128 | 4 | `docs/02-dados.md` | 107 | — | (no texto da linha) |
-| 337 | 0 | intervalo "90–0" do SNGS-128 | 4 | `docs/02-dados.md` | 107 | — | (no texto da linha) |
-| 338 | 0,05 | LocSim: exp(ln(0,05)·d²/τ²) | 5 | `docs/01-metodo.md` | 367 | — | (no texto da linha) |
-| 339 | 5 | τ = 5 m | 5 | `docs/01-metodo.md` | 370 | — | (no texto da linha) |
-| 340 | 1 | mAP-LocSim: τ = 1 a 10 m | 5 | `docs/01-metodo.md` | 371 | — | (no texto da linha) |
-| 341 | 10 | mAP-LocSim: τ = 1 a 10 m | 5 | `docs/01-metodo.md` | 371 | — | (no texto da linha) |
-| 342 | 0 | pessoa de frame sem H vale 0 | 5 | `docs/01-metodo.md` | 377 | — | (no texto da linha) |
-| 343 | 95 | intervalo de 95% | 5, 6 | `docs/03-plano.md` | 560 | — | (no texto da linha) |
-| 344 | 2.000 | reamostragens do bootstrap | 5 | `docs/03-plano.md` | 560 | — | (no texto da linha) |
-| 345 | 1.470 | frames da conferência de determinismo | 5, B | `docs/03-plano.md` | 678 | — | (no texto da linha) |
-| 346 | 25 | frames da conferência: 1 a cada 25 | 5, B | `docs/03-plano.md` | 679 | — | (no texto da linha) |
-| 347 | 735 | tarefas da série com a chave congelada | 5, B | `docs/03-plano.md` | 672 | — | (no texto da linha) |
-| 348 | 47 | caches da valid gravados com a chave errada | 5 | `docs/decisoes.md` | 487 | — | (no texto da linha) |
-| 349 | 0 | manifestos com 0 falhas | B | `docs/decisoes.md` | 849 | — | (no texto da linha) |
+| 205 | 630 | s de parede por clipe com 15 processos, série (máquina inteira) | 6, 9 | `outputs/runs/rodada_test/tabelas/T9.csv` | 2 | s_por_clipe_parede | 630.0204081632653 |
+| 206 | 126 | s de parede por clipe com 10 processos, 6c com as ablações | 6 | `outputs/runs/rodada_test/tabelas/T9.csv` | 3 | s_por_clipe_parede | 125.59183673469387 |
+| 207 | 756 | s de parede por clipe: série + 6c | 9 | `derivado: 630 + 126 (T9, s_por_clipe_parede)` | — | — | 755.612 |
+| 208 | 10 | o --all do zero só no test passa disto (h): 49 clipes × 756 s = 10,3 h | 9 | `derivado: 49 × (série + 6c) / 3600 > 10` | — | — | 10 |
+| 209 | 30 | o --all do zero nas três partições passa disto (h): 164 clipes × 756 s = 34,4 h | 9 | `derivado: (57 + 58 + 49) × (série + 6c) / 3600 > 30` | — | — | 30 |
+| 210 | 1,71 | parede do 6c (h) | 6 | `outputs/runs/rodada_test/tabelas/T9.csv` | 3 | parede_h | 1.7094444444444445 |
+| 211 | 10 | processos do 6c | 6 | `outputs/runs/rodada_test/tabelas/T9.csv` | 3 | processos | 10 |
+| 212 | 292 | AuxFlow, s por clipe (tabela 6) | 6, 9 | `outputs/runs/rodada_test/tabelas/T9.csv` | 8 | s_por_clipe | 292 |
+| 213 | 2,6 | AuxFlow, FPS (tabela 6) | 6 | `outputs/runs/rodada_test/tabelas/T9.csv` | 8 | fps | 2.6 |
+| 214 | 4,76 | detector, s por frame num núcleo, GSR | 6, 9 | `outputs/runs/rodada_test/tabelas_v2.out` | 106 | — | (no texto da linha) |
+| 215 | 3.570 | detector, s por clipe de 750 frames num núcleo (perfil) | 9 | `docs/03-plano.md` | 580 | — | (no texto da linha) |
+| 216 | 2,90 | detector, s por frame num núcleo, WC14 | 6 | `outputs/runs/rodada_test/tabelas_v2.out` | 106 | — | (no texto da linha) |
+| 217 | 127 | 6c fluxo, ms por frame | 6, 9 | `outputs/runs/rodada_test/tabelas_v2.out` | 106 | — | (no texto da linha) |
+| 218 | 750 | frames por clipe | 4, 6 | `docs/02-dados.md` | 74 | — | (no texto da linha) |
+| 219 | 7 | hardware (Ryzen 7 5700X, 8 núcleos, 16 threads, RTX 5060; AuxFlow: RTX 4090) | 6 | `outputs/runs/rodada_test/tabelas_v2.out` | 107 | — | (no texto da linha) |
+| 220 | 8 | hardware (Ryzen 7 5700X, 8 núcleos, 16 threads, RTX 5060; AuxFlow: RTX 4090) | 6 | `outputs/runs/rodada_test/tabelas_v2.out` | 107 | — | (no texto da linha) |
+| 221 | 16 | hardware (Ryzen 7 5700X, 8 núcleos, 16 threads, RTX 5060; AuxFlow: RTX 4090) | 6 | `outputs/runs/rodada_test/tabelas_v2.out` | 107 | — | (no texto da linha) |
+| 222 | 5060 | hardware (Ryzen 7 5700X, 8 núcleos, 16 threads, RTX 5060; AuxFlow: RTX 4090) | 6 | `outputs/runs/rodada_test/tabelas_v2.out` | 107 | — | (no texto da linha) |
+| 223 | 4090 | hardware (Ryzen 7 5700X, 8 núcleos, 16 threads, RTX 5060; AuxFlow: RTX 4090) | 6 | `outputs/runs/rodada_test/tabelas_v2.out` | 107 | — | (no texto da linha) |
+| 224 | 0,252 | LocSim@5 penalizado do 6c, SNGS-149 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 35 | c6 | 0.25245385124828923 |
+| 225 | 0,458 | LocSim@5 penalizado do 6c, SNGS-119 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 5 | c6 | 0.45772018093220884 |
+| 226 | 0,495 | LocSim@5 penalizado do 6c, SNGS-143 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 29 | c6 | 0.4952325656550445 |
+| 227 | 0,495 | LocSim@5 penalizado do teto, SNGS-143 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 29 | teto | 0.49477118746227106 |
+| 228 | 0,506 | LocSim@5 penalizado do 6c, SNGS-144 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 30 | c6 | 0.5055174044700732 |
+| 229 | 0,508 | LocSim@5 penalizado do teto, SNGS-144 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 30 | teto | 0.5077625470280754 |
+| 230 | 0,587 | LocSim@5 penalizado do 6c, SNGS-148 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 34 | c6 | 0.5873981000471749 |
+| 231 | 0,635 | LocSim@5 penalizado do 6c, SNGS-126 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 12 | c6 | 0.634512353785477 |
+| 232 | 0,954 | LocSim@5 penalizado do teto, SNGS-126 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 12 | teto | 0.9541771572553578 |
+| 233 | 6 | piores clipes inspecionados | 7 | `docs/03-plano.md` | 664 | — | (no texto da linha) |
+| 234 | 12 | âncoras erradas inspecionadas | 7 | `docs/03-plano.md` | 664 | — | (no texto da linha) |
+| 235 | 5 | clipes sem âncora inspecionados | 7 | `docs/03-plano.md` | 636 | — | (no texto da linha) |
+| 236 | 3 | lacunas de exemplo inspecionadas | 7 | `docs/03-plano.md` | 636 | — | (no texto da linha) |
+| 237 | 1,355 | NPE da âncora SNGS-126 f588 | 7 | `outputs/runs/rodada_test/falhas/ancoras_erradas_test.csv` | 3 | npe | 1.3550949476054246 |
+| 238 | 0,060 | menor NPE das âncoras de encaixe parcial (SNGS-122 f657) | 7 | `outputs/runs/rodada_test/falhas/ancoras_erradas_test.csv` | 2 | npe | 0.0596927737995924 |
+| 239 | 0,235 | maior NPE das âncoras de encaixe parcial (SNGS-190 f525) | 7 | `outputs/runs/rodada_test/falhas/ancoras_erradas_test.csv` | 12 | npe | 0.23549481829491842 |
+| 240 | 0,063 | NPE da âncora SNGS-132 f721 | 7 | `outputs/runs/rodada_test/falhas/ancoras_erradas_test.csv` | 4 | npe | 0.0633359702238581 |
+| 241 | 10 | âncoras de encaixe parcial: as aceitas erradas menos a troca de reta (SNGS-126 f588) e a quase certa (SNGS-132 f721) | 7 | `derivado: linhas de outputs/runs/rodada_test/falhas/ancoras_erradas_test.csv sem SNGS-126 e SNGS-132` | — | — | 10 |
+| 242 | 13 | clipes sem âncora da valid no jogo 3 | 7, 8 | `docs/decisoes.md` | 370 | — | (no texto da linha) |
+| 243 | 18 | clipes sem âncora da valid | 7, 8 | `docs/decisoes.md` | 374 | — | (no texto da linha) |
+| 244 | 1 | diagnóstico da segmentação em 1 frame a cada 75 | 7 | `outputs/runs/rodada_test/analise_falhas.out` | 61 | — | (no texto da linha) |
+| 245 | 75 | diagnóstico da segmentação em 1 frame a cada 75 | 7 | `outputs/runs/rodada_test/analise_falhas.out` | 61 | — | (no texto da linha) |
+| 246 | 0,988 | menor fração do campo como grama nos sem âncora (SNGS-138) | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 5 | campo_grama | 0.9881636617093701 |
+| 247 | 0,81 | cobertura das marcações a 2 px, SNGS-127 | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 2 | cobertura_2px | 0.8090467516697024 |
+| 248 | 0,85 | cobertura das marcações a 2 px, SNGS-128 | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 3 | cobertura_2px | 0.8461538461538461 |
+| 249 | 0,98 | cobertura das marcações a 2 px, SNGS-138 | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 5 | cobertura_2px | 0.9770642201834863 |
+| 250 | 0,89 | cobertura das marcações a 2 px, clipes com âncora do jogo 7 | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 7 | cobertura_2px | 0.8863636363636364 |
+| 251 | 0,79 | cobertura das marcações a 2 px, referência da Fatia 3 (GSR train) | 7 | `outputs/runs/rodada_test/analise_falhas.out` | 71 | — | (no texto da linha) |
+| 252 | 2 | cobertura das marcações a 2 px | 7 | `outputs/runs/rodada_test/analise_falhas.out` | 71 | — | (no texto da linha) |
+| 253 | 52 | SNGS-147: pontos anotados acima do limiar (%) | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 6 | acima_limiar × 100 | 0.5192307692307692 |
+| 254 | 68 | clipes com âncora do jogo 8: pontos acima do limiar (%) | 7 | `outputs/runs/rodada_test/falhas/sem_ancora_x_fatia3.csv` | 8 | acima_limiar × 100 | 0.6809593023255813 |
+| 255 | 11 | candidatas verificáveis do SNGS-147 | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 33 | verificaveis | 11 |
+| 256 | 0,7 | menor cobertura do detector nos sem âncora (SNGS-138, %) | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 24 | cob_det × 100 | 0.007194244604316547 |
+| 257 | 15,9 | maior cobertura do detector nos sem âncora (SNGS-147, %) | 7 | `outputs/runs/rodada_test/falhas/clipes_test.csv` | 33 | cob_det × 100 | 0.15930388219544847 |
+| 258 | 0,0059 | NPE mediano do 6c a <= 25 frames da âncora, frames com H do detector | 7 | `outputs/runs/rodada_test/falhas/deriva_6c.csv` | 2 | npe_med | 0.005897785590997996 |
+| 259 | 0,0101 | NPE mediano do 6c a <= 25 frames da âncora, pontas | 7 | `outputs/runs/rodada_test/falhas/deriva_6c.csv` | 14 | npe_med | 0.010138998451541235 |
+| 260 | 0,208 | NPE mediano do 6c nas pontas a > 250 frames da âncora | 7, 8 | `outputs/runs/rodada_test/falhas/deriva_6c.csv` | 17 | npe_med | 0.207852393306958 |
+| 261 | 250 | faixa de distância à âncora (> 250 frames) | 7, 8 | `outputs/runs/rodada_test/analise_falhas.out` | 45 | — | (no texto da linha) |
+| 262 | 7,1 | NPE do 6a Bassek no meio da lacuna da Figura 7 (SNGS-121, f14) | 7 | `outputs/runs/rodada_test/falhas/lacunas_4a25_test.csv` | 521 | npe | 7.107828310199786 |
+| 263 | 2 | lacuna da Figura 7 (2-26) | 7 | `outputs/runs/rodada_test/falhas/lacunas_figuras.csv` | 4 | — | (no texto da linha) |
+| 264 | 26 | lacuna da Figura 7 (2-26) | 7 | `outputs/runs/rodada_test/falhas/lacunas_figuras.csv` | 4 | — | (no texto da linha) |
+| 265 | 25 | passos da sensibilidade (±25%) | 8 | `docs/03-plano.md` | 445 | — | (no texto da linha) |
+| 266 | 50 | passos da sensibilidade (±50%) | 8 | `docs/03-plano.md` | 445 | — | (no texto da linha) |
+| 267 | 0,017 | valor de um frame ou imagem nos subconjuntos | 8 | `docs/decisoes.md` | 518 | — | (no texto da linha) |
+| 268 | 0,029 | valor de um frame ou imagem nos subconjuntos | 8 | `docs/decisoes.md` | 518 | — | (no texto da linha) |
+| 269 | 14 | configurações da confirmação do detector (atual + 13 candidatos) | 8 | `docs/decisoes.md` | 646 | — | (no texto da linha) |
+| 270 | 3 | configurações da confirmação do 6c (atual + 2 candidatos) | 8 | `docs/decisoes.md` | 646 | — | (no texto da linha) |
+| 271 | 15 | candidatos confirmados (13 do detector + 2 do 6c) | 8 | `derivado: (14 − 1) + (3 − 1)` | — | — | 15 |
+| 272 | 0,02 | ganho mínimo para virar candidato | 8 | `docs/decisoes.md` | 538 | — | (no texto da linha) |
+| 273 | 30 | limiar de contraste das marcações no GSR, atual | 3, 8 | `docs/decisoes.md` | 652 | — | (no texto da linha) |
+| 274 | 15 | limiar candidato (recusado) | 8 | `docs/decisoes.md` | 652 | — | (no texto da linha) |
+| 275 | +0,034 | Δ LocSim do line_thr 15 | 8 | `docs/decisoes.md` | 652 | — | (no texto da linha) |
+| 276 | +0,003 | IC inferior do Δ do line_thr 15 | 8 | `docs/decisoes.md` | 652 | — | (no texto da linha) |
+| 277 | +0,065 | IC superior do Δ do line_thr 15 | 8 | `docs/decisoes.md` | 652 | — | (no texto da linha) |
+| 278 | +0,127 | Δ LocSim do line_thr 15 no jogo 4 | 8 | `docs/decisoes.md` | 751 | — | (no texto da linha) |
+| 279 | −0,046 | Δ LocSim do line_thr 15 no jogo 9 | 8 | `docs/decisoes.md` | 751 | — | (no texto da linha) |
+| 280 | 0,0056 | NPE mediano do jogo 9, limiar 30 | 8 | `docs/decisoes.md` | 751 | — | (no texto da linha) |
+| 281 | 0,0130 | NPE mediano do jogo 9, limiar 15 | 8 | `docs/decisoes.md` | 751 | — | (no texto da linha) |
+| 282 | 52 | fração do campo coberta pelo gramado no jogo 3 da valid (%) | 8 | `docs/decisoes.md` | 114 | — | (no texto da linha) |
+| 283 | 2,33 | frames do test sem H_gt na geração do gabarito (Fatia 2, %) | 8 | `docs/decisoes.md` | 63 | — | (no texto da linha) |
+| 284 | 3 | homografia 3 × 3 | 1 | `docs/00-problema.md` | 8 | — | (no texto da linha) |
+| 285 | 2 | 2 + 2 retas de duas famílias | Resumo, 3, 7, 8 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 286 | 0,5 | BroadTrack reinicia com IoU < 0,5 | 2 | `docs/01-metodo.md` | 286 | — | (no texto da linha) |
+| 287 | 0,8397 | BroadTrack × AuxFlow no GSR (01-metodo) | 2 | `docs/01-metodo.md` | 315 | — | (no texto da linha) |
+| 288 | 0,8352 | BroadTrack × AuxFlow no GSR (01-metodo) | 2 | `docs/01-metodo.md` | 315 | — | (no texto da linha) |
+| 289 | 0,9224 | BroadTrack × AuxFlow no GSR (01-metodo) | 2 | `docs/01-metodo.md` | 316 | — | (no texto da linha) |
+| 290 | 0,9426 | BroadTrack × AuxFlow no GSR (01-metodo) | 2 | `docs/01-metodo.md` | 316 | — | (no texto da linha) |
+| 291 | 1,34 | BroadTrack × AuxFlow no GSR (01-metodo) | 2 | `docs/01-metodo.md` | 316 | — | (no texto da linha) |
+| 292 | 0,84 | BroadTrack × AuxFlow no GSR (01-metodo) | 2 | `docs/01-metodo.md` | 317 | — | (no texto da linha) |
+| 293 | 2,5 | grade de pontos auxiliares 2,5 × 2 m | 2, 3, 5 | `docs/01-metodo.md` | 252 | — | (no texto da linha) |
+| 294 | 2 | grade de pontos auxiliares 2,5 × 2 m | 2, 3, 5 | `docs/01-metodo.md` | 252 | — | (no texto da linha) |
+| 295 | 1 | erro de ida e volta <= 1 px | 2, 3 | `docs/01-metodo.md` | 257 | — | (no texto da linha) |
+| 296 | 23,42 | AuxFlow sem fluxo no HSB | 2 | `docs/00-problema.md` | 40 | — | (no texto da linha) |
+| 297 | 78,30 | AuxFlow sem pontos-chave do detector no HSB | 2 | `docs/01-metodo.md` | 259 | — | (no texto da linha) |
+| 298 | 78,71 | RAFT no lugar do Lucas–Kanade | 2 | `docs/00-problema.md` | 42 | — | (no texto da linha) |
+| 299 | 39,68 | amostragem geométrica no AuxFlow | 2 | `docs/01-metodo.md` | 254 | — | (no texto da linha) |
+| 300 | 83,39 | amostragem aleatória no AuxFlow | 2 | `docs/01-metodo.md` | 255 | — | (no texto da linha) |
+| 301 | 150 | âncoras ingênuas a cada 150 frames | 2, 3 | `docs/01-metodo.md` | 266 | — | (no texto da linha) |
+| 302 | 82,48 | âncoras ingênuas no AuxFlow | 2 | `docs/01-metodo.md` | 267 | — | (no texto da linha) |
+| 303 | 83,48 | detector sem propagação no AuxFlow | 2 | `docs/01-metodo.md` | 267 | — | (no texto da linha) |
+| 304 | 90,65 | âncoras por heurística no AuxFlow | 2 | `docs/01-metodo.md` | 268 | — | (no texto da linha) |
+| 305 | 91,88 | âncora de gabarito no AuxFlow | 2 | `docs/01-metodo.md` | 268 | — | (no texto da linha) |
+| 306 | 54,74 | AuxFlow com a H inicial perturbada | 2 | `docs/00-problema.md` | 48 | — | (no texto da linha) |
+| 307 | 31 | janela do Savitzky–Golay (Bassek et al.) | 2, 3 | `docs/00-problema.md` | 59 | — | (no texto da linha) |
+| 308 | 3 | grau do Savitzky–Golay (Bassek et al.) | 2, 3 | `config.yaml` | 225 | — | (no texto da linha) |
+| 309 | 25 | lacunas preenchidas por interpolação (Bassek et al.) | 2, 3 | `docs/01-metodo.md` | 212 | — | (no texto da linha) |
+| 310 | 981 | cortes por partida (Bassek et al.) | 2 | `docs/01-metodo.md` | 277 | — | (no texto da linha) |
+| 311 | 10,9 | cortes por minuto (Bassek et al.) | 2 | `docs/01-metodo.md` | 277 | — | (no texto da linha) |
+| 312 | 115 | molde do PnLCalib no WC14 (115 × 74 jardas) | 2 | `docs/01-metodo.md` | 32 | — | (no texto da linha) |
+| 313 | 74 | molde do PnLCalib no WC14 (115 × 74 jardas) | 2 | `docs/01-metodo.md` | 32 | — | (no texto da linha) |
+| 314 | 100 | molde do KpSFR e de Maglo et al. (100 × 60 m) | 2 | `docs/01-metodo.md` | 32 | — | (no texto da linha) |
+| 315 | 60 | molde do KpSFR e de Maglo et al. (100 × 60 m) | 2 | `docs/01-metodo.md` | 32 | — | (no texto da linha) |
+| 316 | 105 | modelo do campo 105 × 68 m | 3 | `docs/01-metodo.md` | 19 | — | (no texto da linha) |
+| 317 | 68 | modelo do campo 105 × 68 m | 3 | `docs/01-metodo.md` | 19 | — | (no texto da linha) |
+| 318 | 20 | faixa de matiz do gramado (±20°) | 3 | `docs/decisoes.md` | 73 | — | (no texto da linha) |
+| 319 | 0,9861 | IoU médio do gramado no WC14 train_val | 3 | `docs/decisoes.md` | 75 | — | (no texto da linha) |
+| 320 | 15 | limiar das marcações no WC14 | 3 | `docs/decisoes.md` | 74 | — | (no texto da linha) |
+| 321 | 30 | limiar das marcações no GSR | 3 | `docs/decisoes.md` | 74 | — | (no texto da linha) |
+| 322 | 180 | simetria de 180° do campo | 3, 7 | `docs/03-plano.md` | 310 | — | (no texto da linha) |
+| 323 | 0,45 | portão: fração explicada | 3 | `config.yaml` | 201 | — | (no texto da linha) |
+| 324 | 0,85 | portão: IoU com o gramado | 3 | `config.yaml` | 202 | — | (no texto da linha) |
+| 325 | 5 | portões logo abaixo do percentil 5 da H_gt | 3 | `config.yaml` | 202 | — | (no texto da linha) |
+| 326 | 12 | janela das âncoras candidatas (±12 frames) | 3 | `config.yaml` | 246 | — | (no texto da linha) |
+| 327 | 2 | vizinhos mínimos da verificação | 3 | `config.yaml` | 249 | — | (no texto da linha) |
+| 328 | 209 | imagens de treino do WC14 | 4 | `docs/02-dados.md` | 35 | — | (no texto da linha) |
+| 329 | 1280 | resolução do WC14 | 4 | `docs/02-dados.md` | 36 | — | (no texto da linha) |
+| 330 | 720 | resolução do WC14 | 4 | `docs/02-dados.md` | 36 | — | (no texto da linha) |
+| 331 | 25 | fps do GSR | 4 | `docs/02-dados.md` | 74 | — | (no texto da linha) |
+| 332 | 1920 | resolução do GSR | 4 | `docs/02-dados.md` | 74 | — | (no texto da linha) |
+| 333 | 1080 | resolução do GSR | 4 | `docs/02-dados.md` | 74 | — | (no texto da linha) |
+| 334 | 57 | clipes de treino do GSR | 4 | `docs/02-dados.md` | 74 | — | (no texto da linha) |
+| 335 | 58 | clipes de validação do GSR | 4 | `docs/02-dados.md` | 75 | — | (no texto da linha) |
+| 336 | 0,8852 | BHITK no GSR, tabela 7 do AuxFlow (conferido por Victor) | 2 | `docs/decisoes.md` | 877 | — | (no texto da linha) |
+| 337 | 0,8851 | NBJW no GSR, tabela 7 do AuxFlow (conferido por Victor) | 2 | `docs/decisoes.md` | 877 | — | (no texto da linha) |
+| 338 | 3 | RANSAC a 3 px da H_gt_auxflow | 4 | `docs/01-metodo.md` | 334 | — | (no texto da linha) |
+| 339 | 10 | clipes do HSB | 4 | `docs/02-dados.md` | 91 | — | (no texto da linha) |
+| 340 | 0 | numeração dos frames a partir de 0 | 4 | `docs/02-dados.md` | 112 | — | (no texto da linha) |
+| 341 | 90 | intervalo "90–0" do SNGS-128 | 4 | `docs/02-dados.md` | 107 | — | (no texto da linha) |
+| 342 | 0 | intervalo "90–0" do SNGS-128 | 4 | `docs/02-dados.md` | 107 | — | (no texto da linha) |
+| 343 | 0,05 | LocSim: exp(ln(0,05)·d²/τ²) | 5 | `docs/01-metodo.md` | 369 | — | (no texto da linha) |
+| 344 | 5 | τ = 5 m | 5 | `docs/01-metodo.md` | 372 | — | (no texto da linha) |
+| 345 | 1 | mAP-LocSim: τ = 1 a 10 m | 5 | `docs/01-metodo.md` | 373 | — | (no texto da linha) |
+| 346 | 10 | mAP-LocSim: τ = 1 a 10 m | 5 | `docs/01-metodo.md` | 373 | — | (no texto da linha) |
+| 347 | 0 | pessoa de frame sem H vale 0 | 5 | `docs/01-metodo.md` | 379 | — | (no texto da linha) |
+| 348 | 95 | intervalo de 95% | 5, 6 | `docs/03-plano.md` | 560 | — | (no texto da linha) |
+| 349 | 2.000 | reamostragens do bootstrap | 5 | `docs/03-plano.md` | 560 | — | (no texto da linha) |
+| 350 | 1.470 | frames da conferência de determinismo | 5, B | `docs/03-plano.md` | 678 | — | (no texto da linha) |
+| 351 | 25 | frames da conferência: 1 a cada 25 | 5, B | `docs/03-plano.md` | 679 | — | (no texto da linha) |
+| 352 | 735 | tarefas da série com a chave congelada | 5, B | `docs/03-plano.md` | 672 | — | (no texto da linha) |
+| 353 | 47 | caches da valid gravados com a chave errada | 5 | `docs/decisoes.md` | 487 | — | (no texto da linha) |
+| 354 | 0 | manifestos com 0 falhas | B | `docs/decisoes.md` | 849 | — | (no texto da linha) |
