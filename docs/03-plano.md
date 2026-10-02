@@ -631,8 +631,38 @@ de gabarito (teto).
      sempre (LocSim@5 0,002 nos 18 clipes), e a verificação não aceita âncora
      nenhuma.
      O detector erra de forma sistemática, e a verificação rejeita tudo.
+     **No test, ao contrário da valid, a causa é o enquadramento, e não a
+     segmentação** (2026-10-02, `outputs/runs/rodada_test/falhas/
+     sem_ancora_x_fatia3.csv`). Nos 5 clipes sem âncora (SNGS-127, 128, 134,
+     138 e 147):
+     - o gramado está normal, e não há sombra;
+     - a cobertura das marcações a 2 px (0,81 a 0,98) fica acima da referência
+       do treino (0,79). Nos dois do jogo 7, fica um pouco abaixo da dos
+       clipes com âncora do mesmo jogo (0,81 e 0,85, contra 0,89), mas com
+       contraste maior;
+     - o contraste das linhas é igual ou maior que nos clipes com âncora do
+       mesmo jogo em quatro dos cinco.
+
+     Quatro são vistas com pouca estrutura de retas: o círculo central e a
+     linha do meio (SNGS-127, 128 e 134) e a zona entre o meio e a área
+     (SNGS-138). O SNGS-147 é a exceção. Ele mostra a grande e a pequena área,
+     oblíquas e comprimidas no alto do quadro. O detector cobre 16% dos frames,
+     e nenhuma das 11 candidatas verificáveis é aceita. É também o único em que
+     a segmentação pode contribuir: tem contraste menor (52% dos pontos
+     anotados acima do limiar, contra 68% nos clipes com âncora do jogo 8) e
+     vazamento do gramado maior.
+
+     **Limitação do método:** o detector gera hipóteses com 2 + 2 retas de duas
+     famílias de paralelas e não fecha a H num quadro sem elas. **Trabalho
+     futuro:** fechar a H com a correspondência entre o círculo central e a
+     elipse, junto com a linha do meio.
   3. deriva da propagação em lacunas longas e nas pontas.
   4. gabarito duvidoso.
+
+- **Inspeção visual** (2026-10-02): as figuras de
+  `outputs/figures/falhas_test/` foram olhadas uma a uma em todos os casos que o
+  relatório cita. São os 6 piores clipes do 6c, as 12 âncoras erradas aceitas,
+  os 5 clipes sem âncora e as 3 lacunas de 4 a 25 frames.
 
 #### 8.7 Demais seções do relatório
 - **Incidente da rodada do test** (2026-10-02, `decisoes.md`): a conferência de
@@ -672,16 +702,27 @@ de gabarito (teto).
     −0,046 no jogo 9, onde o NPE mediano vai de 0,0056 para 0,0130. É o que a
     Fatia 3 viu na segmentação: um limiar global contra o contraste de cada
     jogo. **Trabalho futuro:** um limiar adaptado ao jogo ou ao frame.
-- **Saída e reprodução** (decisão de Victor): o método é o do commit congelado
-  `418a3be` **mais a correção da conferência de fechamento da série no commit
-  `b3bcd98`** (`temporal.py:93`, `a[0]` → `a[0][0]`). Nenhuma saída muda: a chave
-  da série não inclui o `temporal.py`, e as H são as mesmas. Roda com
-  `python -m src.run`. As tabelas do test saem dos
-  scripts versionados em `scripts/rodada_test/`, fora do `src/` para não mudar
-  a impressão digital do código congelado, no commit deles. O hash desse commit
-  vai em cada tabela (colunas `commit_metodo` e `commit_tabelas`), no manifesto
-  dos extras e em `outputs/runs/rodada_test/tabelas/fechamento.json`. O `--all`
-  chama esses scripts no fim.
+- **Saída e reprodução** (decisão de Victor). O código vem de três commits:
+  1. **`418a3be`**: o método congelado;
+  2. **`b3bcd98`**: a correção da conferência de fechamento da série
+     (`temporal.py:93`, `a[0]` → `a[0][0]`);
+  3. **`38512a5`**: o `--all` (`python -m src.run --all`), o caminho inteiro da
+     rodada.
+
+  **Nenhum dos dois últimos muda saídas.** A chave da série não inclui o
+  `temporal.py`, e as H são as mesmas. O `run.py` não entra em nenhuma chave de
+  cache. O teste de fumaça do `--all` (2 clipes do train e 5 imagens do WC14,
+  `outputs/runs/fumaca_all.out`) usou os caches da série e do 6c, com as chaves
+  batendo: 0 tarefas de série, e o fechamento conferiu 2/2 chaves.
+
+  As tabelas do test saem dos scripts versionados em `scripts/rodada_test/`,
+  fora do `src/` para não mudar a impressão digital do código congelado. O hash
+  do commit deles vai:
+  - em cada tabela (colunas `commit_metodo` e `commit_tabelas`);
+  - no manifesto dos extras;
+  - em `outputs/runs/rodada_test/tabelas/fechamento.json`.
+
+  O `--all` chama esses scripts no fim.
 
 ---
 

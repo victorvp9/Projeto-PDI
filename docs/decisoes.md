@@ -866,3 +866,9 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Script das tabelas:** passa a aceitar no cache do 6c a chave congelada ou a do código atual.
   - **Reprodução:** método no `418a3be` mais a correção no `b3bcd98`; tabelas no commit dos scripts.
   | Decisão de Victor.
+- 2026-10-02 | **Rascunho do relatório (`docs/04-relatorio.md`) e números conferidos por script.**
+  - **Números:** `scripts/relatorio/numeros.py` liga cada número do texto à origem (célula de CSV, linha de documento ou conta) e confere o valor arredondado. Confere também a completude: todo número do corpo precisa de origem, exceto identificadores. Gera o `docs/04-relatorio-numeros.md` e o Apêndice A (T1–T9) direto dos CSVs, sem transcrição à mão. O teste do próprio verificador (valor trocado, trecho inexistente, número novo sem origem) foi feito uma vez, à mão.
+  - **Figuras novas** (`scripts/relatorio/figuras.py`, só leitura dos caches): o clipe da curva do HSB foi escolhido por regra fixa (o intervalo mais longo, SNGS-136), e o frame das etapas é do train (SNGS-099 f525), não do test.
+  - **Resultados da rodada versionados:** as tabelas T1–T9, os CSVs da análise de falhas citados e as saídas `tabelas_v2.out` e `analise_falhas.out` entram no git com `git add -f`, porque o arquivo de números aponta para eles e `outputs/runs/` está no `.gitignore`.
+  - **Correção da análise dos clipes sem âncora** (achada ao escrever, com o CSV): a cobertura das marcações nos dois clipes do jogo 7 (0,81 e 0,85) fica um pouco abaixo da dos clipes com âncora do mesmo jogo (0,89), com contraste maior. O SNGS-147 tem contraste menor (52% dos pontos acima do limiar, contra 68%) e vazamento maior; ali a segmentação pode contribuir. A frase anterior ("iguais ou melhores" em tudo) estava forte demais. A conclusão (enquadramento, não segmentação) vale para os outros quatro.
+  | Medição; escolhas minhas, para a revisão de Victor.

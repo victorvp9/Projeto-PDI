@@ -1,0 +1,22 @@
+{
+ "data": "2026-10-02T17:33:53",
+ "particao": "test",
+ "commit_metodo": "418a3be7775cb499e698121a0738e0cd29053613",
+ "commit_tabelas": "355564de53020310e7dd2e3054f97d5e667a322c",
+ "commit_extras": "3ef5292d108b2b8a008c27337ed6fbb95b5bcd21",
+ "tabelas": [
+  "T1.csv",
+  "T1b.csv",
+  "T2.csv",
+  "T3.csv",
+  "T3b.csv",
+  "T4.csv",
+  "T4b.csv",
+  "T5.csv",
+  "T6.csv",
+  "T7.csv",
+  "T8.csv",
+  "T9.csv"
+ ],
+ "reproducao": "método: python -m src.run no commit_metodo; tabelas: scripts/rodada_test no commit_tabelas"
+}

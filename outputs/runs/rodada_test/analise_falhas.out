@@ -1,0 +1,73 @@
+== Item 2. T8 (lacunas do detector: cobertura / NPE mediano)
+   test (49 clipes)
+     lacuna 1-3 | 6a Bassek cob 1.0000 | 6a Bassek NPE 0.0974 | 6a robusto cob 0.9676 | 6a robusto NPE 0.0324 | 6c fluxo cob 0.9429 | 6c fluxo NPE 0.0095 | 6c sem linhas cob 0.9429 | 6c sem linhas NPE 0.0115 | frames 1665
+     lacuna 4-25 | 6a Bassek cob 1.0000 | 6a Bassek NPE 0.8994 | 6a robusto cob 0.9135 | 6a robusto NPE 0.7960 | 6c fluxo cob 0.8858 | 6c fluxo NPE 0.0168 | 6c sem linhas cob 0.8858 | 6c sem linhas NPE 0.0247 | frames 4624
+     lacuna > 25 | 6a Bassek cob 0.0000 | 6a Bassek NPE nan | 6a robusto cob 0.0000 | 6a robusto NPE nan | 6c fluxo cob 0.7332 | 6c fluxo NPE 0.0551 | 6c sem linhas cob 0.7332 | 6c sem linhas NPE 0.0785 | frames 8391
+     lacuna pontas | 6a Bassek cob 0.0000 | 6a Bassek NPE nan | 6a robusto cob 0.0000 | 6a robusto NPE nan | 6c fluxo cob 0.8008 | 6c fluxo NPE 0.1221 | 6c sem linhas cob 0.8008 | 6c sem linhas NPE 0.1355 | frames 3088
+   train[::3] (19 clipes)
+     lacuna 1-3 | 6a Bassek cob 1.0000 | 6a Bassek NPE 0.1487 | 6a robusto cob 0.9778 | 6a robusto NPE 0.0308 | 6c fluxo cob 0.8966 | 6c fluxo NPE 0.0079 | 6c sem linhas cob 0.8966 | 6c sem linhas NPE 0.0101 | frames 812
+     lacuna 4-25 | 6a Bassek cob 1.0000 | 6a Bassek NPE 0.6117 | 6a robusto cob 0.9106 | 6a robusto NPE 0.5069 | 6c fluxo cob 0.9034 | 6c fluxo NPE 0.0101 | 6c sem linhas cob 0.9034 | 6c sem linhas NPE 0.0176 | frames 2484
+     lacuna > 25 | 6a Bassek cob 0.0000 | 6a Bassek NPE nan | 6a robusto cob 0.0000 | 6a robusto NPE nan | 6c fluxo cob 0.8766 | 6c fluxo NPE 0.0217 | 6c sem linhas cob 0.8766 | 6c sem linhas NPE 0.0331 | frames 2731
+     lacuna pontas | 6a Bassek cob 0.0000 | 6a Bassek NPE nan | 6a robusto cob 0.0000 | 6a robusto NPE nan | 6c fluxo cob 0.7158 | 6c fluxo NPE 0.0207 | 6c sem linhas cob 0.7158 | 6c sem linhas NPE 0.0376 | frames 2062
+
+   test: lacunas de 4-25 frames do detector, pela H do detector nas bordas
+   classe                  | lacunas | frames com gabarito | 6a Bassek NPE med, erradas | 6a robusto NPE med, erradas
+   bordas certas           |      99 |                 753 | 0.0242, 26%             | 0.0167, 13%
+   uma borda errada        |     106 |                 958 | 0.3226, 90%             | 0.1332, 70%
+   as duas bordas erradas  |     331 |                2901 | 2.3076, 100%             | 2.5794, 98%
+   borda sem gabarito      |       1 |                  12 | 1.6565, 100%             | 1.6565, 100%
+
+   train[::3]: lacunas de 4-25 frames do detector, pela H do detector nas bordas
+   classe                  | lacunas | frames com gabarito | 6a Bassek NPE med, erradas | 6a robusto NPE med, erradas
+   bordas certas           |      79 |                 600 | 0.0176, 13%             | 0.0141, 7%
+   uma borda errada        |      49 |                 505 | 0.2817, 92%             | 0.1562, 77%
+   as duas bordas erradas  |     142 |                1379 | 3.4001, 100%             | 2.8987, 100%
+   borda sem gabarito      |       0 |                   0 | nan, nan%             | nan, nan%
+
+   conferência do NPE: 30 frames de lacuna refeitos da série guardada (float32); maior diferença relativa 1.86e-04
+   figura outputs\figures\falhas_test\lacuna_SNGS-125_692-706.jpg: classe 'bordas certas'
+   figura outputs\figures\falhas_test\lacuna_SNGS-141_491-514.jpg: classe 'uma borda errada'
+   figura outputs\figures\falhas_test\lacuna_SNGS-121_2-26.jpg: classe 'as duas bordas erradas'
+
+== 8.6. Piores clipes do 6c no test (LocSim@5 penalizado), com âncora
+   clipe     jogo | detector | 6c    | teto  | cobertura 6c | âncoras cand/verif/aceitas/erradas
+   SNGS-149     8 | 0.168    | 0.252 | 0.372 | 1.000        | 8/6/5/0
+   SNGS-119     7 | 0.195    | 0.458 | 0.590 | 1.000        | 24/17/10/0
+   SNGS-143     8 | 0.236    | 0.495 | 0.495 | 1.000        | 14/13/10/0
+   SNGS-144     8 | 0.458    | 0.506 | 0.508 | 1.000        | 19/17/13/0
+   SNGS-148     8 | 0.112    | 0.587 | 0.764 | 1.000        | 14/13/4/1
+   SNGS-126     7 | 0.429    | 0.635 | 0.954 | 1.000        | 23/21/12/1
+
+== 8.6. 6c fluxo: NPE mediano pela distância (frames) à âncora aceita mais próxima
+   detector com H  | <= 25: 0.0059 (14630) | 26-100: 0.0117 (2251) | 101-250: 0.0162 (658) | > 250: 0.0916 (370)
+   lacuna 1-25     | <= 25: 0.0075 (1672) | 26-100: 0.0153 (2093) | 101-250: 0.0201 (1383) | > 250: 0.0910 (518)
+   lacuna > 25     | <= 25: 0.0083 (376) | 26-100: 0.0326 (2499) | 101-250: 0.0764 (2400) | > 250: 0.0898 (877)
+   pontas          | <= 25: 0.0101 (52) | 26-100: 0.0377 (515) | 101-250: 0.1388 (982) | > 250: 0.2079 (924)
+
+== 8.6. Âncoras aceitas erradas (NPE > 0,05) no test
+   SNGS-122 f657  NPE 0.060 | escala/perspectiva errada (comprimento x1.41, largura x1.39) | centro -> (6.1, 1.4), pênaltis -> (-41.9, -0.3) e (70.4, 3.8)
+   SNGS-126 f588  NPE 1.355 | escala/perspectiva errada (comprimento x0.62, largura x6.69) | centro -> (-40.8, -310.7), pênaltis -> (-43.3, -90.4) e (-39.7, -399.7)
+   SNGS-132 f721  NPE 0.063 | escala/perspectiva errada (comprimento x0.98, largura x1.02) | centro -> (0.5, 0.0), pênaltis -> (-40.3, -0.5) e (39.4, 0.5)
+   SNGS-148 f109  NPE 0.066 | escala/perspectiva errada (comprimento x1.31, largura x1.24) | centro -> (4.6, 1.5), pênaltis -> (-41.8, -0.3) e (62.2, 3.8)
+   SNGS-187 f641  NPE 0.078 | escala/perspectiva errada (comprimento x3.89, largura x3.71) | centro -> (-26.1, 1.2), pênaltis -> (-207.8, 3.9) e (41.2, 0.2)
+   SNGS-187 f660  NPE 0.137 | escala/perspectiva errada (comprimento x7.45, largura x6.93) | centro -> (-39.7, 3.3), pênaltis -> (-349.7, 15.2) e (40.5, 0.2)
+   SNGS-190 f431  NPE 0.096 | escala/perspectiva errada (comprimento x4.53, largura x4.08) | centro -> (8.6, 0.6), pênaltis -> (-42.2, -2.3) e (92.2, 5.3)
+   SNGS-190 f454  NPE 0.117 | escala/perspectiva errada (comprimento x6.80, largura x5.49) | centro -> (10.2, -2.7), pênaltis -> (-42.3, -3.0) e (103.6, -2.2)
+   SNGS-190 f468  NPE 0.117 | escala/perspectiva errada (comprimento x8.88, largura x6.91) | centro -> (11.0, -3.2), pênaltis -> (-42.3, -3.0) e (111.2, -3.7)
+   SNGS-190 f503  NPE 0.118 | escala/perspectiva errada (comprimento x3.89, largura x3.41) | centro -> (8.1, -1.4), pênaltis -> (-42.2, -2.4) e (89.2, 0.2)
+   SNGS-190 f525  NPE 0.235 | escala/perspectiva errada (comprimento x2.21, largura x2.15) | centro -> (6.3, -1.1), pênaltis -> (-42.0, 1.2) e (71.4, -4.2)
+   SNGS-190 f555  NPE 0.208 | escala/perspectiva errada (comprimento x2.05, largura x2.02) | centro -> (5.4, -0.9), pênaltis -> (-41.9, 1.4) e (66.6, -3.9)
+
+== 8.6. Clipes sem âncora aceita x limitações da segmentação (Fatia 3); medianas por frame, 1 a cada 75
+   conjunto                       | frames | campo como grama | vazamento | cobertura 2 px | resposta mediana (L*) | acima do limiar 30 | sombra
+   sem âncora: SNGS-127 (jogo 7)  |     10 | 0.995            | 0.000     | 0.809          |  48.5                 | 0.60               | 0.00
+   sem âncora: SNGS-128 (jogo 7)  |     10 | 0.996            | 0.000     | 0.846          |  53.5                 | 0.70               | 0.00
+   sem âncora: SNGS-134 (jogo 8)  |     10 | 0.994            | 0.000     | 0.968          |  72.2                 | 0.78               | 0.00
+   sem âncora: SNGS-138 (jogo 8)  |     10 | 0.988            | 0.000     | 0.977          |  86.0                 | 0.80               | 0.00
+   sem âncora: SNGS-147 (jogo 8)  |     10 | 0.995            | 0.017     | 0.903          |  39.2                 | 0.52               | 0.00
+   com âncora, jogo 7             |    139 | 0.999            | 0.001     | 0.886          |  42.0                 | 0.59               | 0.00
+   com âncora, jogo 8             |    152 | 0.997            | 0.001     | 0.915          |  57.8                 | 0.68               | 0.03
+   com âncora, jogo 11            |    138 | 1.000            | 0.001     | 0.876          |  37.8                 | 0.60               | 0.02
+   referência (Fatia 3, GSR train, 1.697 frames): campo como grama 0,994; cobertura 2 px 0,79 (mediana 0,89); resposta mediana nos pontos 36 / 74 / 81 nos jogos 4 / 6 / 9, fração acima de 30: 0,64 / 0,92 / 0,92
+
+CSVs em outputs\runs\rodada_test\falhas; figuras em outputs\figures\falhas_test
