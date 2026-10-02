@@ -1,0 +1,181 @@
+conjunto,metrica,media,mediana
+GSR test / todos,frames,1470,
+GSR test / todos,frames com H_gt,1433,
+GSR test / todos,cobertura,0.5038381018841591,
+GSR test / todos,iou_whole,0.8780781870042268,0.9381626799319724
+GSR test / todos,iou_part,0.9887703150345568,0.9979782939749315
+GSR test / todos,npe,0.4812398031521503,0.0070215577434941745
+GSR test / todos,re_m,2.6045712033129553,0.21292034825568637
+GSR test / todos,auxflow iou_whole,0.7724670621993248,0.8466651410460915
+GSR test / todos,auxflow iou_part,0.9639783199604659,0.9928214887277751
+GSR test / todos,auxflow npe,0.6713898673834126,0.018175492472904117
+GSR test / todos,auxflow re_m,4.80110219367493,0.6494150950237496
+GSR test / todos,acc@5,0.3877467581549214,
+GSR test / todos,acc@10,0.43328778553268354,
+GSR test / todos,acc@20,0.4487921979758714,
+GSR test / todos,locsim@5,0.8704402653092973,0.975301630613477
+GSR test / todos,locsim@2,0.708938264372199,0.855299944986769
+GSR test / todos,mAP-locsim,0.8234151437953313,
+GSR test / todos,locsim dist (m),2.6923707705344455,0.4568379734700921
+GSR test / todos,locsim@5 penalizado,0.418571457115267,
+GSR test / todos,mAP-locsim penalizado,0.395958333139288,
+GSR test / sem duvidosos,frames,1468,
+GSR test / sem duvidosos,frames com H_gt,1431,
+GSR test / sem duvidosos,cobertura,0.5031446540880503,
+GSR test / sem duvidosos,iou_whole,0.8789440221101323,0.9383239559448844
+GSR test / sem duvidosos,iou_part,0.9892362915748328,0.9979837246057828
+GSR test / sem duvidosos,npe,0.48194044030000466,0.006985595460587035
+GSR test / sem duvidosos,re_m,2.5981235505756572,0.21219575195247892
+GSR test / sem duvidosos,auxflow iou_whole,0.7721905074048889,0.8466651410460915
+GSR test / sem duvidosos,auxflow iou_part,0.9638893369244375,0.9927761537812851
+GSR test / sem duvidosos,auxflow npe,0.6733255631311958,0.018206678539398148
+GSR test / sem duvidosos,auxflow re_m,4.814342448988495,0.6503039336474175
+GSR test / sem duvidosos,acc@5,0.38725322512788457,
+GSR test / sem duvidosos,acc@10,0.4327881776110659,
+GSR test / sem duvidosos,acc@20,0.4483137132319694,
+GSR test / sem duvidosos,locsim@5,0.8701096921536866,0.9750777390352575
+GSR test / sem duvidosos,locsim@2,0.7083461772482246,0.8540735262244644
+GSR test / sem duvidosos,mAP-locsim,0.8230369963697436,
+GSR test / sem duvidosos,locsim dist (m),2.699271200130875,0.4589302147260744
+GSR test / sem duvidosos,locsim@5 penalizado,0.4177844743944372,
+GSR test / sem duvidosos,mAP-locsim penalizado,0.39518244887539467,
+"GSR test, jogo 7 / todos",frames,480,
+"GSR test, jogo 7 / todos",frames com H_gt,475,
+"GSR test, jogo 7 / todos",cobertura,0.4673684210526316,
+"GSR test, jogo 7 / todos",iou_whole,0.8618169101894904,0.9339691402809908
+"GSR test, jogo 7 / todos",iou_part,0.9876155065738867,0.9984138528937254
+"GSR test, jogo 7 / todos",npe,0.39724650945627593,0.008008823559996173
+"GSR test, jogo 7 / todos",re_m,3.666010648205717,0.2508443989060752
+"GSR test, jogo 7 / todos",auxflow iou_whole,0.7418466489125576,0.8187215467783905
+"GSR test, jogo 7 / todos",auxflow iou_part,0.9689471268101686,0.9938842125239837
+"GSR test, jogo 7 / todos",auxflow npe,0.6257787832942658,0.021694201340090147
+"GSR test, jogo 7 / todos",auxflow re_m,4.52969101226581,0.7763800790528994
+"GSR test, jogo 7 / todos",acc@5,0.3687958453583454,
+"GSR test, jogo 7 / todos",acc@10,0.4068748496873497,
+"GSR test, jogo 7 / todos",acc@20,0.4172734788359789,
+"GSR test, jogo 7 / todos",locsim@5,0.8224556919404852,0.9659005031547103
+"GSR test, jogo 7 / todos",locsim@2,0.6398730364353111,0.8050585224633193
+"GSR test, jogo 7 / todos",mAP-locsim,0.7740061341444695,
+"GSR test, jogo 7 / todos",locsim dist (m),4.2917661631941115,0.5380820465881077
+"GSR test, jogo 7 / todos",locsim@5 penalizado,0.34280278428491395,
+"GSR test, jogo 7 / todos",mAP-locsim penalizado,0.3226088170322089,
+"GSR test, jogo 7 / sem duvidosos",frames,480,
+"GSR test, jogo 7 / sem duvidosos",frames com H_gt,475,
+"GSR test, jogo 7 / sem duvidosos",cobertura,0.4673684210526316,
+"GSR test, jogo 7 / sem duvidosos",iou_whole,0.8618169101894904,0.9339691402809908
+"GSR test, jogo 7 / sem duvidosos",iou_part,0.9876155065738867,0.9984138528937254
+"GSR test, jogo 7 / sem duvidosos",npe,0.39724650945627593,0.008008823559996173
+"GSR test, jogo 7 / sem duvidosos",re_m,3.666010648205717,0.2508443989060752
+"GSR test, jogo 7 / sem duvidosos",auxflow iou_whole,0.7418466489125576,0.8187215467783905
+"GSR test, jogo 7 / sem duvidosos",auxflow iou_part,0.9689471268101686,0.9938842125239837
+"GSR test, jogo 7 / sem duvidosos",auxflow npe,0.6257787832942658,0.021694201340090147
+"GSR test, jogo 7 / sem duvidosos",auxflow re_m,4.52969101226581,0.7763800790528994
+"GSR test, jogo 7 / sem duvidosos",acc@5,0.3687958453583454,
+"GSR test, jogo 7 / sem duvidosos",acc@10,0.4068748496873497,
+"GSR test, jogo 7 / sem duvidosos",acc@20,0.4172734788359789,
+"GSR test, jogo 7 / sem duvidosos",locsim@5,0.8224556919404852,0.9659005031547103
+"GSR test, jogo 7 / sem duvidosos",locsim@2,0.6398730364353111,0.8050585224633193
+"GSR test, jogo 7 / sem duvidosos",mAP-locsim,0.7740061341444695,
+"GSR test, jogo 7 / sem duvidosos",locsim dist (m),4.2917661631941115,0.5380820465881077
+"GSR test, jogo 7 / sem duvidosos",locsim@5 penalizado,0.34280278428491395,
+"GSR test, jogo 7 / sem duvidosos",mAP-locsim penalizado,0.3226088170322089,
+"GSR test, jogo 8 / todos",frames,570,
+"GSR test, jogo 8 / todos",frames com H_gt,540,
+"GSR test, jogo 8 / todos",cobertura,0.4537037037037037,
+"GSR test, jogo 8 / todos",iou_whole,0.8471724041125143,0.92194482971182
+"GSR test, jogo 8 / todos",iou_part,0.9832379023841797,0.9982561425426855
+"GSR test, jogo 8 / todos",npe,0.9098999437826257,0.008975010091753905
+"GSR test, jogo 8 / todos",re_m,3.3947066699641093,0.20929020431893133
+"GSR test, jogo 8 / todos",auxflow iou_whole,0.7033095345099046,0.7881897875039844
+"GSR test, jogo 8 / todos",auxflow iou_part,0.9335401202369904,0.9921872781216031
+"GSR test, jogo 8 / todos",auxflow npe,1.3072603106125136,0.02423195433081768
+"GSR test, jogo 8 / todos",auxflow re_m,9.030863818564352,0.7561231028235462
+"GSR test, jogo 8 / todos",acc@5,0.31347605123920913,
+"GSR test, jogo 8 / todos",acc@10,0.35345098858256757,
+"GSR test, jogo 8 / todos",acc@20,0.3756230854915066,
+"GSR test, jogo 8 / todos",locsim@5,0.8286825329975305,0.9697371591882985
+"GSR test, jogo 8 / todos",locsim@2,0.6721394060514962,0.8252541866648446
+"GSR test, jogo 8 / todos",mAP-locsim,0.7848428994765738,
+"GSR test, jogo 8 / todos",locsim dist (m),3.4018866100392824,0.5064088513868861
+"GSR test, jogo 8 / todos",locsim@5 penalizado,0.3629367296891765,
+"GSR test, jogo 8 / todos",mAP-locsim penalizado,0.34373635730614305,
+"GSR test, jogo 8 / sem duvidosos",frames,570,
+"GSR test, jogo 8 / sem duvidosos",frames com H_gt,540,
+"GSR test, jogo 8 / sem duvidosos",cobertura,0.4537037037037037,
+"GSR test, jogo 8 / sem duvidosos",iou_whole,0.8471724041125143,0.92194482971182
+"GSR test, jogo 8 / sem duvidosos",iou_part,0.9832379023841797,0.9982561425426855
+"GSR test, jogo 8 / sem duvidosos",npe,0.9098999437826257,0.008975010091753905
+"GSR test, jogo 8 / sem duvidosos",re_m,3.3947066699641093,0.20929020431893133
+"GSR test, jogo 8 / sem duvidosos",auxflow iou_whole,0.7033095345099046,0.7881897875039844
+"GSR test, jogo 8 / sem duvidosos",auxflow iou_part,0.9335401202369904,0.9921872781216031
+"GSR test, jogo 8 / sem duvidosos",auxflow npe,1.3072603106125136,0.02423195433081768
+"GSR test, jogo 8 / sem duvidosos",auxflow re_m,9.030863818564352,0.7561231028235462
+"GSR test, jogo 8 / sem duvidosos",acc@5,0.31347605123920913,
+"GSR test, jogo 8 / sem duvidosos",acc@10,0.35345098858256757,
+"GSR test, jogo 8 / sem duvidosos",acc@20,0.3756230854915066,
+"GSR test, jogo 8 / sem duvidosos",locsim@5,0.8286825329975305,0.9697371591882985
+"GSR test, jogo 8 / sem duvidosos",locsim@2,0.6721394060514962,0.8252541866648446
+"GSR test, jogo 8 / sem duvidosos",mAP-locsim,0.7848428994765738,
+"GSR test, jogo 8 / sem duvidosos",locsim dist (m),3.4018866100392824,0.5064088513868861
+"GSR test, jogo 8 / sem duvidosos",locsim@5 penalizado,0.3629367296891765,
+"GSR test, jogo 8 / sem duvidosos",mAP-locsim penalizado,0.34373635730614305,
+"GSR test, jogo 11 / todos",frames,420,
+"GSR test, jogo 11 / todos",frames com H_gt,418,
+"GSR test, jogo 11 / todos",cobertura,0.6100478468899522,
+"GSR test, jogo 11 / todos",iou_whole,0.9219288546957602,0.9521660750253164
+"GSR test, jogo 11 / todos",iou_part,0.9950911329859733,0.9976294085209427
+"GSR test, jogo 11 / todos",npe,0.14251343745025874,0.005430181819008073
+"GSR test, jogo 11 / todos",re_m,0.9213447480355997,0.20003585805821528
+"GSR test, jogo 11 / todos",auxflow iou_whole,0.8611040390199112,0.8972228247791472
+"GSR test, jogo 11 / todos",auxflow iou_part,0.9876185441587272,0.9924519843674541
+"GSR test, jogo 11 / todos",auxflow npe,0.14399993599973424,0.014201014160701757
+"GSR test, jogo 11 / todos",auxflow re_m,1.2664130386720538,0.5656724933010026
+"GSR test, jogo 11 / todos",acc@5,0.5102009035937607,
+"GSR test, jogo 11 / todos",acc@10,0.5718239366453651,
+"GSR test, jogo 11 / todos",acc@20,0.5841145296502439,
+"GSR test, jogo 11 / todos",locsim@5,0.9350757027907446,0.9811796828107713
+"GSR test, jogo 11 / todos",locsim@2,0.7840529357993602,0.8880315938000923
+"GSR test, jogo 11 / todos",mAP-locsim,0.8865672210007751,
+"GSR test, jogo 11 / todos",locsim dist (m),1.0625658089634062,0.39819112095887743
+"GSR test, jogo 11 / todos",locsim@5 penalizado,0.5480419417412916,
+"GSR test, jogo 11 / todos",mAP-locsim penalizado,0.5196114280708427,
+"GSR test, jogo 11 / sem duvidosos",frames,418,
+"GSR test, jogo 11 / sem duvidosos",frames com H_gt,416,
+"GSR test, jogo 11 / sem duvidosos",cobertura,0.6081730769230769,
+"GSR test, jogo 11 / sem duvidosos",iou_whole,0.9247395369551875,0.9528833135309883
+"GSR test, jogo 11 / sem duvidosos",iou_part,0.996467199171355,0.9976385352492791
+"GSR test, jogo 11 / sem duvidosos",npe,0.141829666758762,0.00542143999246203
+"GSR test, jogo 11 / sem duvidosos",re_m,0.8896895587810164,0.19901871772563326
+"GSR test, jogo 11 / sem duvidosos",auxflow iou_whole,0.8610498436018331,0.8972228247791472
+"GSR test, jogo 11 / sem duvidosos",auxflow iou_part,0.9875620727728748,0.9923719701145406
+"GSR test, jogo 11 / sem duvidosos",auxflow npe,0.14506913733160867,0.014285826521442878
+"GSR test, jogo 11 / sem duvidosos",auxflow re_m,1.2743079029486901,0.5682719881631566
+"GSR test, jogo 11 / sem duvidosos",acc@5,0.5090535394961232,
+"GSR test, jogo 11 / sem duvidosos",acc@10,0.5707321851460607,
+"GSR test, jogo 11 / sem duvidosos",acc@20,0.5830815848160346,
+"GSR test, jogo 11 / sem duvidosos",locsim@5,0.934723332215063,0.980952454658631
+"GSR test, jogo 11 / sem duvidosos",locsim@2,0.783132566055686,0.886747023087697
+"GSR test, jogo 11 / sem duvidosos",mAP-locsim,0.8860874034766578,
+"GSR test, jogo 11 / sem duvidosos",locsim dist (m),1.0679248517805513,0.4006108223729139
+"GSR test, jogo 11 / sem duvidosos",locsim@5 penalizado,0.5462268533489028,
+"GSR test, jogo 11 / sem duvidosos",mAP-locsim penalizado,0.5178053414438504,
+WC14 test / todos,frames,186,
+WC14 test / todos,frames com H_gt,186,
+WC14 test / todos,cobertura,0.5752688172043011,
+WC14 test / todos,iou_whole,0.8635098695256653,0.9131266960388786
+WC14 test / todos,iou_part,0.986326916857252,0.9946079029829488
+WC14 test / todos,npe,0.3613802041833233,0.011941579969346952
+WC14 test / todos,re_m,1.615112838440006,0.37991867462940904
+WC14 test / todos,acc@5,nan,
+WC14 test / todos,acc@10,nan,
+WC14 test / todos,acc@20,nan,
+WC14 test / sem duvidosos,frames,186,
+WC14 test / sem duvidosos,frames com H_gt,186,
+WC14 test / sem duvidosos,cobertura,0.5752688172043011,
+WC14 test / sem duvidosos,iou_whole,0.8635098695256653,0.9131266960388786
+WC14 test / sem duvidosos,iou_part,0.986326916857252,0.9946079029829488
+WC14 test / sem duvidosos,npe,0.3613802041833233,0.011941579969346952
+WC14 test / sem duvidosos,re_m,1.615112838440006,0.37991867462940904
+WC14 test / sem duvidosos,acc@5,nan,
+WC14 test / sem duvidosos,acc@10,nan,
+WC14 test / sem duvidosos,acc@20,nan,
