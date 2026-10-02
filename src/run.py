@@ -8,7 +8,7 @@ from collections import defaultdict
 import cv2
 import numpy as np
 
-from src.config import CFG, path
+from src.config import CFG, ROOT, path
 from src.executor import SafeProcessPool, exit_if_failed
 from src.evaluate import frame_metrics, image_grid_displacement, summarize
 from src.io import gsr, wc14
@@ -289,12 +289,12 @@ def _print_table(title, table):
             print(f"  {k:16} " + (f"média {v[0]:.4f}  mediana {v[1]:.4f}" if isinstance(v, tuple) else f"{v:.4f}"))
 
 
-def evaluate(name, splits):
+def evaluate(name, splits, clips=None):
     """Tabela de métricas da predição `name` no GSR (com e sem os duvidosos; por jogo se
     for um .npz) e, se o .npz tiver chaves do WC14, no WC14."""
     npz = name not in ("persons", "gt")
     with _pool() as ex:
-        rows = [r for rs in ex.map(_eval_clip, [(c, name) for c in _clips(splits)]) for r in rs]
+        rows = [r for rs in ex.map(_eval_clip, [(c, name) for c in (_clips(splits) if clips is None else clips)]) for r in rs]
         keys = [k.split("/") for k in np.load(name).files if k.startswith("wc14/")] if npz else []
         w = list(ex.map(_eval_wc14, [(name, sp, i) for _, sp, i in keys]))
     tag = os.path.splitext(os.path.basename(name))[0]
@@ -341,21 +341,51 @@ def _detect_wc14(args):
             [dict(variante=v, chave=key, **{k: info.get(k) for k in ("ok", "hipoteses", "podadas", "margem", "img", "iou")}) for v, (_, info) in res.items()])
 
 
-def detect(splits, wc14_split):
-    """Marco da Fatia 5: roda o detector (as variantes do config) no GSR `splits` e no WC14
-    `wc14_split`; grava outputs/pred_<variante>_<conjunto>.npz e outputs/detect_<conjunto>.csv."""
+def detect(splits, wc14_split, clips=None, wc14_limit=None):
+    """Marco da Fatia 5: roda o detector (as variantes do config) no GSR `splits` (ou só em
+    `clips`) e no WC14 `wc14_split` (ou nas `wc14_limit` primeiras imagens); grava
+    outputs/pred_<variante>_<conjunto>.npz e outputs/detect_<conjunto>.csv. Um recorte leva
+    "_recorte" no nome, para não sobrescrever as predições de uma rodada. Devolve {variante: npz}."""
     preds, rows = {}, []
+    clips = _clips(splits) if clips is None else clips
+    ids = wc14.split_ids(wc14_split)[:wc14_limit] if wc14_split else []
     with _pool() as ex:
-        for p_, r_ in list(ex.map(_detect_gsr_clip, _clips(splits))) + \
-                list(ex.map(_detect_wc14, [(wc14_split, i) for i in wc14.split_ids(wc14_split)] if wc14_split else [])):
+        for p_, r_ in list(ex.map(_detect_gsr_clip, clips)) + list(ex.map(_detect_wc14, [(wc14_split, i) for i in ids])):
             for v, d in p_.items():
                 preds.setdefault(v, {}).update(d)
             rows += r_
-    tag = "+".join(splits) + (f"_wc14-{wc14_split}" if wc14_split else "")
+    cut = clips != _clips(splits) or bool(wc14_limit)
+    tag = "+".join(splits) + (f"_wc14-{wc14_split}" if wc14_split else "") + (f"_recorte{len(clips)}c{len(ids)}i" if cut else "")
+    out = {}
     for v, d in preds.items():
-        np.savez_compressed(path("outputs") / f"pred_{v}_{tag}.npz", **d)
-        print(path("outputs") / f"pred_{v}_{tag}.npz")
+        out[v] = path("outputs") / f"pred_{v}_{tag}.npz"
+        np.savez_compressed(out[v], **d)
+        print(out[v])
     _write_csv(path("outputs") / f"detect_{tag}.csv", rows)
+    return out
+
+
+def run_all(clips, splits, wc14_split, wc14_limit=None):
+    """--all: o caminho da rodada do test (03-plano, 8.2), com os caches (série, H_gt, 6c e
+    ECC refazem só se a chave não bater): série do detector, detector no GSR a cada 25 e no
+    WC14 com a avaliação, 6c (com 6a e as ablações), estabilidade e visibilidade (com o
+    Kalman). No test inteiro, chama no fim os scripts versionados das tabelas
+    (scripts/rodada_test: extras e tabelas T1-T9), como na rodada."""
+    import subprocess
+    from src import consequence, temporal
+    print(f"--all: {len(clips)} clipes do GSR ({'+'.join(splits)}); WC14 {wc14_split or '—'}"
+          + (f", {wc14_limit} imagens" if wc14_limit else ""), flush=True)
+    temporal.build_series(_pool, clips)
+    for npz in detect(splits, wc14_split, clips, wc14_limit).values():
+        evaluate(str(npz), splits, clips)
+    temporal.evaluate_6c(_pool, clips)
+    consequence.evaluate_7(_pool, clips)
+    if splits == ["test"] and clips == _clips(["test"]) and wc14_split == "test" and not wc14_limit:
+        env = {**os.environ, "PYTHONPATH": str(ROOT), "PYTHONIOENCODING": "utf-8"}
+        for script, extra in (("extras_test.py", [str(WORKERS)]), ("tabelas_test.py", [])):
+            subprocess.run([sys.executable, "-u", str(ROOT / "scripts" / "rodada_test" / script), *extra], check=True, env=env, cwd=ROOT)
+    else:
+        print("--all num recorte: as tabelas do test (scripts/rodada_test) só rodam no test inteiro")
 
 
 def main():
@@ -377,6 +407,8 @@ def main():
     ap.add_argument("--lines-fp-table", action="store_true", help="Fatia 4: tabela das categorias de falsos positivos (outputs/lines_fp_classes.csv)")
     ap.add_argument("--lines-sweep", action="store_true", help="Fatia 4: grade das retas (escolha no GSR train; WC14 a 3 e 8 px como verificação)")
     ap.add_argument("--lines-sweep-ellipses", action="store_true", help="Fatia 4: grade das elipses (escolha no GSR train; WC14 a 3 e 8 px como verificação)")
+    ap.add_argument("--all", action="store_true", help="o caminho inteiro da rodada (série, detector + WC14, 6c, estabilidade e visibilidade; tabelas do test no fim), com os caches; clipes por --splits/--clips/--clip-step (padrão: todos de --splits)")
+    ap.add_argument("--wc14-limit", type=int, help="--all/--detect: só as N primeiras imagens do --wc14-split (recorte)")
     ap.add_argument("--detect", action="store_true", help="Fatia 5: detector sozinho (variantes do config) no GSR --splits e no WC14 --wc14-split")
     ap.add_argument("--wc14-split", default="train_val", help="partição do WC14 do --detect ('' para pular); o test só na Fatia 8")
     ap.add_argument("--detect-series", action="store_true", help="Fatia 6: série do detector em todos os frames (cache), no --clips ou no subconjunto do config")
@@ -405,7 +437,7 @@ def main():
             or args.segment_variants_calib is not None or args.segment_variants
             or args.lines_fp_sheet or args.lines_fp_table or args.lines_sweep or args.lines_sweep_ellipses or args.detect
             or args.detect_series or args.smooth_eval or args.cut_calib or args.propagate_eval or args.hampel_calib or args.cut_table or args.kalman_calib or args.consequence_eval or args.sensitivity
-            or args.sensitivity_tables or args.confirm):
+            or args.sensitivity_tables or args.confirm or args.all):
         ap.print_help()
     for spec in args.overlay or []:
         overlay(spec)
@@ -414,7 +446,15 @@ def main():
     if args.fit_calibration:
         fit_calibration(args.splits)
     if args.detect:
-        detect(args.splits, args.wc14_split)
+        detect(args.splits, args.wc14_split, wc14_limit=args.wc14_limit)
+    if args.all:
+        if args.clip_step:
+            clips = [c for sp in args.splits for c in sorted((path("gsr") / sp).glob("SNGS-*"))[::args.clip_step]]
+        elif args.clips:
+            clips = [path("gsr") / (c if "/" in c else f"{args.splits[0]}/{c}") for c in args.clips]
+        else:
+            clips = _clips(args.splits)
+        run_all(clips, args.splits, args.wc14_split, args.wc14_limit)
     if args.detect_series or args.smooth_eval or args.cut_calib or args.propagate_eval or args.hampel_calib or args.cut_table or args.kalman_calib or args.consequence_eval:
         from src import temporal
         if args.clip_step:
