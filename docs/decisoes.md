@@ -845,3 +845,10 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Motivo da decisão:** a regra de refazer o test existe para impedir mudança do método depois de ver números do test. Aqui nenhum número foi visto; o defeito está numa conferência de fechamento, não no cálculo; a conferência foi feita por fora com o mesmo critério; e a conferência de determinismo da etapa 2 vai provar de novo, bit a bit, que as séries são as do código congelado.
   - **Depois da rodada, não antes:** a correção `a[0]` → `a[0][0]` vai num commit separado, com um teste que execute o fechamento da série. A reprodução passa a ser "método no `418a3be` mais a correção da conferência"; a correção não muda nenhuma saída, porque a chave da série não inclui o `temporal.py` e as H são as mesmas.
   | Decisão de Victor.
+- 2026-10-02 | **Rodada do test: etapas 2 a 4 e a conferência de determinismo aprovadas.**
+  - **Etapa 2:** 49 clipes do GSR e 186 imagens do WC14, 0 falhas.
+  - **Determinismo:** os 1.470 frames do GSR test a cada 25 saíram **bit a bit iguais** à série da etapa 1, em 49 clipes. O resultado está nos manifestos das duas etapas e no 8.7, como prova de determinismo entre rodadas.
+  - **Etapa 3:** H de gabarito do test com os 49 clipes na chave registrada no congelamento (42 com a comum e 7 com a própria). Os 49 caches da Fatia 2 tinham outra chave, e nenhum foi aproveitado.
+  - **Etapa 4:** avaliação do detector, 49 clipes + 186 imagens, 0 falhas.
+  - **Congelamento:** conferido antes e depois de cada etapa.
+  | Medição.

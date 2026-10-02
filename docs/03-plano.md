@@ -644,6 +644,13 @@ de gabarito (teto).
   conferência e não no cálculo, e a etapa 2 prova bit a bit que as séries são as
   do código congelado. A correção vem depois da rodada, num commit separado, e
   não muda nenhuma saída.
+- **Prova de determinismo entre rodadas** (2026-10-02, `conferencia_det.json` e
+  campo `conferencia_serie` dos manifestos das etapas 1 e 2): nos 1.470 frames do
+  GSR test a cada 25 (49 clipes), a H do detector rodado pelo `--detect` (etapa 2,
+  outro processo e outra hora) saiu **bit a bit igual** à da série da etapa 1
+  (`--detect-series`). O código congelado dá a mesma H em execuções independentes.
+  É também a prova de que as séries do test são as do código congelado, apesar do
+  incidente da conferência de fechamento.
 - **Frames difíceis isolados.** Bassek et al. apontam que o efeito do
   pós-processamento temporal sobre frames com grande zoom nunca foi testado. O
   HSB (T2) reportado à parte é a lacuna declarada que este projeto pode
