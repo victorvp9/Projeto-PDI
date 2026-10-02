@@ -234,3 +234,26 @@ def test_6c_masks_use_the_detector_segment_params():
     v = next(iter(CFG["detector"]["variants"].values()))
     P = params("gsr")
     assert {**P, **v.get("segment", {})} == P
+
+
+def test_build_series_closing_check_runs(tmp_path, monkeypatch):
+    """O fechamento da série (verify_keys do build_series) roda até o fim e grava a chave de
+    cada tarefa no manifesto. Na rodada do test ele quebrava: cada tarefa recebe uma tupla só,
+    (clipe, i0, i1, chave), e a lambda usava a[0] como clipe (decisoes.md, 2026-10-02)."""
+    import json
+    from src import temporal as T
+    from src.executor import SafeThreadPool
+    clip = tmp_path / "test" / "SNGS-999"
+    (clip / "img1").mkdir(parents=True)
+    for i in range(3):
+        (clip / "img1" / f"{i + 1:06d}.jpg").write_bytes(b"")
+    monkeypatch.setattr(T, "_series_path", lambda c: tmp_path / "cache" / f"{c.name}.npz")
+    def series_chunk(args):                                   # o detector trocado por H fixas; o nome vai no manifesto
+        return args[0], [(i, np.eye(3), [1.0] * len(T.SERIES_KEYS)) for i in range(args[1], min(args[2], 3))]
+    monkeypatch.setattr(T, "series_chunk", series_chunk)
+    runs = tmp_path / "runs"
+    out = T.build_series(lambda: SafeThreadPool(2, manifest_dir=runs), [clip])
+    assert out[clip]["H"].shape == (3, 3, 3)
+    (m,) = [json.loads(p.read_text(encoding="utf-8")) for p in runs.glob("*.json")]
+    assert m["status"] == "concluída" and m["chave_rodada"] == T._series_key()
+    assert [t["chave_gravada"] for t in m["tarefas"]] == [T._series_key()]

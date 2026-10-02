@@ -90,7 +90,8 @@ def build_series(pool, clips):
                                 **{k: info[:, j] for j, k in enumerate(SERIES_KEYS)})
             done = sum(1 for v in left.values() if v == 0)
             print(f"   {clip.parent.name}/{clip.name} salvo: {done} de {len(todo)}, {(time.time() - t0) / 60:.0f} min", flush=True)
-        ex.verify_keys(key, lambda a: str(np.load(_series_path(a[0]))["key"]) if _series_path(a[0]).exists() else None)
+        # cada tarefa recebe uma tupla só, (clipe, i0, i1, chave): o clipe é a[0][0] (incidente da rodada do test, decisoes.md 2026-10-02)
+        ex.verify_keys(key, lambda a: str(np.load(_series_path(a[0][0]))["key"]) if _series_path(a[0][0]).exists() else None)
     return {c: dict(np.load(_series_path(c))) for c in clips}
 
 
