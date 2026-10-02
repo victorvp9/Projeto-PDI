@@ -672,8 +672,11 @@ de gabarito (teto).
     −0,046 no jogo 9, onde o NPE mediano vai de 0,0056 para 0,0130. É o que a
     Fatia 3 viu na segmentação: um limiar global contra o contraste de cada
     jogo. **Trabalho futuro:** um limiar adaptado ao jogo ou ao frame.
-- **Saída e reprodução** (decisão de Victor): o método roda no commit
-  congelado (`418a3be`, `python -m src.run`). As tabelas do test saem dos
+- **Saída e reprodução** (decisão de Victor): o método é o do commit congelado
+  `418a3be` **mais a correção da conferência de fechamento da série no commit
+  `b3bcd98`** (`temporal.py:93`, `a[0]` → `a[0][0]`). Nenhuma saída muda: a chave
+  da série não inclui o `temporal.py`, e as H são as mesmas. Roda com
+  `python -m src.run`. As tabelas do test saem dos
   scripts versionados em `scripts/rodada_test/`, fora do `src/` para não mudar
   a impressão digital do código congelado, no commit deles. O hash desse commit
   vai em cada tabela (colunas `commit_metodo` e `commit_tabelas`), no manifesto

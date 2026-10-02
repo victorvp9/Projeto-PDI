@@ -852,3 +852,17 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Etapa 4:** avaliação do detector, 49 clipes + 186 imagens, 0 falhas.
   - **Congelamento:** conferido antes e depois de cada etapa.
   | Medição.
+- 2026-10-02 | **Correção da conferência de fechamento da série** (depois da rodada do test, como decidido). O commit separado `b3bcd98` troca `a[0]` por `a[0][0]` em `src/temporal.py:93` e acrescenta `test_build_series_closing_check_runs`, que executa o fechamento da série: passa com a correção e quebra sem ela, com o mesmo `AttributeError` da rodada. Suíte completa: 92 testes.
+  - **Nenhuma saída muda:** a chave da série não inclui o `temporal.py`, e o cálculo é o mesmo.
+  - **Regravação conferida das chaves que incluem os bytes do `temporal.py`.** Antes da edição, o `src/` estava sem diferença contra o HEAD e todos os caches estavam nas chaves atuais; depois, a única diferença era essa linha. Cada arquivo só foi regravado com a chave antiga exata:
+
+    | cache | chave antiga | chave nova | arquivos |
+    |---|---|---|---|
+    | 6c | `8c9599c7b961` | `e538dfdac3af` | 130: train 23, valid 58, test 49 |
+    | ECC | `a3319c3462ad` | `5569ffe588e7` | 55 |
+    | checkpoints da confirmação | `f207a359faa7` | `5c7f55c99343` | 1.149 |
+
+    As chaves da série e da H de gabarito não mudam.
+  - **Script das tabelas:** passa a aceitar no cache do 6c a chave congelada ou a do código atual.
+  - **Reprodução:** método no `418a3be` mais a correção no `b3bcd98`; tabelas no commit dos scripts.
+  | Decisão de Victor.

@@ -59,7 +59,9 @@ clips = sorted((path("gsr") / SPLIT).glob("SNGS-*"))
 res6 = {}
 for c in clips:
     k, r = pickle.loads(T._eval_6c_path(c).read_bytes())
-    assert k == FROZEN["chaves"]["6c"], f"{c.name}: cache do 6c com outra chave"
+    # a chave congelada (418a3be) ou a do código atual: depois da correção da conferência da série
+    # (temporal.py:93, que não muda saída) a chave do 6c foi regravada com conferência (decisoes.md)
+    assert k in (FROZEN["chaves"]["6c"], T._eval_6c_key()), f"{c.name}: cache do 6c com outra chave"
     res6[c.name] = r
 if DRY:
     extras, cons = {}, None
