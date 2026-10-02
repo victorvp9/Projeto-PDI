@@ -151,8 +151,11 @@ def anc_metric(v, ix):
 
 
 fmt = lambda t: f"{t[0]:.3f} [{t[1]:.3f}; {t[2]:.3f}]"
+NOTE_BOOT = (f"bootstrap com {len(games)} jogos: {__import__('math').comb(2 * len(games) - 1, len(games))} reamostragens distintas; "
+             "o intervalo é praticamente o mínimo e o máximo dos jogos; ver T6")   # nota pedida por Victor (2026-10-02)
 t1 = []
 print(f"\n== T1. GSR test, {len(clips)} clipes, {len(games)} jogos (intervalo de 95% por bootstrap de jogos; com < 5 jogos, ver a T6 ao lado)")
+print(f"   nota: {NOTE_BOOT}")
 print("série                     | cobertura              | NPE med (média) | IoU_whole med | LocSim@5 pen           | nos cobertos           | mAP pen                | pen, clipes com âncora | fração ao teto")
 for v in SERIES:
     m = point[v]
@@ -163,7 +166,7 @@ for v in SERIES:
           f"{fmt(c['locsim_cob'])} | {fmt(c['map_pen'])} | {fmt(an)} | {fmt(fr) if np.isfinite(fr[0]) else '—'}")
     t1.append(dict(serie=v, **{f"{k}": c[k][0] for k in c}, **{f"{k}_lo": c[k][1] for k in c}, **{f"{k}_hi": c[k][2] for k in c},
                    npe_media=m["npe_media"], iou_med=m["iou_med"], locsim_pen_com_ancora=an[0], locsim_pen_com_ancora_lo=an[1],
-                   locsim_pen_com_ancora_hi=an[2], fracao_teto=fr[0], fracao_teto_lo=fr[1], fracao_teto_hi=fr[2]))
+                   locsim_pen_com_ancora_hi=an[2], fracao_teto=fr[0], fracao_teto_lo=fr[1], fracao_teto_hi=fr[2], nota=NOTE_BOOT))
 write("T1", t1)
 
 t6 = []
@@ -211,9 +214,22 @@ if not DRY:
         return rs_variant[lo:hi + 1]                                     # linhas na ordem dos frames do clipe
 
 
+    def coverages(rs):
+        """Cobertura nos frames com H_gt (a coluna original), nos frames com pessoas (a que fecha
+        pen = cob x cobertura nas médias por frame) e por pessoa (fração das pessoas-frame com H,
+        a que fecha pen = cob no agregado por pessoa-frame); e o LocSim por pessoa-frame."""
+        wp = [r for r in rs if r.get("n_pessoas")]
+        ls = lambda r: float(locsim(r["locsim_d"], 5).sum()) if "locsim_d" in r else 0.0
+        n_all, n_cov = sum(r["n_pessoas"] for r in wp), sum(r["n_pessoas"] for r in wp if r["has_pred"])
+        return dict(cov_gt=np.mean([r["has_pred"] for r in rs if r["has_gt"]]) if any(r["has_gt"] for r in rs) else np.nan,
+                    cov_fr=np.mean([r["has_pred"] for r in wp]), cov_ps=n_cov / n_all,
+                    pen_ps=sum(ls(r) for r in wp) / n_all, cob_ps=sum(ls(r) for r in wp if r["has_pred"]) / n_cov if n_cov else np.nan)
+
     t2, pooled = [], defaultdict(lambda: ([], [], [], []))
-    print("\n== T2. HSB: 10 clipes do test, LocSim@5 por frame (%), penalizado e só nos cobertos; cobertura")
-    print("clipe    intervalo | NBJW (tab. 3) | (1) só propagação: pen / cob / cobertura | (2) detector | (3) pipeline (6c)")
+    print("\n== T2. HSB: 10 clipes do test, LocSim@5 por frame (%), penalizado / só nos cobertos; cobertura nos frames com H_gt / "
+          "nos frames com pessoas / por pessoa. Confere: pen = cob x cobertura nos frames com pessoas (médias por frame) e, "
+          "no agregado por pessoa-frame, pen = cob x cobertura por pessoa")
+    print("clipe    intervalo | NBJW (tab. 3) | (1) só propagação | (2) detector | (3) pipeline (6c)")
     for c, h in hsb_csv.items():
         a, b = int(h["inicio"]), int(h["fim"])
         rs6 = res6[c][0]
@@ -226,22 +242,32 @@ if not DRY:
                 cells.append("sem H_gt_auxflow no frame inicial")
                 continue
             pen, cob = per_frame(rs)
-            cov = np.mean([r["has_pred"] for r in rs if r["has_gt"]]) if any(r["has_gt"] for r in rs) else np.nan
+            cv = coverages(rs)
+            cob_m = np.nanmean(cob) if np.isfinite(cob).any() else 0.0
+            assert abs(np.mean(pen) - cob_m * cv["cov_fr"]) < 1e-9, (c, k, "pen != cob x cobertura nos frames com pessoas")
+            assert not np.isfinite(cv["cob_ps"]) or abs(cv["pen_ps"] - cv["cob_ps"] * cv["cov_ps"]) < 1e-9, (c, k, "identidade por pessoa")
             for i, x in enumerate((pen, cob)):
                 pooled[k][i].extend(x)
-            pooled[k][2].append(cov)
+            pooled[k][2].extend(rs)
             pooled[k][3].extend([r["has_pred"] for r in rs if r["has_gt"]])
-            cells.append(f"{100 * np.mean(pen):5.1f} / {100 * np.nanmean(cob) if np.isfinite(cob).any() else np.nan:5.1f} / {cov:.2f}")
-            rec |= {f"{k} pen média": np.mean(pen), f"{k} cob média": np.nanmean(cob) if np.isfinite(cob).any() else np.nan, f"{k} cobertura": cov}
+            cells.append(f"{100 * np.mean(pen):5.1f} / {100 * np.nanmean(cob) if np.isfinite(cob).any() else np.nan:5.1f}; "
+                         f"{cv['cov_gt']:.2f} / {cv['cov_fr']:.2f} / {cv['cov_ps']:.2f}")
+            rec |= {f"{k} pen média": np.mean(pen), f"{k} cob média": np.nanmean(cob) if np.isfinite(cob).any() else np.nan,
+                    f"{k} cobertura": cv["cov_gt"], f"{k} cobertura frames com pessoas": cv["cov_fr"], f"{k} cobertura por pessoa": cv["cov_ps"],
+                    f"{k} pen por pessoa-frame": cv["pen_ps"], f"{k} cob por pessoa-frame": cv["cob_ps"]}
         print(f"{c} {a:4}-{b:<4} | {100 * float(h['locsim5_nbjw']):5.1f}         | " + " | ".join(cells))
         t2.append(rec)
     print("todos os frames do HSB (média / mediana por frame, %):")
-    for k, (pen, cob, _, hp) in pooled.items():
+    for k, (pen, cob, rs_all, hp) in pooled.items():
         pen, cob = np.array(pen), np.array(cob)
+        cv = coverages(rs_all)
         print(f"   {k:18} pen {100 * pen.mean():5.1f} / {100 * np.median(pen):5.1f} | cob {100 * np.nanmean(cob):5.1f} / {100 * np.nanmedian(cob):5.1f} | "
-              f"cobertura {np.mean(hp):.3f} | frames com pessoas {len(pen)}")
+              f"cobertura {np.mean(hp):.3f} (frames com H_gt) / {cv['cov_fr']:.3f} (frames com pessoas) / {cv['cov_ps']:.3f} (por pessoa) | "
+              f"por pessoa-frame: pen {100 * cv['pen_ps']:5.1f}, cob {100 * cv['cob_ps']:5.1f} | frames com pessoas {len(pen)}")
         t2.append(dict(clipe="todos", **{f"{k} pen média": pen.mean(), f"{k} pen mediana": np.median(pen), f"{k} cob média": np.nanmean(cob),
-                                         f"{k} cob mediana": np.nanmedian(cob), f"{k} cobertura": np.mean(hp)}))
+                                         f"{k} cob mediana": np.nanmedian(cob), f"{k} cobertura": np.mean(hp),
+                                         f"{k} cobertura frames com pessoas": cv["cov_fr"], f"{k} cobertura por pessoa": cv["cov_ps"],
+                                         f"{k} pen por pessoa-frame": cv["pen_ps"], f"{k} cob por pessoa-frame": cv["cob_ps"]}))
     print(f"   AuxFlow, tabela 4 (média / mediana, %): NBJW {AUXFLOW_T4['NBJW']}, AuxFlow {AUXFLOW_T4['AuxFlow']}; "
           "a medição (1) começa da H_gt_auxflow (RANSAC nas pessoas) e é o análogo da tabela 4")
     write("T2", t2)
@@ -267,13 +293,20 @@ if not DRY:
         v = tw[k]
         print(f"   {k:10} " + (f"média {v[0]:.4f}  mediana {v[1]:.4f}" if isinstance(v, tuple) else f"{v:.4f}"))
     write("T3", t3)
-    print(f"\n== T3b. WC14 test no protocolo KpSFR (src/eval_kpsfr.py sem mudança; molde 100 x 60 m declarado), nas {len(kp)} imagens com H "
-          f"(cobertura {len(kp) / len(ids):.3f})")
+    NOTE_KP = (f"ATENÇÃO: protocolo KpSFR aplicado só nas {len(kp)} de {len(ids)} imagens com H (cobertura {len(kp) / len(ids):.3f}); "
+               "a literatura reporta esse protocolo sobre todas as imagens")
+    print(f"\n== T3b. WC14 test no protocolo KpSFR (src/eval_kpsfr.py sem mudança; molde 100 x 60 m declarado)")
+    print(f"   *** {NOTE_KP} ***")
     t3b = []
     for k in ("iou_part", "iou_whole", "proj_error_m", "reproj_error"):
         v = np.array([x[k] for x in kp], float)
         print(f"   {k:13} média {np.nanmean(v):.4f}  mediana {np.nanmedian(v):.4f}")
-        t3b.append(dict(metrica=k, media=np.nanmean(v), mediana=np.nanmedian(v), imagens=len(kp), cobertura=len(kp) / len(ids)))
+        t3b.append(dict(metrica=k, media=np.nanmean(v), mediana=np.nanmedian(v), imagens=len(kp), cobertura=len(kp) / len(ids), nota=NOTE_KP))
+    for k in ("iou_part", "iou_whole"):                                # nossa convenção: imagem sem H vale 0 (IoU 0)
+        v = np.r_[np.array([x[k] for x in kp], float), np.zeros(len(ids) - len(kp))]
+        print(f"   {k:13} média {np.nanmean(v):.4f}  mediana {np.nanmedian(v):.4f}   [nossa convenção: as {len(ids) - len(kp)} imagens sem H valem 0; {len(ids)} imagens]")
+        t3b.append(dict(metrica=f"{k} (nossa convenção: imagem sem H vale 0)", media=np.nanmean(v), mediana=np.nanmedian(v), imagens=len(ids),
+                        cobertura=len(kp) / len(ids), nota="nossa convenção: imagem sem H vale 0 (IoU 0); os erros não têm valor para imagem sem H"))
     write("T3b", t3b)
 
     # ---------------------------------------------------------------- T4 e T4b
@@ -325,6 +358,7 @@ if not DRY:
 # ---------------------------------------------------------------- T5
 print("\n== T5. Comparação com a tabela 7 do AuxFlow (LocSim@5). O deles não tem frame sem H; o nosso é agregado sobre pessoas-frame,")
 print("   penalizado (pessoa de frame sem H vale 0); agregar por frame quase não muda a média (conferência de 2026-09-25)")
+print(f"   nota: {NOTE_BOOT}")
 gain = ci(lambda mm: mm["6c fluxo"]["locsim_pen"] - mm["detector"]["locsim_pen"])
 gain_cob = ci(lambda mm: mm["6c fluxo"]["locsim_cob"] - mm["detector"]["locsim_cob"])
 cm = {v: metrics(A[v], np.nonzero(common)[0]) for v in ("detector", "6c fluxo")}
@@ -333,9 +367,9 @@ t5 = [dict(linha="NBJW (AuxFlow, tab. 7)", locsim5=AUXFLOW_T7["NBJW"]), dict(lin
 for v in ("detector", "6c fluxo"):
     p, cb = ci(lambda mm, v=v: mm[v]["locsim_pen"]), ci(lambda mm, v=v: mm[v]["locsim_cob"])
     print(f"   nosso {v:9}: penalizado {fmt(p)} | nos cobertos {fmt(cb)} | conjunto comum {cm[v]['locsim_cob']:.3f}")
-    t5.append(dict(linha=f"nosso {v}", pen=p[0], pen_lo=p[1], pen_hi=p[2], cob=cb[0], cob_lo=cb[1], cob_hi=cb[2], comum=cm[v]["locsim_cob"]))
+    t5.append(dict(linha=f"nosso {v}", pen=p[0], pen_lo=p[1], pen_hi=p[2], cob=cb[0], cob_lo=cb[1], cob_hi=cb[2], comum=cm[v]["locsim_cob"], nota=NOTE_BOOT))
 print(f"   ganho 6c - detector: penalizado {fmt(gain)} | nos cobertos {fmt(gain_cob)} | AuxFlow - NBJW: {AUXFLOW_T7['AuxFlow'] - AUXFLOW_T7['NBJW']:+.3f}")
-t5.append(dict(linha="ganho 6c - detector", pen=gain[0], pen_lo=gain[1], pen_hi=gain[2], cob=gain_cob[0], cob_lo=gain_cob[1], cob_hi=gain_cob[2]))
+t5.append(dict(linha="ganho 6c - detector", pen=gain[0], pen_lo=gain[1], pen_hi=gain[2], cob=gain_cob[0], cob_lo=gain_cob[1], cob_hi=gain_cob[2], nota=NOTE_BOOT))
 write("T5", t5)
 
 # ---------------------------------------------------------------- T7 e T8
