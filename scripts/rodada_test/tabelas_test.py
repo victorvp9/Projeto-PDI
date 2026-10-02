@@ -66,7 +66,10 @@ if DRY:
     SERIES = [v for v in SERIES if v != "Kalman + RTS"]
 else:
     ext = pickle.loads((OUT / "extras_test.pkl").read_bytes())
-    assert ext["commit_scripts"] == COMMIT_T, "extras de outro commit dos scripts"
+    COMMIT_EXTRAS = ext["commit_scripts"]                           # os extras valem se o extras_test.py não mudou desde o commit deles
+    assert COMMIT_EXTRAS == COMMIT_T or __import__("subprocess").run(
+        ["git", "diff", "--quiet", COMMIT_EXTRAS, "HEAD", "--", "scripts/rodada_test/extras_test.py"]).returncode == 0, \
+        "extras de um commit em que o extras_test.py era diferente"
     extras = {e["clip"]: e for e in ext["res"]}
     cons = pickle.loads((OUT / "consequencia_test.pkl").read_bytes())
     assert set(res6) == set(extras) == set(cons["clipes"]) and len(res6) == 49
@@ -425,7 +428,7 @@ if not DRY:
     write("T9", t9 + [dict(etapa=f"AuxFlow {n}", lote=l, s_por_clipe=s, fps=f) for n, l, s, f in AUXFLOW_T6])
 (TAB / "fechamento.json").write_text(json.dumps(dict(
     data=__import__("datetime").datetime.now().isoformat(timespec="seconds"), particao=SPLIT, commit_metodo=FROZEN["commit"],
-    commit_tabelas=COMMIT_T, tabelas=sorted(p.name for p in TAB.glob("*.csv")),
+    commit_tabelas=COMMIT_T, commit_extras=None if DRY else COMMIT_EXTRAS, tabelas=sorted(p.name for p in TAB.glob("*.csv")),
     reproducao="método: python -m src.run no commit_metodo; tabelas: scripts/rodada_test no commit_tabelas"),
     ensure_ascii=False, indent=1), encoding="utf-8")
 print(f"commit do método {FROZEN['commit'][:12]}; commit dos scripts das tabelas {COMMIT_T[:12]}")
