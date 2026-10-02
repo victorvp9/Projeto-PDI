@@ -828,3 +828,20 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Commit dos scripts:** passa a ser `be247d07f19b89caad67998b34c9f8ad98f3a4b1`, o hash que as tabelas vão gravar; o `src/` e o config continuam iguais ao `418a3be`.
   - **Se tudo bater,** vai para o 8.7 como prova de determinismo entre rodadas.
   | Regra de Victor.
+- 2026-10-02 | **Incidente da rodada do test, etapa 1: a conferência de fechamento da série quebrou** (decisão de Victor: opção B).
+  - **O defeito:** a série terminou (735/735 tarefas, 0 falhas, 49 clipes gravados, congelamento conferido antes e depois), mas o `ex.verify_keys` do `build_series` quebrou na linha `src/temporal.py:93` com `AttributeError: 'tuple' object has no attribute 'parent'`. Cada tarefa da série recebe um único argumento, a tupla `(clipe, i0, i1, chave)`, e a lambda usa `a[0]` como clipe; o certo é `a[0][0]`. Essa conferência entrou na Fatia 7, depois das séries do train e da valid, e nunca tinha rodado (nenhum manifesto da série tinha `chave_rodada`). O processo saiu com código 1, e a rodada parou pela regra. Nenhum número do test tinha sido visto: a avaliação é a etapa 4.
+  - **Nada foi corrigido durante a rodada.** O `src/` continua igual ao `418a3be`.
+  - **Depois da linha 93:** o `build_series` só fecha o pool e devolve um dicionário que o `run.py` descarta. Os caches são gravados clipe a clipe dentro do laço, e não há índice, resumo nem marcador, então nada faltou para as etapas seguintes.
+  - **Conferência externa** (`scripts/rodada_test/fechamento_serie.py`, commit dos scripts `3ef5292`):
+    - mesmo critério do `verify_keys`, por tarefa: a chave gravada no cache do clipe tem que ser a da rodada (`932cc12c3b78`, a congelada);
+    - resultado: 735/735 iguais, em 49 clipes de 750 frames;
+    - gravada no manifesto da etapa 1 como o `verify_keys` gravaria (`chave_rodada`, `chave_gravada` por tarefa) e no campo `fechamento`, com a nota "feita por fora, mesmo critério, por defeito na linha temporal.py:93";
+    - a etapa 1 foi marcada como feita.
+  - **As outras conferências das etapas 2 a 6 e do fechamento** (`scripts/rodada_test/checa_leituras.py`): testadas sem executar as etapas, com os argumentos reais do test e as lambdas extraídas do próprio `src/`. Todas passam.
+    - O `verify_keys` do 6c (`temporal.py:723`) e o do ECC (`consequence.py:102`) já tinham rodado até o fim em rodadas reais (30/09) e passam com os argumentos do test.
+    - O `--detect` e o `--evaluate` não têm conferência de chave.
+    - As conferências dos scripts da rodada passam.
+    - Na primeira execução do teste, duas quebras foram do próprio script de teste, e não das funções testadas: a lambda do 6c depende do `import pickle` local do `evaluate_6c`, e o teste do `hgt_test` recebia a tupla no lugar do clipe. Foram corrigidas no teste, e tudo passou.
+  - **Motivo da decisão:** a regra de refazer o test existe para impedir mudança do método depois de ver números do test. Aqui nenhum número foi visto; o defeito está numa conferência de fechamento, não no cálculo; a conferência foi feita por fora com o mesmo critério; e a conferência de determinismo da etapa 2 vai provar de novo, bit a bit, que as séries são as do código congelado.
+  - **Depois da rodada, não antes:** a correção `a[0]` → `a[0][0]` vai num commit separado, com um teste que execute o fechamento da série. A reprodução passa a ser "método no `418a3be` mais a correção da conferência"; a correção não muda nenhuma saída, porque a chave da série não inclui o `temporal.py` e as H são as mesmas.
+  | Decisão de Victor.

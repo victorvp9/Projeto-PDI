@@ -635,6 +635,15 @@ de gabarito (teto).
   4. gabarito duvidoso.
 
 #### 8.7 Demais seções do relatório
+- **Incidente da rodada do test** (2026-10-02, `decisoes.md`): a conferência de
+  fechamento da série (`ex.verify_keys` em `src/temporal.py:93`) quebrou depois
+  de a série terminar, porque a lambda usa `a[0]`, que é a tupla da tarefa, e não
+  o clipe. Nada foi corrigido durante a rodada. A conferência foi feita por fora,
+  com o mesmo critério: 735/735 chaves iguais à congelada. A rodada seguiu da
+  etapa 2. Motivo: nenhum número do test tinha sido visto, o defeito está numa
+  conferência e não no cálculo, e a etapa 2 prova bit a bit que as séries são as
+  do código congelado. A correção vem depois da rodada, num commit separado, e
+  não muda nenhuma saída.
 - **Frames difíceis isolados.** Bassek et al. apontam que o efeito do
   pós-processamento temporal sobre frames com grande zoom nunca foi testado. O
   HSB (T2) reportado à parte é a lacuna declarada que este projeto pode
