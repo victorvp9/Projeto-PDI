@@ -455,6 +455,38 @@ O Apêndice A (tabelas T1 a T9) é gerado pelo mesmo script a partir de `outputs
 | 447 | 24,5 | B2, HSB, 6a robusto: pen_media | 6 | `outputs/runs/rodada_test/pos_rodada/B2.csv` | 43 | pen_media × 100 | 0.24468732504909463 |
 | 448 | 0,0 | B2, HSB, 6a robusto: pen_mediana | 6 | `outputs/runs/rodada_test/pos_rodada/B2.csv` | 43 | pen_mediana × 100 | 0.0 |
 | 449 | 0,371 | B2, HSB, 6a robusto: cob_fr | 6 | `outputs/runs/rodada_test/pos_rodada/B2.csv` | 43 | cob_fr | 0.37142857142857144 |
-| 450 | 960 | escala da acurácia contra as linhas (960 × 540) | 5 | `config.yaml` | 62 | — | (no texto da linha) |
-| 451 | 540 | escala da acurácia contra as linhas (960 × 540) | 5 | `config.yaml` | 62 | — | (no texto da linha) |
-| 452 | 20 | limiares da acurácia (5, 10, 20 px) | 5, 6 | `config.yaml` | 63 | — | (no texto da linha) |
+| 450 | 5 | B5, protocolo: ruído σ = 5 | 6, B | `docs/decisoes.md` | 904 | — | (no texto da linha) |
+| 451 | 10 | B5, protocolo: ruído σ = 10 | 6, B | `docs/decisoes.md` | 904 | — | (no texto da linha) |
+| 452 | 20 | B5, protocolo: ruído σ = 20 | 6, B | `docs/decisoes.md` | 904 | — | (no texto da linha) |
+| 453 | 11 | B5, protocolo: núcleo do borrão de 11 px | 6, B | `docs/decisoes.md` | 905 | — | (no texto da linha) |
+| 454 | 21 | B5, protocolo: núcleo do borrão de 21 px | 6, B | `docs/decisoes.md` | 905 | — | (no texto da linha) |
+| 455 | 0,7 | B5, protocolo: sombra: L* × 0,7 | 6, B | `docs/decisoes.md` | 906 | — | (no texto da linha) |
+| 456 | 0,5 | B5, protocolo: sombra: L* × 0,5 | 6, B | `docs/decisoes.md` | 906 | — | (no texto da linha) |
+| 457 | 0,35 | B5, protocolo: sombra: L* × 0,35 | 6, B | `docs/decisoes.md` | 906 | — | (no texto da linha) |
+| 458 | 0,05 | B5, protocolo: sombra: rampa de 0,05·h | 6, B | `docs/decisoes.md` | 906 | — | (no texto da linha) |
+| 459 | 0,6 | B5, protocolo: oclusão: elipse de 0,6 m de largura | 6, B | `docs/decisoes.md` | 907 | — | (no texto da linha) |
+| 460 | 1,8 | B5, protocolo: oclusão: elipse de 1,8 m de altura | 6, B | `docs/decisoes.md` | 907 | — | (no texto da linha) |
+| 461 | 0,8 | B5, protocolo: aceita errada: IoU do campo inteiro < 0,8 | 6, B | `docs/decisoes.md` | 908 | — | (no texto da linha) |
+| 462 | 209 | B5, protocolo: imagens do WC14 train_val | 6, B | `docs/decisoes.md` | 902 | — | (no texto da linha) |
+| 463 | 0,9861 | B5: IoU do gramado na imagem limpa | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 2 | gramado_iou | 0.9861109669697167 |
+| 464 | 0,612 | B5: cobertura das marcações a 2 px, limpa | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 2 | marcas_cob2 | 0.6116499441208049 |
+| 465 | 0,517 | B5: cobertura do detector, limpa | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 2 | det_cobertura | 0.5167464114832536 |
+| 466 | 0,102 | B5: aceitas erradas, limpa | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 2 | det_aceitas_erradas | 0.10185185185185185 |
+| 467 | 0,708 | B5: IoU do gramado, ruído σ = 10 | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 4 | gramado_iou | 0.7081201491899404 |
+| 468 | 0,244 | B5: cobertura do detector, ruído σ = 10 | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 4 | det_cobertura | 0.24401913875598086 |
+| 469 | 0,004 | B5: IoU do gramado, ruído σ = 20 | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 5 | gramado_iou | 0.004165937081813937 |
+| 470 | 0,000 | B5: cobertura do detector, ruído σ = 20 (nenhuma imagem) | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 5 | det_cobertura | 0.0 |
+| 471 | 0,543 | B5: cobertura das marcações, borrão de 11 px | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 7 | marcas_cob2 | 0.5432420429051623 |
+| 472 | 0,077 | B5: cobertura do detector, borrão de 21 px | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 8 | det_cobertura | 0.07655502392344497 |
+| 473 | 0,375 | B5: aceitas erradas, borrão de 21 px | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 8 | det_aceitas_erradas | 0.375 |
+| 474 | 0,526 | B5: cobertura das marcações, sombra L* × 0,5 | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 10 | marcas_cob2 | 0.5262829077424046 |
+| 475 | 0,969 | B5: IoU do gramado, sombra L* × 0,35 | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 11 | gramado_iou | 0.9692651972516488 |
+| 476 | 0,533 | B5: cobertura das marcações, oclusão de 20% | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 14 | marcas_cob2 | 0.5333991581010133 |
+| 477 | 0,478 | B5: cobertura do detector, oclusão de 20% | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 14 | det_cobertura | 0.4784688995215311 |
+| 478 | 0,889 | B5: menor IoU do campo inteiro mediano entre os níveis com resposta (borrão de 21 px) | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 8 | det_iou_mediano | 0.8894947602438756 |
+| 479 | 0,930 | B5: maior IoU do campo inteiro mediano entre os níveis com resposta (ruído σ = 5) | 6 | `outputs/runs/rodada_test/pos_rodada/B5.csv` | 3 | det_iou_mediano | 0.9302916877530989 |
+| 480 | 16 | B5: imagens aceitas com o borrão de 21 px (0,077 × 209) | 6 | `derivado: cobertura × 209` | — | — | 16 |
+| 481 | 10 | B5: queda de mais de 10% em relação à imagem limpa ("quebra") | 6 | `docs/decisoes.md` | 909 | — | (no texto da linha) |
+| 482 | 960 | escala da acurácia contra as linhas (960 × 540) | 5 | `config.yaml` | 62 | — | (no texto da linha) |
+| 483 | 540 | escala da acurácia contra as linhas (960 × 540) | 5 | `config.yaml` | 62 | — | (no texto da linha) |
+| 484 | 20 | limiares da acurácia (5, 10, 20 px) | 5, 6 | `config.yaml` | 63 | — | (no texto da linha) |

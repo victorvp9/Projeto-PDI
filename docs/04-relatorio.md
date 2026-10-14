@@ -116,7 +116,7 @@ As ablações da propagação isolam cada componente: **propagação sem fluxo**
 
 **Congelamento e rodada única.** Antes da rodada, o código e o config foram congelados num commit, com o SHA-1 do config e as chaves de cache registradas; cada etapa da rodada conferiu esse congelamento antes e depois. Valia a regra de que nenhum parâmetro muda depois de ver um número do test, e de que um defeito no meio obriga a refazer o test inteiro, declarando a segunda rodada. Houve uma rodada só. O determinismo foi conferido entre execuções independentes: nos 1.470 frames do GSR test a cada 25, a homografia do detector rodado numa etapa saiu bit a bit igual à da série gerada noutra etapa, outro processo e outra hora. **Houve um incidente:** a conferência de fechamento da série (`temporal.py:93`) quebrou depois que a série terminou, porque passava a tupla da tarefa no lugar do clipe. Nada foi corrigido durante a rodada. A conferência foi feita por fora, com o mesmo critério (735/735 chaves iguais à congelada), e a rodada seguiu. Não houve segunda rodada porque nenhum número do test tinha sido visto, o defeito estava numa conferência e não no cálculo, e a prova bit a bit da etapa seguinte confirmou que as séries eram as do código congelado. A correção veio depois, num commit separado, e não muda nenhuma saída (Apêndice B).
 
-**Análises posteriores à rodada.** Depois de uma revisão externa do texto, quatro medidas foram acrescentadas: o LocSim das homografias de gabarito como predição, a suavização S-G no HSB, a acurácia contra as linhas anotadas e o teto do sistema. Todas saem dos caches da rodada, por um script fora do código congelado, chamando as funções dele sem mudança, e nenhum parâmetro mudou (Apêndice B).
+**Análises posteriores à rodada.** Depois de uma revisão externa do texto, cinco medidas foram acrescentadas: o LocSim das homografias de gabarito como predição, a suavização S-G no HSB, a acurácia contra as linhas anotadas, o teto do sistema e a robustez do detector a degradações sintéticas, esta só no WC14 de treino. Todas saem dos caches da rodada, por um script fora do código congelado, chamando as funções dele sem mudança, e nenhum parâmetro mudou (Apêndice B).
 
 **Lição de método.** As conferências da sensibilidade e da rodada de validação acharam defeitos silenciosos antes do congelamento (lista no Apêndice B). A lição geral: estado derivado precisa de chave completa, o gabarito se carrega fora de qualquer perturbação, e uma variação exatamente nula pede prova de que o parâmetro é lido.
 
@@ -273,6 +273,19 @@ O hardware foi um AMD Ryzen 7 5700X (8 núcleos, 16 threads) com uma RTX 5060. O
 
 **Máquina inteira contra máquina inteira, só a série do detector leva mais que o dobro do AuxFlow inteiro (630 s contra 292 s por clipe).** O pipeline é viável offline e roda sem GPU, mas não é leve: quase todo o custo é o detector, que precisa rodar em todo frame para escolher as âncoras.
 
+## 6.9 Robustez a degradações
+
+Análise posterior à rodada, no WC14 de treino (209 imagens), nunca no test. Cada degradação sintética foi aplicada sozinha à imagem original, em três níveis, e cada etapa foi medida com as funções de avaliação da calibração (protocolo no Apêndice B; tabela completa na T11, no Apêndice A). A etapa que "quebra primeiro" é, no menor nível em que alguma medida cai mais de 10% em relação à imagem limpa, a primeira na ordem do pipeline (Figura 8). Na imagem limpa, o gramado tem IoU de 0,9861, a cobertura das marcações a 2 px é 0,612 e o detector cobre 0,517 das imagens.
+
+- **Ruído gaussiano:** quebra primeiro o gramado, em σ = 10 (IoU de 0,708), e o detector cobre 0,244 das imagens. Em σ = 20, o gramado desaparece (IoU de 0,004), e o detector não responde em nenhuma imagem.
+- **Borrão de movimento horizontal:** quebra primeiro a cobertura das marcações, com núcleo de 11 px (0,543). Com 21 px, o detector responde em 0,077 das imagens. O gramado não muda.
+- **Sombra sintética:** quebra primeiro a cobertura das marcações, com o L\* multiplicado por 0,5 (0,526). O gramado por matiz quase não muda (IoU de 0,969 com o L\* × 0,35), porque escurecer não muda o matiz. A sombra real do jogo 3 da validação também tira croma, o que esta sombra sintética não reproduz.
+- **Oclusão por elipses do tamanho de jogadores:** só com 20% do gramado coberto uma medida passa do limite, de novo a cobertura das marcações (0,533); a cobertura do detector cai para 0,478.
+
+**Fora do ruído, o elo fraco é o limiar global das marcações**, o mesmo que a sensibilidade apontou (Seção 8). Quando o detector responde, a homografia continua boa: o IoU do campo inteiro mediano nas imagens cobertas fica entre 0,889 e 0,930 em todos os níveis com resposta. O que se perde primeiro é a cobertura, e a fração de aceitas erradas (IoU do campo inteiro < 0,8) sobe com o borrão e o ruído: de 0,102 na imagem limpa para 0,375 com o núcleo de 21 px, sobre só 16 imagens aceitas.
+
+![Figura 8 — Robustez a degradações sintéticas no WC14 de treino (análise posterior à rodada): cada medida por etapa dividida pelo seu valor na imagem limpa, por degradação e nível. A linha tracejada marca a queda de 10%.](../outputs/figures/relatorio/fig8_degradacao.png)
+
 # 7. Análise de falhas
 
 **Inspeção visual.** As figuras de todos os casos citados nesta seção foram inspecionadas uma a uma: os 6 piores clipes da propagação, as 12 âncoras erradas aceitas, os 5 clipes sem âncora e as 3 lacunas de exemplo (`outputs/figures/falhas_test/`). As causas abaixo vêm dessa inspeção e dos números das âncoras e do teto condicionado de cada clipe.
@@ -358,7 +371,7 @@ As métricas e as tabelas do test saem de um comando, `python -m src.run --all -
 - Farin, D., Krabbe, S., de With, P. H. N., Effelsberg, W. (2004). Robust camera calibration for sport videos using court models. Proc. SPIE 5307, Storage and Retrieval Methods and Applications for Multimedia, 80–91.
 - Finlayson, G. D., Hordley, S. D., Lu, C., Drew, M. S. (2006). On the removal of shadows from images. IEEE Transactions on Pattern Analysis and Machine Intelligence, 28(1), 59–68.
 - Fischler, M. A., Bolles, R. C. (1981). Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography. Communications of the ACM, 24(6), 381–395.
-- Fitzgibbon, A. W., Fisher, R. B. (1995). A buyer's guide to conic fitting. Proc. British Machine Vision Conference (BMVC), p. 513–522.
+- Fitzgibbon, A. W., Fisher, R. B. (1995). A buyer's guide to conic fitting. Proc. British Machine Vision Conference (BMVC), 513–522.
 - Gonzalez, R. C., Woods, R. E. (2018). Digital Image Processing, 4ª ed. Pearson.
 - Gutiérrez-Pérez, M., Agudo, A. (2024). No bells, just whistles: Sports field registration by leveraging geometric properties. IEEE/CVF CVPR Workshops (CVPRW), p. 3325–3334. [NBJW]
 - Gutiérrez-Pérez, M., Agudo, A. (2026). PnLCalib: Sports field registration via points and lines optimization. Computer Vision and Image Understanding, 267, 104712.
@@ -373,7 +386,7 @@ As métricas e as tabelas do test saem de um comando, `python -m src.run --all -
 - Magera, F., Hoyoux, T., Barnich, O., Van Droogenbroeck, M. (2025). BroadTrack: Broadcast camera tracking for soccer. IEEE/CVF WACV, p. 6177–6187.
 - Manafifard, M., Ebadi, H., Abrishami Moghaddam, H. (2017). A survey on player tracking in soccer videos. Computer Vision and Image Understanding, 159, 19–46.
 - Matas, J., Galambos, C., Kittler, J. (2000). Robust detection of lines using the progressive probabilistic Hough transform. Computer Vision and Image Understanding, 78(1), 119–137.
-- Niblack, W. (1986). An Introduction to Digital Image Processing. Prentice Hall.
+- Niblack, W. (1986). An Introduction to Digital Image Processing. Prentice-Hall.
 - Otsu, N. (1979). A threshold selection method from gray-level histograms. IEEE Transactions on Systems, Man, and Cybernetics, 9(1), 62–66.
 - Rauch, H. E., Tung, F., Striebel, C. T. (1965). Maximum likelihood estimates of linear dynamic systems. AIAA Journal, 3(8), 1445–1450.
 - Sampson, P. D. (1982). Fitting conic sections to "very scattered" data: an iterative refinement of the Bookstein algorithm. Computer Graphics and Image Processing, 18(1), 97–108.
@@ -611,6 +624,24 @@ Geradas por `scripts/relatorio/numeros.py` a partir dos CSVs da rodada (`outputs
 
 : Tabela T10 (b) — O mesmo, no conjunto comum: os frames com homografia do detector.
 
+| Degradação | Nível | Gramado: IoU | Marcações: cobertura a 2 px | Marcações: precisão a 3 px | Retas: recall de linhas | Detector: cobertura | IoU do campo inteiro mediano | Aceitas erradas (IoU < 0,8) |
+|---|---|---|---|---|---|---|---|---|
+| limpa | — | 0,986 | 0,612 | 0,487 | 0,658 | 0,517 | 0,929 | 0,102 |
+| ruído | 5 | 0,950 | 0,626 | 0,471 | 0,652 | 0,498 | 0,930 | 0,106 |
+| ruído | 10 | 0,708 | 0,591 | 0,161 | 0,560 | 0,244 | 0,890 | 0,235 |
+| ruído | 20 | 0,004 | 0,008 | 0,036 | 0,008 | 0,000 | — | — |
+| borrão | 5 | 0,986 | 0,599 | 0,522 | 0,676 | 0,531 | 0,919 | 0,144 |
+| borrão | 11 | 0,986 | 0,543 | 0,541 | 0,634 | 0,445 | 0,916 | 0,129 |
+| borrão | 21 | 0,986 | 0,402 | 0,525 | 0,445 | 0,077 | 0,889 | 0,375 |
+| sombra | 0,7 | 0,985 | 0,580 | 0,498 | 0,646 | 0,522 | 0,918 | 0,165 |
+| sombra | 0,5 | 0,980 | 0,526 | 0,503 | 0,624 | 0,488 | 0,922 | 0,108 |
+| sombra | 0,35 | 0,969 | 0,455 | 0,503 | 0,611 | 0,445 | 0,908 | 0,183 |
+| oclusão | 0,05 | 0,982 | 0,592 | 0,484 | 0,673 | 0,522 | 0,929 | 0,119 |
+| oclusão | 0,1 | 0,976 | 0,574 | 0,476 | 0,672 | 0,502 | 0,927 | 0,143 |
+| oclusão | 0,2 | 0,956 | 0,533 | 0,454 | 0,674 | 0,478 | 0,916 | 0,150 |
+
+: Tabela T11 — Análise posterior à rodada, WC14 train_val (209 imagens): robustez a degradações sintéticas, uma de cada vez (ruído: σ em 8 bits; borrão horizontal: núcleo em px; sombra: fator do L* na faixa; oclusão: fração do gramado coberta). Médias por imagem no gramado e nas marcações; recall de linhas somado nas imagens.
+
 
 # Apêndice B — Protocolo, incidente e reprodução
 
@@ -632,6 +663,15 @@ Geradas por `scripts/relatorio/numeros.py` a partir dos CSVs da rodada (`outputs
 
 Dois foram denunciados por uma variação exatamente nula.
 
-**Análises posteriores à rodada.** Pedidas numa revisão externa do texto, depois da rodada e sem mudar parâmetro nenhum: (1) o LocSim@5 da homografia de gabarito pelas linhas e da `H_gt_auxflow` como predição; (2) a suavização S-G (Bassek) e a S-G robusta no HSB; (3) a acurácia contra as linhas anotadas, já gravada por frame nos caches da rodada; (4) o teto do sistema, com âncoras de gabarito no primeiro frame com gabarito de cada bloco de 150 frames e a mesma propagação. Saem de `scripts/relatorio/pos_rodada.py`, fora do `src/`, a partir dos caches da série, da propagação e do gabarito, com as chaves conferidas contra o congelamento, chamando as funções do `src/` sem mudança. Os CSVs (`outputs/runs/rodada_test/pos_rodada/`) gravam o commit do método e o do script.
+**Análises posteriores à rodada.** Pedidas numa revisão externa do texto, depois da rodada e sem mudar parâmetro nenhum: (1) o LocSim@5 da homografia de gabarito pelas linhas e da `H_gt_auxflow` como predição; (2) a suavização S-G (Bassek) e a S-G robusta no HSB; (3) a acurácia contra as linhas anotadas, já gravada por frame nos caches da rodada; (4) o teto do sistema, com âncoras de gabarito no primeiro frame com gabarito de cada bloco de 150 frames e a mesma propagação; (5) a robustez a degradações sintéticas, só no WC14 `train_val`, com o protocolo gravado antes de rodar e nada ajustado depois. Saem de `scripts/relatorio/pos_rodada.py`, fora do `src/`, a partir dos caches da série, da propagação e do gabarito, com as chaves conferidas contra o congelamento, chamando as funções do `src/` sem mudança. Os CSVs (`outputs/runs/rodada_test/pos_rodada/`) gravam o commit do método e o do script.
+
+**Protocolo da robustez a degradações.** Script `scripts/relatorio/degradacao.py`, com o config congelado (SHA-1 conferido) e semente fixa por imagem, degradação e nível. As degradações, uma de cada vez, sobre a imagem original:
+
+- ruído gaussiano de σ = 5, 10 e 20, em 8 bits;
+- borrão de movimento horizontal, com núcleo linear de 5, 11 e 21 px;
+- sombra: uma faixa pelo centroide do gramado anotado, com orientação sorteada e largura igual a metade da extensão do gramado na direção normal a ela, em que o L\* é multiplicado por 0,7, 0,5 e 0,35, com bordas em rampa de 0,05 da altura;
+- oclusão: elipses cheias de 0,6 × 1,8 m na escala local da homografia de gabarito, com cores de uniforme, sobre o gramado, até cobrir 5%, 10% e 20% dele. Na folha de depuração, as elipses saem maiores que os jogadores da imagem; como o nível controla a fração coberta, isso muda o número de elipses, e não a área coberta.
+
+As medidas são a média por imagem do IoU do gramado, a cobertura a 2 px e a precisão a 3 px das marcações, o recall de linhas (linhas do modelo visíveis com um segmento casado) e, no detector, a cobertura, o IoU do campo inteiro mediano nas cobertas e a fração de aceitas com IoU < 0,8. As aceitas erradas entram na regra da "etapa que quebra primeiro" pelo complemento, a fração de aceitas certas.
 
 **Reprodução.** O código vem de três commits: o método congelado (`418a3be`), a correção da conferência (`b3bcd98`) e o `--all` (`38512a5`). Nenhum dos dois últimos muda saídas: a chave da série não inclui o `temporal.py`, o `run.py` não entra em nenhuma chave, e o teste de fumaça do `--all` usou os caches da série e da propagação com as chaves batendo. O caminho inteiro do test roda com `python -m src.run --all --splits test --wc14-split test`. As tabelas saem dos scripts versionados em `scripts/rodada_test/`, fora do `src/` para não mudar a impressão digital do código congelado, e cada tabela grava o commit do método e o dos scripts. As figuras novas deste relatório saem de `scripts/relatorio/figuras.py`, e as de falha, de `scripts/rodada_test/analise_falhas.py`.

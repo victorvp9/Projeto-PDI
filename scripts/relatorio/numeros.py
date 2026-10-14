@@ -434,6 +434,33 @@ for serie, cols in (("6a Bassek", (("20,9", "pen_media", 100), ("0,0", "pen_medi
                     ("6a robusto", (("24,5", "pen_media", 100), ("0,0", "pen_mediana", 100), ("0,371", "cob_fr", 1)))):
     for t, col, esc in cols:
         C(t, f"B2, HSB, {serie}: {col}", f"{POS}/B2.csv", B2T | {"serie": serie}, col, esc, sec="6")
+B5 = f"{POS}/B5.csv"
+B5A = {"ruído": "ruído gaussiano, σ = 5, 10 e 20 (8 bits)", "borrão": "borrão de movimento horizontal, núcleo linear 1 × k",
+       "sombra": "sombra: faixa por uma reta que passa pelo centroide", "oclusão": "oclusão: elipses cheias, uma por",
+       "medidas": "fração das aceitas com IoU do campo inteiro < 0,8", "dados": "WC14 `train_val` (209 imagens), nunca o test. Script `scripts/relatorio/degradacao.py`"}
+for t, d, a in (("5", "ruído σ = 5", "ruído"), ("10", "ruído σ = 10", "ruído"), ("20", "ruído σ = 20", "ruído"), ("11", "núcleo do borrão de 11 px", "borrão"),
+                ("21", "núcleo do borrão de 21 px", "borrão"), ("0,7", "sombra: L* × 0,7", "sombra"), ("0,5", "sombra: L* × 0,5", "sombra"),
+                ("0,35", "sombra: L* × 0,35", "sombra"), ("0,05", "sombra: rampa de 0,05·h", "sombra"), ("0,6", "oclusão: elipse de 0,6 m de largura", "oclusão"),
+                ("1,8", "oclusão: elipse de 1,8 m de altura", "oclusão"), ("0,8", "aceita errada: IoU do campo inteiro < 0,8", "medidas"),
+                ("209", "imagens do WC14 train_val", "dados")):
+    X(t, f"B5, protocolo: {d}", DEC, B5A[a], sec="6, B")
+LV = lambda deg, nv: {"degradacao": deg, "nivel": str(nv)}
+for t, deg, nv, col, d in (("0,9861", "limpa", 0, "gramado_iou", "IoU do gramado na imagem limpa"), ("0,612", "limpa", 0, "marcas_cob2", "cobertura das marcações a 2 px, limpa"),
+                           ("0,517", "limpa", 0, "det_cobertura", "cobertura do detector, limpa"), ("0,102", "limpa", 0, "det_aceitas_erradas", "aceitas erradas, limpa"),
+                           ("0,708", "ruído", 2, "gramado_iou", "IoU do gramado, ruído σ = 10"), ("0,244", "ruído", 2, "det_cobertura", "cobertura do detector, ruído σ = 10"),
+                           ("0,004", "ruído", 3, "gramado_iou", "IoU do gramado, ruído σ = 20"), ("0,000", "ruído", 3, "det_cobertura", "cobertura do detector, ruído σ = 20 (nenhuma imagem)"),
+                           ("0,543", "borrão", 2, "marcas_cob2", "cobertura das marcações, borrão de 11 px"),
+                           ("0,077", "borrão", 3, "det_cobertura", "cobertura do detector, borrão de 21 px"),
+                           ("0,375", "borrão", 3, "det_aceitas_erradas", "aceitas erradas, borrão de 21 px"),
+                           ("0,526", "sombra", 2, "marcas_cob2", "cobertura das marcações, sombra L* × 0,5"),
+                           ("0,969", "sombra", 3, "gramado_iou", "IoU do gramado, sombra L* × 0,35"),
+                           ("0,533", "oclusão", 3, "marcas_cob2", "cobertura das marcações, oclusão de 20%"),
+                           ("0,478", "oclusão", 3, "det_cobertura", "cobertura do detector, oclusão de 20%"),
+                           ("0,889", "borrão", 3, "det_iou_mediano", "menor IoU do campo inteiro mediano entre os níveis com resposta (borrão de 21 px)"),
+                           ("0,930", "ruído", 1, "det_iou_mediano", "maior IoU do campo inteiro mediano entre os níveis com resposta (ruído σ = 5)")):
+    C(t, f"B5: {d}", B5, LV(deg, nv), col, key={"0,077": "b5_cob21"}.get(t), sec="6")
+D("16", "B5: imagens aceitas com o borrão de 21 px (0,077 × 209)", "cobertura × 209", lambda v: v["b5_cob21"] * 209, sec="6")
+X("10", "B5: queda de mais de 10% em relação à imagem limpa (\"quebra\")", DEC, "cai mais de 10% em relação à imagem limpa", sec="6")
 X("960", "escala da acurácia contra as linhas (960 × 540)", CFG, "sncalib_size: [960, 540]", sec="5")
 X("540", "escala da acurácia contra as linhas (960 × 540)", CFG, "sncalib_size: [960, 540]", sec="5")
 X("20", "limiares da acurácia (5, 10, 20 px)", CFG, "sncalib_thresholds_px: [5, 10, 20]", sec="5, 6")
@@ -689,6 +716,14 @@ def apendice():
             head.append("Fração ao teto do sistema")
             rows = [x + [f(fr.get(r["serie"], "")) if r["serie"] != "detector" else "—"] for x, r in zip(rows, rs)]
         out.append(table(head, rows, cap))
+    b5 = [r for r in _t("B5", POS) if r["nivel"] != "quebra"]
+    out.append(table(["Degradação", "Nível", "Gramado: IoU", "Marcações: cobertura a 2 px", "Marcações: precisão a 3 px", "Retas: recall de linhas",
+                      "Detector: cobertura", "IoU do campo inteiro mediano", "Aceitas erradas (IoU < 0,8)"],
+                     [[r["degradacao"], r["valor"].replace(".", ",") if r["valor"] else "—", f(r["gramado_iou"]), f(r["marcas_cob2"]), f(r["marcas_prec3"]),
+                       f(r["recall_linhas"]), f(r["det_cobertura"]), f(r["det_iou_mediano"]), f(r["det_aceitas_erradas"])] for r in b5],
+                     "Tabela T11 — Análise posterior à rodada, WC14 train_val (209 imagens): robustez a degradações sintéticas, uma de cada vez "
+                     "(ruído: σ em 8 bits; borrão horizontal: núcleo em px; sombra: fator do L* na faixa; oclusão: fração do gramado coberta). "
+                     "Médias por imagem no gramado e nas marcações; recall de linhas somado nas imagens."))
     return "\n".join(out).rstrip() + "\n"
 
 
