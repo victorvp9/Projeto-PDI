@@ -132,7 +132,10 @@ projeto para na homografia planar — traves e bola no ar ficam fora.
 
 ## Critério de sucesso
 
-O projeto está pronto quando `python -m src.run --all` produz, do zero:
+O projeto está pronto quando `uv run python -m src.run --all --splits test --wc14-split test`
+produz, do zero, as métricas e as tabelas do test (as figuras saem de
+`scripts/relatorio/figuras.py` e `scripts/rodada_test/analise_falhas.py`; o `--all`
+padrão, com todas as partições do GSR, leva mais de 30 h e não produz as tabelas do test):
 
 - `IoU_whole`, `IoU_part` e erro de reprojeção no WC14, com média e mediana;
 - as mesmas métricas e o LocSim no GSR, com e sem propagação;
