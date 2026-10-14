@@ -934,3 +934,15 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Achado 6, anotado e não aplicado (sem efeito nos resultados entregues):** a seleção de clipes está escrita duas vezes no `main` (`run.py:451-456` e `460-463`).
   - **Achado 7, anotado e não aplicado (sem efeito nos resultados entregues):** o CSV das âncoras do 6c leva só a partição do primeiro clipe no nome (`temporal.py:725`), e uma rodada com várias partições sai rotulada pela primeira.
   | Decisão de Victor; a lista dos caches a apagar por item é minha, derivada das chaves.
+- 2026-10-14 | **Plano do v2 congelado** (`docs/05-melhorias-plano.md`, tag `plano-v2-congelado`, branch `v2-melhorias`), antes de qualquer experimento.
+  - **Decisões D1–D4:**
+    - **D1, aceite:** ganho em ≥ 4 dos 6 jogos de dev, com validação cruzada por jogo, e média dos ganhos por jogo > 0.
+    - **D2, queda máxima num jogo:** −0,03 de LocSim@5 penalizado.
+    - **D3, mudanças no detector (A, B, E):** checagem barata em todo o dev (detector sozinho, 1 frame em 25). Depois, confirmação na metade fixa de cada jogo: os clipes de índice par na ordem de ID, contando de 0, regra escrita antes de qualquer resultado.
+    - **D3, rodadas completas no dev:** só para a combinação final, no máximo 3 no ciclo; as mudanças de propagação (C, D) podem rodar completas.
+    - **D4:** ver o item abaixo.
+  - **Trabalho futuro (D4, fora do ciclo):** usar o sinal das pessoas para escolher ou rejeitar âncoras.
+    - **Por que fica fora:** mudaria a natureza do método, que passaria a usar as caixas das pessoas e não só as marcações do campo.
+    - **Referência:** o gabarito do AuxFlow por RANSAC nas pessoas dá LocSim@5 0,978, mas acurácia contra as linhas a 5 px de só 0,533 (relatório v1, Seção 6.3).
+    - **Se for feito:** trilha à parte, relatada separada e nunca somada ao v2.
+  | Decisões de Victor.
