@@ -24,6 +24,8 @@ REL = Path("docs/04-relatorio.md")
 OUT_MD = Path("docs/04-relatorio-numeros.md")
 TAB = "outputs/runs/rodada_test/tabelas"
 FAL = "outputs/runs/rodada_test/falhas"
+POS = "outputs/runs/rodada_test/pos_rodada"          # análises posteriores à rodada (scripts/relatorio/pos_rodada.py)
+B134 = f"{POS}/B1_B3_B4.csv"
 V2 = "outputs/runs/rodada_test/tabelas_v2.out"
 AF = "outputs/runs/rodada_test/analise_falhas.out"
 DEC, P0, M1, D2, PL, CFG = "docs/decisoes.md", "docs/00-problema.md", "docs/01-metodo.md", "docs/02-dados.md", "docs/03-plano.md", "config.yaml"
@@ -61,7 +63,8 @@ C("0,650", "LocSim@5 penalizado do 6c, IC inferior", "T1", {"serie": "6c fluxo"}
 C("0,920", "LocSim@5 penalizado do 6c, IC superior", "T1", {"serie": "6c fluxo"}, "locsim_pen_hi", sec="6")
 C("0,833", "LocSim@5 do 6c nos cobertos", "T1", {"serie": "6c fluxo"}, "locsim_cob", sec="6")
 C("0,0105", "NPE mediano do 6c fluxo", "T1", {"serie": "6c fluxo"}, "npe_med", sec="6")
-C("0,959", "fração da distância ao teto, 6c fluxo", "T1", {"serie": "6c fluxo"}, "fracao_teto", sec=S)
+C("0,959", "fração da distância ao teto condicionado às âncoras, propagação", "T1", {"serie": "6c fluxo"}, "fracao_teto", sec="6")
+C("95,9", "a mesma fração, em %", "T1", {"serie": "6c fluxo"}, "fracao_teto", 100, sec="6")
 C("0,925", "fração ao teto, IC inferior", "T1", {"serie": "6c fluxo"}, "fracao_teto_lo", sec="6")
 C("0,986", "fração ao teto, IC superior", "T1", {"serie": "6c fluxo"}, "fracao_teto_hi", sec="6")
 for serie, cols in (("6a Bassek", ("0,680", "0,0126", "0,446", "0,681", "0,078")), ("6a robusto", ("0,665", "0,0097", "0,478", "0,747", "0,171")),
@@ -99,12 +102,24 @@ C("−0,003", "ganho nos cobertos, IC superior", "T5", {"linha": "ganho 6c - det
 C("0,885", "LocSim@5 do NBJW, tabela 7 do AuxFlow", "T5", {"linha": "NBJW (AuxFlow, tab. 7)"}, "locsim5", key="nbjw", sec="2, 6, 9")
 C("0,929", "LocSim@5 do AuxFlow, tabela 7", "T5", {"linha": "AuxFlow (tab. 7)"}, "locsim5", key="auxflow", sec="2, 6, 9")
 C("+0,044", "ganho AuxFlow − NBJW", "T5", {"linha": "ganho AuxFlow - NBJW"}, "locsim5", sec=S)
-C("0,930", "LocSim@5 do 6c no conjunto comum (nos cobertos)", "T5", {"linha": "nosso 6c fluxo"}, "comum", sec="6")
 C("0,869", "LocSim@5 do detector no conjunto comum", "T5", {"linha": "nosso detector"}, "comum", sec="6")
 D("65", "fração da distância detector -> AuxFlow fechada pelo 6c (%)", "(6c − detector) / (AuxFlow − detector)",
   lambda v: 100 * (v["c6_pen"] - v["det_pen"]) / (v["auxflow"] - v["det_pen"]), sec="6, 9")
 C("18.133", "frames do conjunto comum", "T1b", {"serie": "detector"}, "frames", sec="6")
-C("0,922", "LocSim@5 penalizado do 6c no conjunto comum", "T1b", {"serie": "6c fluxo"}, "locsim_pen", sec="6")
+C("0,922", "LocSim@5 penalizado do 6c no conjunto comum", "T1b", {"serie": "6c fluxo"}, "locsim_pen", key="c6_com", sec="Resumo, 6, 9")
+C("0,869", "LocSim@5 penalizado do detector no conjunto comum", "T1b", {"serie": "detector"}, "locsim_pen", key="det_com", sec="6, 9")
+D("0,131", "erro residual do detector no conjunto comum", "1 − LocSim@5 pen. do detector (T1b)", lambda v: 1 - v["det_com"], sec="6")
+D("0,078", "erro residual da propagação no conjunto comum", "1 − LocSim@5 pen. da propagação (T1b)", lambda v: 1 - v["c6_com"], sec="6")
+D("40", "redução do erro residual no conjunto comum (%), com os resíduos como escritos no texto (0,131 → 0,078; 40,5% com os brutos)",
+  "(0,131 − 0,078) / 0,131", lambda v: 100 * (round(1 - v["det_com"], 3) - round(1 - v["c6_com"], 3)) / round(1 - v["det_com"], 3), sec="Resumo, 6, 9")
+D("0,115", "erro residual do NBJW (tabela 7 do AuxFlow)", "1 − 0,885", lambda v: 1 - v["nbjw"], sec="6")
+D("0,071", "erro residual do AuxFlow (tabela 7)", "1 − 0,929", lambda v: 1 - v["auxflow"], sec="6")
+D("38", "redução do erro residual do AuxFlow sobre o NBJW (%)", "(0,929 − 0,885) / (1 − 0,885)",
+  lambda v: 100 * (v["auxflow"] - v["nbjw"]) / (1 - v["nbjw"]), sec="Resumo, 6, 9")
+D("0,581", "erro residual do detector, penalizado", "1 − 0,419", lambda v: 1 - v["det_pen"], sec="6")
+D("0,251", "erro residual da propagação, penalizado", "1 − 0,749", lambda v: 1 - v["c6_pen"], sec="6")
+D("57", "redução do erro residual no conjunto inteiro (%)", "(0,749 − 0,419) / (1 − 0,419)",
+  lambda v: 100 * (v["c6_pen"] - v["det_pen"]) / (1 - v["det_pen"]), sec="6")
 C("0,0066", "NPE mediano do 6c no conjunto comum", "T1b", {"serie": "6c fluxo"}, "npe_med", sec="6")
 C("0,818", "LocSim@5 da âncora ingênua no conjunto comum", "T1b", {"serie": "6c âncora ingênua /150"}, "locsim_pen", sec="6")
 X("85", "fração ao teto nos 19 clipes do train[::3] (%)", DEC, "fração da distância fechada entre o detector e o teto", sec="6")
@@ -129,6 +144,7 @@ X("43,15", "NBJW sozinho no HSB, média (AuxFlow, tabela 4)", P0, "contra 43,15 
 X("35,93", "NBJW no HSB, mediana (AuxFlow, tabela 4)", V2, "NBJW (43.15, 35.93)", sec="6")
 X("83,67", "AuxFlow no HSB, média (tabela 4)", P0, "de 83,67 para 23,42", sec="2, 6, 9")
 X("96,15", "AuxFlow no HSB, mediana (tabela 4)", V2, "AuxFlow (83.67, 96.15)", sec="6")
+C("50,8", "SNGS-124, só propagação (%): a menor média do HSB", "T2", {"clipe": "SNGS-124"}, "(1) só propagação pen média", 100, sec="6")
 C("97,4", "SNGS-128, só propagação (%)", "T2", {"clipe": "SNGS-128"}, "(1) só propagação pen média", 100, sec="6")
 C("96,5", "SNGS-138, só propagação (%)", "T2", {"clipe": "SNGS-138"}, "(1) só propagação pen média", 100, sec="6")
 C("0", "SNGS-128 e SNGS-138: pipeline vale 0 (sem âncora)", "T2", {"clipe": "SNGS-128"}, "(3) pipeline pen média", sec="6")
@@ -150,6 +166,10 @@ C("0,380", "RE mediano (m), WC14 test", "T3", {"metrica": "re_m"}, "mediana", se
 C("1,615", "RE médio (m), WC14 test", "T3", {"metrica": "re_m"}, "media", sec="6")
 C("107", "imagens com H (protocolo KpSFR)", "T3b", {"metrica": "iou_part"}, "imagens", key="kp_n", sec="6")
 C("0,937", "iou_part médio no protocolo KpSFR, 107 imagens", "T3b", {"metrica": "iou_part"}, "media", sec="6")
+C("0,5155", "iou_whole médio no protocolo KpSFR, 186 imagens com 0 nas sem H", "T3b", {"metrica": "iou_whole (nossa convenção: imagem sem H vale 0)"}, "media", sec="6, 9")
+C("0,8634", "iou_whole mediano no protocolo KpSFR, 186 imagens com 0 nas sem H", "T3b", {"metrica": "iou_whole (nossa convenção: imagem sem H vale 0)"}, "mediana", sec="6, 9")
+C("0,8962", "iou_whole médio no protocolo KpSFR, 107 imagens com H", "T3b", {"metrica": "iou_whole"}, "media", sec="6, 9")
+C("0,9534", "iou_whole mediano no protocolo KpSFR, 107 imagens com H", "T3b", {"metrica": "iou_whole"}, "mediana", sec="6, 9")
 C("0,539", "iou_part médio, 186 imagens com 0 nas sem H", "T3b", {"metrica": "iou_part (nossa convenção: imagem sem H vale 0)"}, "media", sec="6")
 D("79", "imagens do WC14 test sem H", "186 − 107", lambda v: 186 - v["kp_n"], sec="6")
 X("0", "imagem sem H vale 0 na nossa convenção", f"{TAB}/T3b.csv", "nossa convenção: imagem sem H vale 0", sec="6")
@@ -251,7 +271,7 @@ D("10", "âncoras de encaixe parcial: as aceitas erradas menos a troca de reta (
   f"linhas de {AE} sem SNGS-126 e SNGS-132",
   lambda v: sum(1 for r in csv.DictReader(open(AE, encoding="utf-8")) if r["clipe"] not in ("SNGS-126", "SNGS-132")), sec="7")
 X("13", "clipes sem âncora da valid no jogo 3", DEC, "13 / 21 (62%)", sec="7, 8")
-X("18", "clipes sem âncora da valid", DEC, "Os 18 coincidem com as limitações da Fatia 3", sec="7, 8")
+X("18", "clipes sem âncora da valid", DEC, "Os 18 coincidem com as limitações da Fatia 3", sec="6, 7, 8")
 X("1", "diagnóstico da segmentação em 1 frame a cada 75", AF, "medianas por frame, 1 a cada 75", sec="7")
 X("75", "diagnóstico da segmentação em 1 frame a cada 75", AF, "medianas por frame, 1 a cada 75", sec="7")
 SA = f"{FAL}/sem_ancora_x_fatia3.csv"
@@ -368,6 +388,56 @@ X("735", "tarefas da série com a chave congelada", PL, "735/735 chaves iguais �
 X("47", "caches da valid gravados com a chave errada", DEC, "mas 47 foram gravados com a chave errada", sec="5")
 X("0", "manifestos com 0 falhas", DEC, "imagens do WC14, 0 falhas", sec="B")
 
+# revisão externa (2026-10-13): Tabela 1 (contribuição das etapas, treino), limite do LocSim e acurácia contra as linhas
+SEG, RET = "Varredura da Fatia 3 no treino", "Varredura das retas (Etapa 3), só no GSR train"
+for t, d in (("0,9838", "IoU do gramado, lab_hue (média)"), ("0,9797", "IoU do gramado, lab_hue (sombra)"), ("0,9822", "IoU do gramado, HSV (média)"),
+             ("0,9764", "IoU do gramado, HSV (sombra)"), ("0,9728", "IoU do gramado, Lab por distância (média)"), ("0,9319", "IoU do gramado, Lab por distância (sombra)"),
+             ("0,9441", "ablação do gramado: cru"), ("0,9492", "ablação: + abertura"), ("0,9548", "ablação: + fechamento"), ("0,9763", "ablação: + maior componente"),
+             ("0,579", "F1 a 3 px, filtro de linha, WC14"), ("0,560", "F1 a 3 px, top-hat, WC14"), ("0,634", "F1 a 3 px, filtro de linha, GSR"), ("0,577", "F1 a 3 px, top-hat, GSR")):
+    X(t, f"Tabela 1: {d} (treino)", DEC, SEG, sec="3")
+for t, d in (("0,641", "F1 dos segmentos na configuração escolhida, GSR"), ("0,597", "F1 sem o filtro de forma"), ("1,17", "fragmentação com a fusão"),
+             ("4,70", "fragmentação sem a fusão"), ("0,634", "F1 sem a fusão")):
+    X(t, f"Tabela 1: {d} (GSR train)", DEC, RET, sec="3")
+X("0,9928", "LocSim@5 do gabarito do AuxFlow (tabela 2 deles)", DEC, "nosso 0,932 / 0,983 / 0,38 m; AuxFlow", sec="4, 6")
+C("0,933", "LocSim@5 da H_gt pelas linhas como predição, train (antes da rodada)", "outputs/metrics_gt_train.csv",
+  {"conjunto": "todos", "metrica": "locsim@5"}, "media", sec="4")
+C("0,930", "LocSim@5 da propagação no conjunto comum, nos frames que ela cobre", "T5", {"linha": "nosso 6c fluxo"}, "comum", sec="6")
+
+# análises posteriores à rodada (pos_rodada.py): B1, B3 e B4 em B1_B3_B4.csv, B4 em B4_fracao.csv, B2 em B2.csv
+TI, CC, SIS = "test inteiro", "conjunto comum", "teto do sistema (âncora de gabarito /150)"
+for t, col, d in (("1,000", "cobertura", "cobertura"), ("0,0058", "npe_med", "NPE mediano"), ("0,922", "locsim_pen", "LocSim@5 penalizado"),
+                  ("0,922", "locsim_cob", "LocSim@5 nos cobertos"), ("0,899", "locsim_pen_min", "LocSim@5 pen., mín. entre os jogos (jogo 8)"),
+                  ("0,949", "locsim_pen_max", "LocSim@5 pen., máx. entre os jogos (jogo 11)"), ("0,919", "locsim_pen_jogo7", "LocSim@5 pen., jogo 7"),
+                  ("0,899", "locsim_pen_jogo8", "LocSim@5 pen., jogo 8"), ("0,949", "locsim_pen_jogo11", "LocSim@5 pen., jogo 11"),
+                  ("0,733", "acc5_pen", "acurácia a 5 px, penalizada"), ("0,733", "acc5_cob", "acurácia a 5 px, nos cobertos")):
+    C(t, f"B4, teto do sistema: {d}", B134, {"conjunto": TI, "serie": SIS}, col, sec="6")
+C("0,934", "B4, teto do sistema no conjunto comum: LocSim@5 pen.", B134, {"conjunto": CC, "serie": SIS}, "locsim_pen", sec="6")
+C("0,794", "B4, teto do sistema no conjunto comum: acurácia a 5 px", B134, {"conjunto": CC, "serie": SIS}, "acc5_pen", sec="6")
+for serie, t in (("6a Bassek", "0,054"), ("6a robusto", "0,117"), ("Kalman + RTS", "0,142"), ("6c fluxo", "0,656"), ("6c sem linhas", "0,588"),
+                 ("6c sem fluxo", "−0,106"), ("6c âncora ingênua /150", "0,303"), ("6c âncora de gabarito", "0,684")):
+    C(t, f"B4, fração ao teto do sistema: {serie}", f"{POS}/B4_fracao.csv", {"serie": serie}, "fracao_teto_sistema", sec="6, 9")
+C("0,946", "B1, H_gt pelas linhas como predição: LocSim@5 nos frames com gabarito (test)", B134, {"conjunto": TI, "serie": "H_gt pelas linhas"},
+  "locsim_cob", sec="Resumo, 4, 6, 9")
+C("0,978", "B1, H_gt_auxflow como predição: LocSim@5 nos frames com ela (test)", B134, {"conjunto": TI, "serie": "H_gt_auxflow"}, "locsim_cob", sec="4, 6")
+for serie, (tp, tc, cp) in (("detector", ("0,387", "0,784", "0,784")), ("6a Bassek", ("0,398", "0,599", "0,735")), ("6a robusto", ("0,430", "0,662", "0,779")),
+                            ("Kalman + RTS", ("0,419", "0,631", "0,760")), ("6c fluxo", ("0,551", "0,613", "0,807")),
+                            ("6c sem linhas", ("0,508", "0,566", "0,787")), ("6c âncora de gabarito", ("0,576", "0,641", "0,829")),
+                            ("H_gt pelas linhas", ("0,849", "0,869", "0,904")), ("H_gt_auxflow", ("0,515", "0,533", "0,545"))):
+    k = {"detector": "acc_det", "6c fluxo": "acc_c6"}.get(serie)
+    C(tp, f"B3, acurácia a 5 px penalizada, test inteiro: {serie}", B134, {"conjunto": TI, "serie": serie}, "acc5_pen", sec="6")
+    C(tc, f"B3, acurácia a 5 px nos cobertos, test inteiro: {serie}", B134, {"conjunto": TI, "serie": serie}, "acc5_cob", sec="6")
+    C(cp, f"B3, acurácia a 5 px penalizada, conjunto comum: {serie}", B134, {"conjunto": CC, "serie": serie}, "acc5_pen", key=k, sec="6, 9")
+D("11", "B3: redução do erro (1 − acurácia a 5 px) no conjunto comum, detector -> propagação (%)", "(acc_c6 − acc_det) / (1 − acc_det)",
+  lambda v: 100 * (v["acc_c6"] - v["acc_det"]) / (1 - v["acc_det"]), sec="6")
+B2T = {"clipe": "todos"}
+for serie, cols in (("6a Bassek", (("20,9", "pen_media", 100), ("0,0", "pen_mediana", 100), ("0,396", "cob_fr", 1), ("52,9", "cob_media", 100))),
+                    ("6a robusto", (("24,5", "pen_media", 100), ("0,0", "pen_mediana", 100), ("0,371", "cob_fr", 1)))):
+    for t, col, esc in cols:
+        C(t, f"B2, HSB, {serie}: {col}", f"{POS}/B2.csv", B2T | {"serie": serie}, col, esc, sec="6")
+X("960", "escala da acurácia contra as linhas (960 × 540)", CFG, "sncalib_size: [960, 540]", sec="5")
+X("540", "escala da acurácia contra as linhas (960 × 540)", CFG, "sncalib_size: [960, 540]", sec="5")
+X("20", "limiares da acurácia (5, 10, 20 px)", CFG, "sncalib_thresholds_px: [5, 10, 20]", sec="5, 6")
+
 
 # ------------------------------------------------------------------ fontes
 _cache = {}
@@ -454,8 +524,8 @@ def body_tokens(text):
 
 
 # ------------------------------------------------------------------ Apêndice A
-def _t(name):
-    return list(csv.DictReader(open(f"{TAB}/{name}.csv", encoding="utf-8")))
+def _t(name, d=TAB):
+    return list(csv.DictReader(open(f"{d}/{name}.csv", encoding="utf-8")))
 
 
 def f(x, d=3, pct=False):
@@ -468,8 +538,15 @@ def f(x, d=3, pct=False):
     return s.replace("-", "−")
 
 
-def ic(r, c, d=3):
-    return f"{f(r[c], d)} [{f(r[c + '_lo'], d)}; {f(r[c + '_hi'], d)}]" if r.get(c + "_lo", "") not in ("", "nan") else f(r[c], d)
+MM = "mín.–máx. por jogo (bootstrap de 3 jogos)"
+
+
+def mm(r, c, d=3):
+    """Intervalo do bootstrap de jogos: com 3 jogos, o mínimo e o máximo entre eles (T6)."""
+    if r.get(c + "_lo", "") in ("", "nan"):
+        return "—"
+    lo, hi = f(r[c + "_lo"], d), f(r[c + "_hi"], d)
+    return f"{lo} a {hi}" if lo.startswith("−") else f"{lo}–{hi}"
 
 
 def milhar(x):
@@ -480,21 +557,30 @@ def table(head, rows, caption):
     return "\n".join(["| " + " | ".join(head) + " |", "|" + "---|" * len(head)] + ["| " + " | ".join(r) + " |" for r in rows] + ["", f": {caption}", ""])
 
 
-NAMES = {"6c âncora ingênua /150": "âncora ingênua /150", "6c âncora de gabarito": "âncora de gabarito (teto)"}
+NAMES = {"6a Bassek": "suavização S-G (Bassek)", "6a robusto": "S-G robusta", "6c fluxo": "propagação", "6c sem linhas": "propagação sem linhas",
+         "6c sem fluxo": "propagação sem fluxo", "6c âncora ingênua /150": "âncora ingênua /150",
+         "6c âncora de gabarito": "teto condicionado às âncoras", "teto do sistema (âncora de gabarito /150)": "teto do sistema (âncora de gabarito /150)"}
+n = lambda s: NAMES.get(s, s)
 
 
 def apendice():
     t1 = _t("T1")
-    n = lambda s: NAMES.get(s, s)
     out = ["Geradas por `scripts/relatorio/numeros.py` a partir dos CSVs da rodada (`outputs/runs/rodada_test/tabelas/`), cada um com o commit do "
-           "método e o dos scripts das tabelas. Intervalos de 95% por bootstrap sorteando jogos (2.000 reamostragens); com 3 jogos, há 10 "
-           "reamostragens distintas, e o intervalo é praticamente o mínimo e o máximo dos jogos (T6).", ""]
-    out.append(table(["Série", "Cobertura", "NPE mediano (média)", "IoU_whole mediano", "mAP-LocSim penalizado"],
-                     [[n(r["serie"]), ic(r, "cobertura"), f"{f(r['npe_med'], 4)} ({f(r['npe_media'])})", f(r["iou_med"]), ic(r, "map_pen")] for r in t1],
+           "método e o dos scripts das tabelas, e, nas tabelas marcadas, das análises posteriores à rodada "
+           "(`outputs/runs/rodada_test/pos_rodada/`). A coluna \"" + MM + "\" é o intervalo de 95% do bootstrap que sorteia jogos "
+           "(2.000 reamostragens): com 3 jogos, há só 10 reamostragens distintas, e o intervalo é o mínimo e o máximo entre os jogos (T6). "
+           "O teto condicionado às âncoras é a propagação a partir da homografia de gabarito nos frames das âncoras verificadas.", ""]
+    out.append(table(["Série", "Cobertura", MM, "NPE mediano (média)", "IoU_whole mediano", "mAP-LocSim penalizado", MM],
+                     [[n(r["serie"]), f(r["cobertura"]), mm(r, "cobertura"), f"{f(r['npe_med'], 4)} ({f(r['npe_media'])})", f(r["iou_med"]),
+                       f(r["map_pen"]), mm(r, "map_pen")] for r in t1],
                      "Tabela T1 (a) — GSR test, 49 clipes, 3 jogos: cobertura e geometria."))
-    out.append(table(["Série", "LocSim@5 penalizado", "Nos cobertos", "Penalizado, clipes com âncora", "Fração ao teto"],
-                     [[n(r["serie"]), ic(r, "locsim_pen"), ic(r, "locsim_cob"), ic(r, "locsim_pen_com_ancora"), ic(r, "fracao_teto")] for r in t1],
-                     "Tabela T1 (b) — GSR test: LocSim@5. A fração ao teto é (série − detector) / (teto − detector)."))
+    out.append(table(["Série", "LocSim@5 penalizado", MM, "Nos cobertos", MM],
+                     [[n(r["serie"]), f(r["locsim_pen"]), mm(r, "locsim_pen"), f(r["locsim_cob"]), mm(r, "locsim_cob")] for r in t1],
+                     "Tabela T1 (b) — GSR test: LocSim@5."))
+    out.append(table(["Série", "Penalizado, clipes com âncora", MM, "Fração ao teto condicionado", MM],
+                     [[n(r["serie"]), f(r["locsim_pen_com_ancora"]), mm(r, "locsim_pen_com_ancora"), f(r["fracao_teto"]), mm(r, "fracao_teto")] for r in t1],
+                     "Tabela T1 (c) — GSR test: LocSim@5 penalizado nos 44 clipes com âncora e fração da distância ao teto condicionado às âncoras, "
+                     "(série − detector) / (teto − detector)."))
     t1b = _t("T1b")
     out.append(table(["Série", "NPE mediano", "LocSim@5 penalizado", "Nos cobertos"],
                      [[n(r["serie"]), f(r["npe_med"], 4), f(r["locsim_pen"]), f(r["locsim_cob"])] for r in t1b],
@@ -520,6 +606,14 @@ def apendice():
     out.append(table(["Medição", "Penalizado: média / mediana", "Cobertos: média / mediana", "Cobertura (frames com H_gt)", "Cobertura (frames com pessoas)",
                       "Cobertura (por pessoa)", "Por pessoa-frame: pen. / cob."], rows,
                      "Tabela T2 (b) — HSB, todos os frames dos intervalos (%). AuxFlow, tabela 4 (média / mediana): NBJW 43,15 / 35,93; AuxFlow 83,67 / 96,15."))
+    b2 = {r["serie"]: r for r in _t("B2", POS) if r["clipe"] == "todos"}
+    out.append(table(["Série", "Penalizado: média / mediana", "Cobertos: média / mediana", "Cobertura (frames com H_gt)", "Cobertura (frames com pessoas)",
+                      "Cobertura (por pessoa)", "Por pessoa-frame: pen. / cob."],
+                     [[n(s), f"{f(r['pen_media'], 1, True)} / {f(r['pen_mediana'], 1, True)}", f"{f(r['cob_media'], 1, True)} / {f(r['cob_mediana'], 1, True)}",
+                       f(r["cob_gt"]), f(r["cob_fr"]), f(r["cob_ps"]), f"{f(r['pen_ps'], 1, True)} / {f(r['cob_ps_ls'], 1, True)}"]
+                      for s, r in b2.items() if s in ("6a Bassek", "6a robusto")],
+                     "Tabela T2 (c) — Análise posterior à rodada: as suavizações S-G sobre a série do detector, nos mesmos frames do HSB e com as "
+                     "colunas da T2 (b) (%)."))
     t3 = {r["metrica"]: r for r in _t("T3")}
     out.append(table(["Cobertura", "IoU_whole (média / mediana)", "IoU_part (média / mediana)", "NPE (média / mediana)", "RE em m (média / mediana)"],
                      [[f(t3["cobertura"]["media"]), *(f"{f(t3[m]['media'], d)} / {f(t3[m]['mediana'], d)}" for m, d in
@@ -530,31 +624,32 @@ def apendice():
                      "homografia; a literatura o reporta sobre todas. As duas últimas linhas seguem a nossa convenção: imagem sem homografia vale 0."))
     t4 = _t("T4")
     out.append(table(["Série", "Cobertura", "Tremor mediano / p90 (px)", "Deslize mediano / p90 (px)", "Pares"],
-                     [[r["serie"], f(r["cobertura"]), f"{f(r['tremor_med'], 2)} / {f(r['tremor_p90'], 2)}", f"{f(r['deslize_med'], 2)} / {f(r['deslize_p90'], 2)}",
+                     [[n(r["serie"]), f(r["cobertura"]), f"{f(r['tremor_med'], 2)} / {f(r['tremor_p90'], 2)}", f"{f(r['deslize_med'], 2)} / {f(r['deslize_p90'], 2)}",
                        f"{int(r['pares']):,}".replace(",", ".")] for r in t4],
                      "Tabela T4 (a) — Estabilidade no GSR test, cada série no próprio conjunto de frames. O ECC convergiu em todos os pares."))
     out.append(table(["Série", "Jogadores invertidos: pen. / cobertos", "Grade: pen. / cobertos", "0 visíveis: pen. / cobertos"],
-                     [[r["serie"], f"{f(r['jogadores_penalizada'])} / {f(r['jogadores_só cobertos'])}", f"{f(r['grade_penalizada'])} / {f(r['grade_só cobertos'])}",
+                     [[n(r["serie"]), f"{f(r['jogadores_penalizada'])} / {f(r['jogadores_só cobertos'])}", f"{f(r['grade_penalizada'])} / {f(r['grade_só cobertos'])}",
                        f"{f(r['zero_visiveis_penalizada'])} / {f(r['zero_visiveis_só cobertos'])}"] for r in t4],
                      "Tabela T4 (b) — Visibilidade no GSR test: fração de jogadores-frame jogados para fora do quadro, de pontos da grade com rótulo trocado e "
                      "de frames com 0 jogadores visíveis, penalizada (frame sem homografia conta como erro) e só nos frames cobertos."))
     out.append(table(["Série", "Tremor mediano / p90 (px), trios", "Deslize mediano / p90 (px), pares", "Jogadores invertidos", "0 visíveis"],
-                     [[r["serie"], f"{f(r['tremor_med'], 2)} / {f(r['tremor_p90'], 2)} ({milhar(r['trios'])})",
+                     [[n(r["serie"]), f"{f(r['tremor_med'], 2)} / {f(r['tremor_p90'], 2)} ({milhar(r['trios'])})",
                        f"{f(r['deslize_med'], 2)} / {f(r['deslize_p90'], 2)} ({milhar(r['pares'])})", f(r["jogadores"]), f(r["zero_visiveis"])]
                       for r in _t("T4b")],
-                     "Tabela T4b — Estabilidade e visibilidade na interseção dos frames cobertos pelas cinco séries (detector, 6a Bassek, 6a robusto, "
-                     "Kalman + RTS e 6c fluxo)."))
+                     "Tabela T4b — Estabilidade e visibilidade na interseção dos frames cobertos pelas cinco séries (detector, suavização S-G "
+                     "(Bassek), S-G robusta, Kalman + RTS e propagação)."))
     rows = []
+    lin = lambda s: s.replace(" - ", " − ").replace("6c fluxo", "propagação").replace("nosso propagação", "nossa propagação").replace("6c", "propagação")
     for r in _t("T5"):
+        sg = "+" if r["linha"].startswith("ganho") else ""
         if r["locsim5"]:
-            rows.append([r["linha"].replace(" - ", " − "), ("+" if r["linha"].startswith("ganho") else "") + f(r["locsim5"]), "—", "—"])
+            rows.append([lin(r["linha"]), sg + f(r["locsim5"]), "—", "—", "—", "—"])
         else:
-            pen = ("+" if r["linha"].startswith("ganho") else "") + ic(r, "pen")
-            rows.append([r["linha"].replace(" - ", " − "), pen, ic(r, "cob"), f(r["comum"])])
-    out.append(table(["Linha", "LocSim@5 (penalizado, no nosso caso)", "Nos cobertos", "Conjunto comum"], rows,
+            rows.append([lin(r["linha"]), sg + f(r["pen"]), mm(r, "pen"), f(r["cob"]), mm(r, "cob"), f(r["comum"])])
+    out.append(table(["Linha", "LocSim@5 (penalizado, no nosso caso)", MM, "Nos cobertos", MM, "Conjunto comum (nos cobertos)"], rows,
                      "Tabela T5 — Comparação com a tabela 7 do AuxFlow. O LocSim deles não tem frames sem homografia; o nosso é agregado sobre "
                      "pessoas-frame, e a pessoa de frame sem homografia vale 0."))
-    out.append(table(["Jogo", "Clipes", "Com âncora", "Frames", "Cobertura detector / 6c", "LocSim@5 pen.: detector / 6c / teto"],
+    out.append(table(["Jogo", "Clipes", "Com âncora", "Frames", "Cobertura detector / propagação", "LocSim@5 pen.: detector / propagação / teto condicionado"],
                      [[r["jogo"], r["clipes"], r["com_ancora"], f"{int(r['frames']):,}".replace(",", "."), f"{f(r['cob_detector'])} / {f(r['cob_6c'])}",
                        f"{f(r['locsim_pen_detector'])} / {f(r['locsim_pen_6c'])} / {f(r['locsim_pen_teto'])}"] for r in _t("T6")],
                      "Tabela T6 — GSR test por jogo."))
@@ -563,21 +658,37 @@ def apendice():
                      [[r["conjunto"], r["n"], r["com_gabarito"] or "—", (f"{r['erradas']} ({f(int(r['erradas']) / int(r['com_gabarito']), 1, pct=True)}%)"
                                                                          if r["erradas"] else r["lista"].replace(" ", ", "))] for r in t7],
                      "Tabela T7 — Âncoras no GSR test."))
-    out.append(table(["Lacuna", "Frames", "6a Bassek", "6a robusto", "6c fluxo", "6c sem linhas"],
+    out.append(table(["Lacuna", "Frames", "suavização S-G (Bassek)", "S-G robusta", "propagação", "propagação sem linhas"],
                      [[r["lacuna"].replace("-", "–"), milhar(r["frames"]), *(f"{f(r[s + ' cob'])} / {f(r[s + ' NPE'], 4)}" for s in
                                                                                  ("6a Bassek", "6a robusto", "6c fluxo", "6c sem linhas"))] for r in _t("T8")],
                      "Tabela T8 — Lacunas do detector no GSR test: cobertura / NPE mediano. As pontas são lacunas que tocam o começo ou o fim do clipe."))
     t9 = _t("T9")
     out.append(table(["Etapa", "Processos", "Parede (h)", "Vazão (frames/s)", "ms por frame num processo", "s por clipe num processo", "s por clipe de parede"],
-                     [[r["etapa"], r["processos"], f(r["parede_h"], 2), f(r["frames_por_s"], 2), f"{float(r['ms_por_frame_processo']):,.0f}".replace(",", "."),
+                     [[r["etapa"].replace("6c", "propagação"), r["processos"], f(r["parede_h"], 2), f(r["frames_por_s"], 2), f"{float(r['ms_por_frame_processo']):,.0f}".replace(",", "."),
                        f"{float(r['s_por_clipe_processo']):,.0f}".replace(",", "."), f(r["s_por_clipe_parede"], 0)] for r in t9 if r["processos"]],
-                     "Tabela T9 (a) — Custo na rodada do test (AMD Ryzen 7 5700X, 8 núcleos e 16 threads, com RTX 5060; o detector em CPU, as máscaras do "
-                     "6c em GPU). Com 15 processos em 8 núcleos, o custo por frame num processo é maior que o do perfil num núcleo sem concorrência "
-                     "(4,76 s por frame no detector; 127 ms no 6c)."))
+                     "Tabela T9 (a) — Custo na rodada do test (AMD Ryzen 7 5700X, 8 núcleos e 16 threads, com RTX 5060; o detector em CPU, as máscaras da "
+                     "propagação em GPU). Com 15 processos em 8 núcleos, o custo por frame num processo é maior que o do perfil num núcleo sem concorrência "
+                     "(4,76 s por frame no detector; 127 ms na propagação)."))
     out.append(table(["Etapa (AuxFlow)", "Lote", "Tempo por clipe (s)", "FPS"],
                      [[r["etapa"].replace("AuxFlow ", ""), r["lote"], r["s_por_clipe"], f(r["fps"], 1)] for r in t9 if not r["processos"]],
                      "Tabela T9 (b) — Tabela 6 do AuxFlow, por clipe de 750 frames (i7-8700K com RTX 4090; o lote é o tamanho do lote na GPU ou o "
                      "número de threads)."))
+    b = _t("B1_B3_B4", POS)
+    fr = {r["serie"]: r["fracao_teto_sistema"] for r in _t("B4_fracao", POS)}
+    acc = lambda r, k: " / ".join(f(r[f"acc{t}_{k}"]) for t in (5, 10, 20))
+    for conj, cap in (("test inteiro", "Tabela T10 (a) — Análise posterior à rodada, GSR test inteiro: o teto do sistema (âncora de gabarito no primeiro frame "
+                                       "com gabarito de cada bloco de 150 frames, com a mesma propagação), as duas homografias de gabarito como predição e "
+                                       "a acurácia contra as linhas anotadas (contagem do SN-Calib, 960 × 540). Acurácia penalizada: frame com linhas "
+                                       "anotadas e sem homografia vale 0. A fração ao teto do sistema é (série − detector) / (teto do sistema − detector), "
+                                       "no LocSim@5 penalizado."),
+                      ("conjunto comum", "Tabela T10 (b) — O mesmo, no conjunto comum: os frames com homografia do detector.")):
+        rs = [r for r in b if r["conjunto"] == conj]
+        head = ["Série", "Cobertura", "NPE mediano", "LocSim@5 pen.", "Nos cobertos", "Acurácia 5 / 10 / 20 px, pen.", "Acurácia 5 / 10 / 20 px, cobertos"]
+        rows = [[n(r["serie"]), f(r["cobertura"]), f(r["npe_med"], 4), f(r["locsim_pen"]), f(r["locsim_cob"]), acc(r, "pen"), acc(r, "cob")] for r in rs]
+        if conj == "test inteiro":
+            head.append("Fração ao teto do sistema")
+            rows = [x + [f(fr.get(r["serie"], "")) if r["serie"] != "detector" else "—"] for x, r in zip(rows, rs)]
+        out.append(table(head, rows, cap))
     return "\n".join(out).rstrip() + "\n"
 
 

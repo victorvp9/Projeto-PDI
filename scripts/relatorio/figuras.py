@@ -1,10 +1,10 @@
 """Figuras do relatório (docs/04-relatorio.md) que não existiam: esquema do pipeline, etapas
-do detector num frame, LocSim@5 por frame num clipe do HSB e deriva do 6c com a distância à
-âncora. Só lê os caches e os CSVs da rodada do test e funções do src/ sem mudança; nenhum
+do detector num frame, LocSim@5 por frame num clipe do HSB, deriva da propagação com a
+distância à âncora e a lacuna da Figura 7 com os nomes descritivos das séries. Só lê os caches e os CSVs da rodada do test e funções do src/ sem mudança; nenhum
 número das tabelas é recalculado de outro jeito. A única conta nova é a das máscaras, retas e
 elipses do frame de ilustração (do train), com os parâmetros do detector congelado.
 
-As figuras de falha do relatório são as da análise de falhas (outputs/figures/falhas_test/).
+As outras figuras de falha do relatório são as da análise de falhas (outputs/figures/falhas_test/).
 Saída: outputs/figures/relatorio/. Uso (da raiz, PYTHONPATH=.): figuras.py"""
 import csv
 import pickle
@@ -36,17 +36,17 @@ def pipeline():
     arrow = lambda x0, y0, x1, y1: ax.annotate("", (x1, y1), (x0, y0), arrowprops=dict(arrowstyle="->", color="0.25"))
     top = [("frame\n(BGR)", 8), ("1. gramado\n(matiz em Lab)", 12), ("2. marcações\n(filtro de linha)", 12),
            ("3-4. retas\ne elipses", 11), ("5. hipóteses:\n2 + 2 retas", 12),
-           ("verificação:\nnota e portões", 13), ("7. refino\nponto-linha", 12)]
+           ("6. verificação:\nnota e portões", 13), ("7. refino\nponto-linha", 12)]
     x = 1
     for k, (t, w) in enumerate(top):
         box(x, 33, w, t, "#e8f0e0" if k else "#eeeeee")
         if k:
             arrow(x - 2.2, 37.5, x - 0.4, 37.5)
         x += w + 2.6
-    ax.text(1, 44.5, "Detector frame a frame (Etapas 1-7)", fontsize=10, weight="bold")
-    ax.text(1, 27, "Consistência temporal (Etapa 8), por clipe", fontsize=10, weight="bold")
-    bot = [("série do detector\n(H ou nada)", 15), ("6b. cortes\n(histograma)", 12),
-           ("âncoras: máximos\nda nota + verificação", 18), ("6c. Lucas-Kanade\n+ linhas guiadas", 16),
+    ax.text(1, 44.5, "Detector frame a frame", fontsize=10, weight="bold")
+    ax.text(1, 27, "Consistência temporal, por clipe", fontsize=10, weight="bold")
+    bot = [("série do detector\n(H ou nada)", 15), ("detecção de corte\n(histograma)", 14),
+           ("âncoras: máximos\nda nota + verificação", 18), ("propagação: Lucas-\nKanade + linhas guiadas", 20),
            ("H nos frames dos\nplanos com âncora", 16)]
     x = 1
     for k, (t, w) in enumerate(bot):
@@ -55,9 +55,10 @@ def pipeline():
             arrow(x - 2.2, 17.5, x - 0.4, 17.5)
         x += w + 2.6
     arrow(96, 33, 9, 22.6)
-    ax.text(1, 7, "Comparadas a partir da mesma série: 6a (Savitzky-Golay 31/3, lacunas ≤ 25 frames por interpolação linear;\n"
-            "\"robusto\": Hampel antes) e Kalman de velocidade constante + RTS. Ablações do 6c: sem fluxo, sem linhas,\n"
-            "âncora ingênua a cada 150 frames e âncora de gabarito (teto).", fontsize=8.5, va="top")
+    ax.text(1, 7, "Comparadas a partir da mesma série: suavização S-G (Bassek: Savitzky-Golay 31/3, lacunas ≤ 25 frames por\n"
+            "interpolação linear), S-G robusta (Hampel antes) e Kalman de velocidade constante + RTS. Ablações da propagação:\n"
+            "sem fluxo, sem linhas, âncora ingênua a cada 150 frames e âncora de gabarito (teto condicionado às âncoras).",
+            fontsize=8.5, va="top")
     fig.savefig(OUT / "fig1_pipeline.png", dpi=200, bbox_inches="tight")
     plt.close(fig)
 
@@ -119,7 +120,7 @@ def hsb_curve():
     assert [r["pos"] for r in prop] == list(fr)
     fig, ax = plt.subplots(figsize=(9, 3.4))
     ax.plot(fr, [val(r) for r in prop], color="#1f77b4", lw=1.2, label="só propagação, a partir da H_gt_auxflow (medição 1)")
-    ax.plot(fr, [val(r) for r in c6], color="#d62728", lw=1.2, label="pipeline: 6c com as nossas âncoras (medição 3)")
+    ax.plot(fr, [val(r) for r in c6], color="#d62728", lw=1.2, label="pipeline: propagação com as nossas âncoras (medição 3)")
     has = np.array([r["has_pred"] for r in det])
     ax.plot(fr[has], [val(r) for r, h in zip(det, has) if h], "k.", ms=4, label="detector, só nos frames com H (medição 2)")
     ax.plot(fr[~has], np.full((~has).sum(), -0.04), "|", color="0.5", ms=5, label="detector sem H")
@@ -149,7 +150,7 @@ def drift():
         axs[0].plot(labels, [float(r[b]["npe_med"]) for b in bins], marker=mk, label=lab)
         axs[1].plot(labels, [float(r[b]["erradas"]) for b in bins], marker=mk, label=lab)
     axs[0].set_yscale("log")
-    axs[0].set_ylabel("NPE mediano do 6c")
+    axs[0].set_ylabel("NPE mediano da propagação")
     axs[1].set_ylabel("fração com NPE > 0,05")
     axs[1].yaxis.set_major_formatter(COMMA)
     for a in axs:
@@ -161,8 +162,36 @@ def drift():
     plt.close(fig)
 
 
+def gap_strip():
+    """A primeira lacuna de lacunas_figuras.csv (a da Figura 7: duas bordas erradas), refeita como
+    em analise_falhas.py, só com o rótulo descritivo da suavização S-G (Bassek)."""
+    import sys
+    sys.path.insert(0, "scripts/rodada_test")
+    from analise_falhas import panel
+    from src import temporal as T
+    from src.config import path
+    from src.evaluate import npe_re
+    from src.io import gsr
+    fig = next(r for r in csv.DictReader(open(RUN / "falhas" / "lacunas_figuras.csv", encoding="utf-8")) if r["classe"] == "as duas bordas erradas")
+    c, (a, b) = fig["clipe"], map(int, fig["lacuna"].split("-"))
+    clip = path("gsr") / "test" / c
+    k, res6 = pickle.loads(T._eval_6c_path(clip).read_bytes())
+    assert k == T._eval_6c_key(), "cache do 6c de outro código"
+    samples, ser = gsr.load_clip(clip), dict(np.load(T._series_path(clip)))
+    mid = (a + b) // 2
+    H6 = res6[3]["6a Bassek"][mid].astype(float)
+    e = lambda H, s: npe_re(H, s.H_gt, s.size)[0]
+    pa, pm, pb = samples[a - 1], samples[mid], samples[b + 1]
+    strip = np.hstack([panel(pa.image, ser["H"][a - 1], pa.lines_uv, f"{c} f{a - 1}: detector (borda) NPE {e(ser['H'][a - 1], pa):.3f}"),
+                       panel(pm.image, H6, pm.lines_uv, f"f{mid}: S-G (Bassek), lacuna {a}-{b} NPE {e(H6, pm):.3f}"),
+                       panel(pb.image, ser["H"][b + 1], pb.lines_uv, f"f{b + 1}: detector (borda) NPE {e(ser['H'][b + 1], pb):.3f}")])
+    cv2.imwrite(str(OUT / "fig7_lacuna.jpg"), strip, [cv2.IMWRITE_JPEG_QUALITY, 85])
+    print(f"fig7: {c}, lacuna {a}-{b}")
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
+    gap_strip()
     pipeline()
     drift()
     hsb_curve()

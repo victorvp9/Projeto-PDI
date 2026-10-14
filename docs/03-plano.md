@@ -654,8 +654,13 @@ de gabarito (teto).
 
      **Limitação do método:** o detector gera hipóteses com 2 + 2 retas de duas
      famílias de paralelas e não fecha a H num quadro sem elas. **Trabalho
-     futuro:** fechar a H com a correspondência entre o círculo central e a
-     elipse, junto com a linha do meio.
+     futuro** (corrigido na revisão externa, 2026-10-13): círculo + uma reta é
+     degenerado (sobra uma família de um parâmetro; `decisoes.md`, 2026-09-25),
+     então a proposta é círculo central + linha do meio + uma lateral, que
+     essas vistas mostram, com as correspondências linha × elipse e as
+     tangências do PnLCalib. A ablação de correspondências foi neutra no
+     treino, mas entrava depois da hipótese 2 + 2, que é justamente o que falta
+     nessas vistas.
   3. deriva da propagação em lacunas longas e nas pontas.
   4. gabarito duvidoso.
 
@@ -701,7 +706,10 @@ de gabarito (teto).
     `line_thr` 15 no GSR dá +0,127 de LocSim no jogo 4 (contraste baixo) e
     −0,046 no jogo 9, onde o NPE mediano vai de 0,0056 para 0,0130. É o que a
     Fatia 3 viu na segmentação: um limiar global contra o contraste de cada
-    jogo. **Trabalho futuro:** um limiar adaptado ao jogo ou ao frame.
+    jogo. **Trabalho futuro:** um limiar adaptado ao jogo ou ao frame
+    (limiar adaptativo local, de Niblack ou Sauvola), filtragem homomórfica ou
+    Retinex, e um espaço invariante a sombra (Finlayson et al.) para o jogo 3;
+    a histerese e o limiar relativo já foram testados na Fatia 3 e reprovados.
 - **Saída e reprodução** (decisão de Victor). O código vem de três commits:
   1. **`418a3be`**: o método congelado;
   2. **`b3bcd98`**: a correção da conferência de fechamento da série

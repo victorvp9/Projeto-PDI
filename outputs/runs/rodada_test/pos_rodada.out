@@ -1,0 +1,94 @@
+SNGS-125: 5 âncoras de gabarito
+SNGS-121: 5 âncoras de gabarito
+SNGS-119: 5 âncoras de gabarito
+SNGS-117: 5 âncoras de gabarito
+SNGS-122: 5 âncoras de gabarito
+SNGS-124: 5 âncoras de gabarito
+SNGS-116: 5 âncoras de gabarito
+SNGS-123: 5 âncoras de gabarito
+SNGS-118: 5 âncoras de gabarito
+SNGS-120: 5 âncoras de gabarito
+SNGS-126: 5 âncoras de gabarito
+SNGS-127: 5 âncoras de gabarito
+SNGS-129: 5 âncoras de gabarito
+SNGS-128: 5 âncoras de gabarito
+SNGS-130: 5 âncoras de gabarito
+SNGS-132: 5 âncoras de gabarito
+SNGS-135: 5 âncoras de gabarito
+SNGS-134: 5 âncoras de gabarito
+SNGS-131: 5 âncoras de gabarito
+SNGS-133: 5 âncoras de gabarito
+SNGS-136: 5 âncoras de gabarito
+SNGS-137: 5 âncoras de gabarito
+SNGS-138: 5 âncoras de gabarito
+SNGS-143: 5 âncoras de gabarito
+SNGS-140: 5 âncoras de gabarito
+SNGS-145: 5 âncoras de gabarito
+SNGS-144: 5 âncoras de gabarito
+SNGS-139: 5 âncoras de gabarito
+SNGS-142: 5 âncoras de gabarito
+SNGS-141: 5 âncoras de gabarito
+SNGS-146: 5 âncoras de gabarito
+SNGS-147: 5 âncoras de gabarito
+SNGS-148: 5 âncoras de gabarito
+SNGS-150: 5 âncoras de gabarito
+SNGS-149: 5 âncoras de gabarito
+SNGS-190: 5 âncoras de gabarito
+SNGS-187: 5 âncoras de gabarito
+SNGS-191: 5 âncoras de gabarito
+SNGS-189: 5 âncoras de gabarito
+SNGS-188: 5 âncoras de gabarito
+SNGS-192: 5 âncoras de gabarito
+SNGS-193: 5 âncoras de gabarito
+SNGS-194: 5 âncoras de gabarito
+SNGS-196: 5 âncoras de gabarito
+SNGS-195: 5 âncoras de gabarito
+SNGS-197: 5 âncoras de gabarito
+SNGS-199: 5 âncoras de gabarito
+SNGS-200: 5 âncoras de gabarito
+SNGS-198: 5 âncoras de gabarito
+conjunto       | série                                     | cob   | NPE med | LocSim@5 pen / cob | acc 5/10/20 pen        | acc 5/10/20 cob
+test inteiro   | detector                                  | 0.505 | 0.0072  | 0.4193 / 0.8685    | 0.387 0.436 0.451 | 0.784 0.884 0.914
+test inteiro   | 6a Bassek                                 | 0.680 | 0.0126  | 0.4463 / 0.6814    | 0.398 0.462 0.494 | 0.599 0.695 0.743
+test inteiro   | 6a robusto                                | 0.665 | 0.0097  | 0.4780 / 0.7471    | 0.430 0.492 0.518 | 0.662 0.757 0.797
+test inteiro   | Kalman + RTS                              | 0.680 | 0.0113  | 0.4904 / 0.7492    | 0.419 0.490 0.520 | 0.631 0.737 0.783
+test inteiro   | 6c fluxo                                  | 0.897 | 0.0105  | 0.7490 / 0.8335    | 0.551 0.650 0.707 | 0.613 0.724 0.787
+test inteiro   | 6c sem linhas                             | 0.897 | 0.0122  | 0.7152 / 0.7958    | 0.508 0.598 0.656 | 0.566 0.666 0.731
+test inteiro   | 6c sem fluxo                              | 0.897 | 0.1248  | 0.3660 / 0.4073    | 0.202 0.273 0.347 | 0.225 0.304 0.386
+test inteiro   | 6c âncora ingênua /150                    | 1.000 | 0.0262  | 0.5714 / 0.5714    | 0.461 0.547 0.581 | 0.461 0.547 0.581
+test inteiro   | 6c âncora de gabarito                     | 0.897 | 0.0064  | 0.7631 / 0.8491    | 0.576 0.671 0.727 | 0.641 0.748 0.809
+test inteiro   | teto do sistema (âncora de gabarito /150) | 1.000 | 0.0058  | 0.9220 / 0.9220    | 0.733 0.853 0.902 | 0.733 0.853 0.902
+test inteiro   | H_gt pelas linhas                         | 1.000 | 0.0000  | 0.9291 / 0.9464    | 0.849 0.930 0.949 | 0.869 0.952 0.972
+test inteiro   | H_gt_auxflow                              | 0.966 | 0.0136  | 0.9746 / 0.9779    | 0.515 0.746 0.852 | 0.533 0.772 0.882
+conjunto comum | detector                                  | 1.000 | 0.0072  | 0.8685 / 0.8685    | 0.784 0.884 0.914 | 0.784 0.884 0.914
+conjunto comum | 6a Bassek                                 | 1.000 | 0.0081  | 0.8266 / 0.8266    | 0.735 0.838 0.880 | 0.735 0.838 0.880
+conjunto comum | 6a robusto                                | 0.995 | 0.0073  | 0.8681 / 0.8729    | 0.779 0.879 0.912 | 0.783 0.883 0.917
+conjunto comum | Kalman + RTS                              | 1.000 | 0.0081  | 0.8730 / 0.8730    | 0.760 0.871 0.909 | 0.760 0.871 0.910
+conjunto comum | 6c fluxo                                  | 0.988 | 0.0066  | 0.9218 / 0.9302    | 0.807 0.906 0.937 | 0.817 0.917 0.949
+conjunto comum | 6c sem linhas                             | 0.988 | 0.0069  | 0.9156 / 0.9240    | 0.787 0.895 0.931 | 0.797 0.906 0.942
+conjunto comum | 6c sem fluxo                              | 0.988 | 0.0294  | 0.6650 / 0.6711    | 0.377 0.501 0.616 | 0.382 0.507 0.623
+conjunto comum | 6c âncora ingênua /150                    | 1.000 | 0.0087  | 0.8184 / 0.8184    | 0.720 0.814 0.844 | 0.720 0.814 0.844
+conjunto comum | 6c âncora de gabarito                     | 0.988 | 0.0032  | 0.9261 / 0.9345    | 0.829 0.920 0.948 | 0.839 0.931 0.960
+conjunto comum | teto do sistema (âncora de gabarito /150) | 1.000 | 0.0052  | 0.9339 / 0.9339    | 0.794 0.897 0.933 | 0.794 0.897 0.933
+conjunto comum | H_gt pelas linhas                         | 1.000 | 0.0000  | 0.9469 / 0.9474    | 0.904 0.964 0.978 | 0.904 0.965 0.979
+conjunto comum | H_gt_auxflow                              | 0.959 | 0.0147  | 0.9810 / 0.9837    | 0.545 0.762 0.867 | 0.568 0.794 0.904
+
+fração ao teto do sistema: detector 0.000, 6a Bassek 0.054, 6a robusto 0.117, Kalman + RTS 0.142, 6c fluxo 0.656, 6c sem linhas 0.588, 6c sem fluxo -0.106, 6c âncora ingênua /150 0.303, 6c âncora de gabarito 0.684
+
+B2 (HSB, %): série | pen média / mediana | cob média / mediana | cobertura H_gt / pessoas / por pessoa
+   6a Bassek    |  20.9 /   0.0 |  52.9 /  62.7 | 0.477 / 0.396 / 0.444
+   6a robusto   |  24.5 /   0.0 |  65.9 /  93.5 | 0.448 / 0.371 / 0.416
+   detector     |  17.7 /   0.0 |  79.7 /  95.6 | 0.267 / 0.221 / 0.252
+   6c fluxo     |  61.7 /  71.1 |  74.5 /  86.3 | 0.831 / 0.829 / 0.827
+por clipe (pen média %):
+   SNGS-117: 6a Bassek 0.0, 6a robusto 0.0, detector 0.0, 6c fluxo 59.4
+   SNGS-123: 6a Bassek 18.8, 6a robusto 24.2, detector 10.1, 6c fluxo 59.1
+   SNGS-124: 6a Bassek 34.5, 6a robusto 75.5, detector 40.6, 6c fluxo 70.3
+   SNGS-128: 6a Bassek 0.0, 6a robusto 0.0, detector 0.0, 6c fluxo 0.0
+   SNGS-136: 6a Bassek 45.3, 6a robusto 46.3, detector 44.2, 6c fluxo 85.7
+   SNGS-138: 6a Bassek 0.0, 6a robusto 0.0, detector 0.0, 6c fluxo 0.0
+   SNGS-150: 6a Bassek 0.7, 6a robusto 7.3, detector 6.6, 6c fluxo 56.7
+   SNGS-187: 6a Bassek 45.6, 6a robusto 40.3, detector 21.8, 6c fluxo 95.0
+   SNGS-191: 6a Bassek 0.1, 6a robusto 0.0, detector 0.0, 6c fluxo 77.6
+   SNGS-193: 6a Bassek 43.2, 6a robusto 42.9, detector 30.0, 6c fluxo 92.1
+exit=0
