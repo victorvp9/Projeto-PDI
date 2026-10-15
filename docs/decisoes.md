@@ -927,7 +927,7 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
     - Os mesmos pontos estão no README, em "Limitações conhecidas".
   - **Os números relatados não são afetados:**
     - na rodada do test, as 735/735 chaves da série foram conferidas iguais à congelada (registro de 2026-10-01);
-    - as 49/49 do 6c também: a etapa 5 fechou com 0 falhas, com o `verify_keys`, e os 49 caches do test estavam na chave congelada exata na regravação de 2026-10-02;
+    - as 49/49 do 6c também, pelo manifesto do estágio 5 do test, `outputs/runs/_eval_clip_6c_cached_20261002_122732_644364.json` (local; `outputs/runs/` não é versionado). Ele traz `"status": "concluída"`, `"ok": 49`, `"falhas": 0` e `"chave_rodada": "8c9599c7b9618bd496ab68ad0845c476041e4af7"`, que é a chave do 6c em `outputs/runs/congelamento.json`. Cada uma das 49 tarefas tem `"chave_gravada"` igual a ela, gravada pelo `verify_keys` no fechamento, que marca falha em toda tarefa cuja chave gravada difere;
     - o `config.yaml` não mudou desde o `418a3be` (`git diff` vazio).
   - **Achado 4, anotado e não aplicado (sem efeito nos resultados entregues):** `--sensitivity-params` com nomes que não são de uma parte faz essa parte refazer todos os parâmetros (`run.py:485, 488`), e um nome errado refaz as duas partes sem erro.
   - **Achado 5, anotado e não aplicado (sem efeito nos resultados entregues):** `evaluate._sample` é cópia exata de `conics._seg_points`.
