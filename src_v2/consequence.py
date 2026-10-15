@@ -28,7 +28,9 @@ def _ecc_path(clip):
 def _ecc_key():
     """Config do ECC e bytes (lidos na importação) do stability.py e do temporal.py
     (máscaras); o processo principal calcula no início da rodada e o trabalhador confere."""
-    return hashlib.sha1(json.dumps(S, sort_keys=True).encode() + _SRC_ECC + T._SRC["temporal.py"]).hexdigest()
+    mask = {"temporal.compact_dilate_frac": T.T["compact_dilate_frac"], "segment": CFG["segment"], "lines": CFG["lines"]}  # v2, achado 3
+    return hashlib.sha1(json.dumps(S, sort_keys=True).encode() + _SRC_ECC + T._SRC["temporal.py"]
+                        + json.dumps(mask, sort_keys=True).encode() + T._SRC["segment.py"] + T._SRC["lines.py"]).hexdigest()
 
 
 def clip_motions(clip, samples, key):
@@ -58,7 +60,7 @@ def _eval_clip_7(clip, key6, key_ecc):
     check_key(key6, T._eval_6c_key(), "6c")
     check_key(key_ecc, _ecc_key(), "ECC")
     cv2.setNumThreads(1)
-    ser = dict(np.load(T._series_path(clip)))
+    ser = T.load_series(clip)
     samples = gsr.load_clip(clip)
     size = samples[0].size
     p6 = T._eval_6c_path(clip)

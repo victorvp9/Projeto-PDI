@@ -24,7 +24,7 @@ import src_v2.assign, src_v2.conics, src_v2.evaluate, src_v2.geometry, src_v2.ho
 # detector e o io/gsr.py não guardam os próprios bytes: editá-los mudaria a série do
 # detector (~11 h por partição) e o cache da H_gt.
 _KEY_SOURCES = ("segment.py", "lines.py", "conics.py", "assign.py", "homography.py", "geometry.py", "render.py")
-_SRC = {f: (ROOT / "src_v2" / f).read_bytes() for f in _KEY_SOURCES + ("temporal.py", "evaluate.py", "io/gsr.py")}
+_SRC = {f: (ROOT / "src_v2" / f).read_bytes() for f in _KEY_SOURCES + ("temporal.py", "evaluate.py", "io/gsr.py", "pitch_model.py")}
 
 T = CFG["temporal"]
 SERIES_KEYS = ("ok", "img", "mod", "iou", "margem")
@@ -32,11 +32,28 @@ SERIES_KEYS = ("ok", "img", "mod", "iou", "margem")
 
 def _series_key():
     """Hash do config e do código de que a série do detector depende (bytes lidos na
-    importação; mesmo valor da fórmula anterior)."""
-    h = hashlib.sha1(json.dumps({k: CFG[k] for k in ("segment", "lines", "assign", "detector", "fit")}, sort_keys=True).encode())
-    for f in _KEY_SOURCES:
+    importação). v2 (achado 3 da revisão de 2026-10-14): entram também a seção `pitch`, o
+    `eval.quality_grid_px` (margem de ambiguidade por evaluate.image_grid_displacement) e os
+    bytes do evaluate.py e do pitch_model.py."""
+    cfg = {k: CFG[k] for k in ("segment", "lines", "assign", "detector", "fit", "pitch")}
+    cfg["eval.quality_grid_px"] = CFG["eval"]["quality_grid_px"]
+    h = hashlib.sha1(json.dumps(cfg, sort_keys=True).encode())
+    for f in _KEY_SOURCES + ("evaluate.py", "pitch_model.py"):
         h.update(_SRC[f])
     return h.hexdigest()
+
+
+def load_series(clip, key=None):
+    """Série do detector de um clipe, só se gravada com a chave do código e do config atuais
+    (`key`, padrão `_series_key()`); senão, erro. v2, achado 2 da revisão de 2026-10-14: a
+    série era lida sem conferir a chave, e um trecho com falha deixava a série velha valer."""
+    p = _series_path(clip)
+    if not p.exists():
+        raise FileNotFoundError(f"sem a série do detector de {clip.name}: rode --detect-series")
+    ser, key = dict(np.load(p)), key or _series_key()
+    if str(ser["key"]) != key:
+        raise RuntimeError(f"série de {clip.name} gravada com a chave {str(ser['key'])[:12]}, a atual é {key[:12]}: rode --detect-series")
+    return ser
 
 
 def _series_path(clip):
@@ -92,7 +109,7 @@ def build_series(pool, clips):
             print(f"   {clip.parent.name}/{clip.name} salvo: {done} de {len(todo)}, {(time.time() - t0) / 60:.0f} min", flush=True)
         # cada tarefa recebe uma tupla só, (clipe, i0, i1, chave): o clipe é a[0][0] (incidente da rodada do test, decisoes.md 2026-10-02)
         ex.verify_keys(key, lambda a: str(np.load(_series_path(a[0][0]))["key"]) if _series_path(a[0][0]).exists() else None)
-    return {c: dict(np.load(_series_path(c))) for c in clips}
+    return {c: load_series(c, key) for c in clips if _series_path(c).exists() and str(np.load(_series_path(c))["key"]) == key}
 
 
 # ======================= 6a: Savitzky–Golay =======================
@@ -280,7 +297,7 @@ def _eval_clip_6a(clip):
     """Métricas por frame (todos os frames) e tremor de cada série do 6a num clipe."""
     from src_v2.evaluate import frame_metrics
     cv2.setNumThreads(1)
-    ser = dict(np.load(_series_path(clip)))
+    ser = load_series(clip)
     samples = gsr.load_clip(clip)
     assert [s.frame_idx for s in samples] == list(ser["frames"])
     size = samples[0].size
@@ -641,7 +658,7 @@ def _eval_clip_6c(clip):
     from src_v2.evaluate import frame_metrics, npe_re
     cv2.setNumThreads(1)
     t0 = time.time()
-    ser = dict(np.load(_series_path(clip)))
+    ser = load_series(clip)
     samples = gsr.load_clip(clip)
     assert [s.frame_idx for s in samples] == list(ser["frames"])
     cf = ClipFrames(samples)
@@ -687,6 +704,8 @@ def _eval_6c_key():
     linha da importação (valid, 2026-09-30: 47 de 58 clipes gravados com chave errada).
     O processo principal a calcula no início da rodada e cada trabalhador confere."""
     h = hashlib.sha1(json.dumps(T, sort_keys=True).encode() + _series_key().encode())
+    # v2, achado 3: as métricas (eval), o gabarito (gsr, gsr_label_fixes) e o molde (pitch)
+    h.update(json.dumps({k: CFG[k] for k in ("eval", "gsr", "gsr_label_fixes", "pitch")}, sort_keys=True).encode())
     for f in ("temporal.py", "evaluate.py", "io/gsr.py"):
         h.update(_SRC[f])
     return h.hexdigest()
@@ -775,7 +794,7 @@ def _eval_clip_hampel(clip):
     Bassek (sem Hampel), e o que o Hampel descartou (NPE da H do detector descartada)."""
     from src_v2.evaluate import frame_metrics, npe_re
     cv2.setNumThreads(1)
-    ser = dict(np.load(_series_path(clip)))
+    ser = load_series(clip)
     samples = gsr.load_clip(clip)
     assert [s.frame_idx for s in samples] == list(ser["frames"])
     size, game = samples[0].size, gsr.game_id(clip)
@@ -842,7 +861,7 @@ def _eval_clip_kalman(clip):
     (6a Bassek, 6a robusto) num clipe."""
     from src_v2.evaluate import frame_metrics
     cv2.setNumThreads(1)
-    ser = dict(np.load(_series_path(clip)))
+    ser = load_series(clip)
     samples = gsr.load_clip(clip)
     assert [s.frame_idx for s in samples] == list(ser["frames"])
     size = samples[0].size

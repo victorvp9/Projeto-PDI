@@ -119,7 +119,7 @@ def _flow_metrics(clip, samples):
     `samples` (com o gabarito) vêm de fora da perturbação."""
     from src_v2 import temporal as T
     from src_v2.evaluate import frame_metrics
-    ser = dict(np.load(T._series_path(clip)))
+    ser = T.load_series(clip)
     cf, seg = T.ClipFrames(samples), np.zeros(len(samples), int)
     anc, _, _ = T.anchors(ser, cf, seg)
     Hs = T.fill_from_anchors(cf, anc, ser["H"], seg, "flow")
@@ -329,7 +329,7 @@ def _rows_6c(clip, samples):
     atual confere as H com as do cache da produção, frame a frame."""
     from src_v2 import temporal as TM
     from src_v2.evaluate import frame_metrics
-    ser = dict(np.load(TM._series_path(path("gsr") / "train" / clip)))
+    ser = TM.load_series(path("gsr") / "train" / clip)
     cf, n = TM.ClipFrames(samples), len(samples)
     hists = [TM.frame_hist(s.image) for s in samples]
     cut = np.r_[False, [TM.hist_distance(hists[i], hists[i + 1]) > TM.T["cut_thr"] for i in range(n - 1)]]
