@@ -968,3 +968,19 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **C:** só o desenho por enquanto. O teto é recalculado com o código de C e os dois são reportados, mas a decisão é pelo LocSim@5 penalizado do 6c, e não pela fração ao teto.
   - **A:** diagnóstico primeiro, nos 10 clipes de dev sem âncora fora do jogo 3 (jogos 4, 9, 2 e 5), com o método da Seção 7 do relatório v1.
   | Decisão de Victor.
+- 2026-10-15 | **v2, B1 etapa 1: separabilidade das âncoras (diagnóstico, sem regra)** (`scripts/v2/b1_diagnostico.py`, commit `019d994`; `outputs/runs_v2/b1_diagnostico/`; 115/115 clipes, 0 falhas). São 1.908 candidatas de dev com gabarito, 771 delas erradas; entre as aceitas, 795 certas e 45 erradas.
+  - **Sinal escolhido pelo treino:** limiar com no máximo 2% das candidatas certas do treino recusadas. Nas aceitas, o melhor do treino é a nota do detector (`nota` = IoU + fração explicada, já na série), que recusa 81% das aceitas erradas do treino (13 de 16) e 52% na valid (15 de 29), com 0,2% e 0,4% das certas recusadas. Por jogo (4, 6, 9, 2, 3, 5), recusa 2/4, 4/4, 7/8, 0/4, 11/19 e 4/6 das erradas.
+  - **Linhas na imagem inteira** (`b_total`, `mod`): no jogo 3, recusam as 19 aceitas erradas; nos jogos 6 e 9, nenhuma.
+  - **Consistência com âncoras distantes** (`a_min`): separa bem as candidatas (AUC 0,96 no treino). Nas aceitas do jogo 3 falha (1 de 19), porque as âncoras distantes também estão erradas ali.
+  - **"nota OU b_total"**, com os limiares do treino, só como informação (não pré-escolhida): 41 de 45 aceitas erradas recusadas, contra 5 de 795 certas.
+  - A regra (etapa 2) espera a aprovação de Victor.
+  | Medição.
+- 2026-10-15 | **v2, A: diagnóstico das causas da falta de âncora** nos 10 clipes de dev sem âncora fora do jogo 3 (`scripts/v2/a_diagnostico.py`; `outputs/runs_v2/a_diagnostico/`; 1 frame a cada 75; segmentação comparada com os 65 clipes com âncora dos mesmos jogos).
+  - **A regra automática de enquadramento falhou:** contava como "2 + 2 disponível" qualquer classe anotada, inclusive as linhas do fundo que quase não aparecem na máscara e os tocos de área nos cantos do quadro.
+  - **Pela inspeção visual das figuras** (método da Seção 7 do v1; `inspecao_visual.csv`), dos 100 frames amostrados:
+    - 63 são vistas centrais (círculo e linha do meio), maioria em 7 dos 10 clipes;
+    - 35 são vistas da área com as linhas do fundo mal segmentadas (contraste baixo, jogos 2, 4 e 5);
+    - 2 são zona meio–área, com o gramado perdendo a sombra (SNGS-151, jogo 9).
+  - **Por clipe:** vista central em 6, segmentação das linhas do fundo em 2, misto em 2.
+  - **Leitura:** a vista central explica a maior parte, o que justifica desenhar o A (círculo central + linha do meio + lateral). As vistas da área com linhas do fundo fracas são o caso de E.
+  | Medição; a classificação visual é minha.
