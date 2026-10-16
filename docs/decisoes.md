@@ -984,3 +984,19 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Por clipe:** vista central em 6, segmentação das linhas do fundo em 2, misto em 2.
   - **Leitura:** a vista central explica a maior parte, o que justifica desenhar o A (círculo central + linha do meio + lateral). As vistas da área com linhas do fundo fracas são o caso de E.
   | Medição; a classificação visual é minha.
+- 2026-10-15 | **v2, decisões antes de rodar o B1 (etapa 2) e o C** (Victor, depois dos diagnósticos).
+  - **B1 = `nota` sozinha** (`iou + img` da série, a nota de escolha das âncoras), com o limiar fixado no treino pela regra do diagnóstico: no máximo 2% das candidatas certas dos jogos 4, 6 e 9 recusadas, ou seja `nota` < 1,6153357723089734. A âncora que passa na verificação por maioria só é aceita se a nota dela não estiver abaixo desse limiar. A regra vai no `config_v2.yaml` como `temporal.anchor_min_nota` e no `temporal.anchors` do `src_v2`; com `null`, nada muda. A série é reaproveitada, e o 6c roda inteiro no dev.
+  - **Não entra:** a combinação "nota OU b_total". No treino, o `b_total` quase nada acrescenta à nota, e o ganho dela vem da valid, sobretudo do jogo 3. Escolhê-la agora seria escolher pela valid. Fica registrada como ideia não testada.
+  - **Fraqueza conhecida:** no jogo 2, a nota recusa 0 das 4 aceitas erradas.
+  - **Validação cruzada por jogo** (plano, seção 4), conferida antes de rodar com o `sinais_por_candidata.csv`: o limiar leave-one-game-out (a mesma regra nos outros 5 jogos) recusa exatamente as mesmas aceitas que o limiar do treino nos jogos 4, 6, 2, 3 e 5, onde o Δ medido é o Δ da validação cruzada. No jogo 9, o limiar LOGO (1,6385) recusa 13 aceitas, contra 7 do limiar do treino. O jogo 9 é medido também com o limiar LOGO, sem cache e fora do `src_v2` (`scripts/v2`, limiar no config do processo), e o critério é reportado nas duas leituras.
+  - **Decisão** pelo critério congelado: Δ > 0 em ≥ 4 de 6 jogos, média > 0 e nenhum jogo abaixo de −0,03 de LocSim@5 penalizado do 6c. Os caches do 6c da linha de base são guardados antes em `outputs/cache_v2/eval_6c_baseline/`.
+  - **C** (propagação bidirecional entre âncoras), aprovado com três ajustes:
+    - (a) a fusão usa só os pontos da grade do campo (2,5 × 2 m) que caem dentro da imagem no frame t pelas duas homografias, com margem fixa de 0,02·h além da borda. Ela é feita por DLT normalizada (Hartley), com o peso (a₂ − t)/(a₂ − a₁) para a propagação vinda de a₁. Com menos de 8 pontos, o frame fica com a homografia da âncora mais próxima, como hoje;
+    - (b) registro, por frame e só como diagnóstico, da discordância entre as duas propagações nos mesmos pontos (mediana em fração da altura);
+    - (c) o C é medido em cima do B1, se o B1 for aceito, ou contra a linha de base, se for recusado. Roda só depois da decisão do B1. O teto é recalculado com o mesmo código, mas a decisão é pelo 6c.
+  - **A, quando chegar a vez:** o desenho vem antes do código e precisa ter:
+    - as hipóteses novas só nos frames em que as 2 + 2 não dão nenhuma candidata que passe nos portões;
+    - a contagem dos graus de liberdade e das combinações que fecham a homografia (a cônica restringe pouco, pela simetria do círculo);
+    - a ambiguidade de 180° resolvida pela regra atual do detector;
+    - a checagem barata (1 frame a cada 25) como primeira medida.
+  | Decisões de Victor; a margem de 0,02·h, o mínimo de 8 pontos e a medição LOGO do jogo 9 são meus, fixados antes de rodar.
