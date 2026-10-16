@@ -4,6 +4,9 @@
 dos Δ > 0 e nenhum Δ < −0,03. Relata também o teto, a cobertura, as aceitas erradas, os clipes que
 perderam todas as âncoras e o LocSim que tinham antes.
 
+- Cada clipe vai para `por_clipe.csv` (e `por_clipe_logo9.csv`) assim que o resultado sai, e cada
+  tabela por jogo é gravada antes da decisão: uma falha no fim não perde o cálculo (Victor, 2026-10-16).
+
 - Antes de rodar, os caches do 6c da base (os do cache_v2 com a chave atual de antes da mudança) são
   copiados para outputs/cache_v2/<arquivo da base>/ (só se ainda não existem), para a comparação por
   clipe e para voltar à base sem recalcular.
@@ -23,7 +26,7 @@ import cv2
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent))
-from baseline_dev import per_game                          # noqa: E402  (mesmas métricas da linha de base)
+from baseline_dev import WRONG, per_game                   # noqa: E402  (mesmas métricas da linha de base)
 from src_v2.config import path                              # noqa: E402
 
 DEV = ("train", "valid")
@@ -45,11 +48,38 @@ def archive(name):
     return True
 
 
-def clip_locsim(r):
+def clip_locsim(r, variant="6c fluxo"):
     from src_v2.evaluate import locsim
-    fr = [x for x in r[0] if x["variante"] == "6c fluxo"]
+    fr = [x for x in r[0] if x["variante"] == variant]
     n = sum(x["n_pessoas"] for x in fr)
     return sum(locsim(x["locsim_d"], 5).sum() for x in fr if "locsim_d" in x) / n if n else np.nan
+
+
+def clip_row(c, r):
+    from src_v2.io import gsr
+    acc = np.array([a["npe"] for a in r[2] if a["aceita"]], float)
+    gt = [x["has_pred"] for x in r[0] if x["variante"] == "6c fluxo" and x["has_gt"]]
+    return dict(particao=c.parent.name, clipe=c.name, jogo=gsr.game_id(c), locsim_pen_6c=clip_locsim(r),
+                locsim_pen_teto=clip_locsim(r, "6c âncora de gabarito"), cob_6c=float(np.mean(gt)) if gt else np.nan,
+                aceitas=len(acc), aceitas_erradas=int((acc[np.isfinite(acc)] > WRONG).sum()))
+
+
+def stream(out, name, clips, results):
+    """Consome os resultados na ordem dos clipes e grava cada um em <name>.csv assim que sai."""
+    res = {}
+    with (out / f"{name}.csv").open("w", newline="", encoding="utf-8") as f:
+        w = None
+        for c, r in zip(clips, results):
+            res[c] = r
+            if r is None:                                    # falhou: está no manifesto
+                continue
+            row = clip_row(c, r)
+            if w is None:
+                w = csv.DictWriter(f, fieldnames=list(row))
+                w.writeheader()
+            w.writerow(row)
+            f.flush()
+    return res
 
 
 def run_6c(clips, n, out):
@@ -59,11 +89,11 @@ def run_6c(clips, n, out):
     T.build_series(pool, clips)                              # tudo em cache: só confere
     with pool() as ex:
         key = T._eval_6c_key()
-        res = list(ex.map(T._eval_clip_6c_cached, clips, [key] * len(clips)))
+        res = stream(out, "por_clipe", clips, ex.map(T._eval_clip_6c_cached, clips, [key] * len(clips)))
         ex.verify_keys(key, lambda a: pickle.loads(T._eval_6c_path(a[0]).read_bytes())[0] if T._eval_6c_path(a[0]).exists() else None)
     exit_if_failed()
-    assert all(r is not None for r in res)
-    return dict(zip(clips, res))
+    assert all(r is not None for r in res.values())
+    return res
 
 
 def _init_threshold(v):
@@ -82,10 +112,10 @@ def logo9(n, out):
     thr = -float(np.quantile(right, 0.98, method="higher"))
     clips = [c for c in clips_dev() if gsr.game_id(c) == "9"]
     with SafeProcessPool(n, initializer=_init_threshold, initargs=(thr,), manifest_dir=out / "manifestos") as ex:
-        res = list(ex.map(T._eval_clip_6c, clips))
+        res = stream(out, "por_clipe_logo9", clips, ex.map(T._eval_clip_6c, clips))
     exit_if_failed()
-    assert all(r is not None for r in res)
-    return thr, dict(zip(clips, res))
+    assert all(r is not None for r in res.values())
+    return thr, res
 
 
 def decide(delta):
@@ -136,6 +166,7 @@ if __name__ == "__main__":
         thr, r9 = logo9(n, out)
         rows9, _ = per_game(r9)
         d9 = rows9[0]["locsim_pen_6c"] - float(base["9"]["locsim_pen_6c"])
+        write(out, "por_jogo_logo9", [rows9[0] | dict(limiar=thr, delta_6c=d9)])
         meta["logo_jogo9"] = dict(limiar=thr, locsim_pen_6c=rows9[0]["locsim_pen_6c"], locsim_pen_teto=rows9[0]["locsim_pen_teto"], delta_6c=d9,
                                   aceitas_erradas=rows9[0]["aceitas_erradas"], aceitas=rows9[0]["aceitas"], sem_ancora=rows9[0]["sem_ancora"],
                                   decisao=decide({r["jogo"]: (d9 if r["jogo"] == "9" else r["delta_6c"]) for r in rows}))
