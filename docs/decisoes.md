@@ -1000,3 +1000,19 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
     - a ambiguidade de 180° resolvida pela regra atual do detector;
     - a checagem barata (1 frame a cada 25) como primeira medida.
   | Decisões de Victor; a margem de 0,02·h, o mínimo de 8 pontos e a medição LOGO do jogo 9 são meus, fixados antes de rodar.
+- 2026-10-16 | **v2, B1: regra de decisão fixada antes do resultado do jogo 9 com o limiar leave-one-game-out** (Victor, com a rodada no ar e a leitura LOGO do jogo 9 ainda não terminada).
+  - **Decisão:** o critério congelado (Δ > 0 em ≥ 4 de 6 jogos, média > 0, nenhum jogo abaixo de −0,03) é aplicado à **leitura leave-one-game-out**, a que corresponde à validação cruzada por jogo do plano (seção 4). Na leitura com o limiar do treino, os jogos 4, 6 e 9 são avaliados com o limiar ajustado neles mesmos, e ela fica só como informação.
+  - Nos jogos 4, 6, 2, 3 e 5, as duas leituras coincidem (mesmas aceitas recusadas; registro de 2026-10-15); só o jogo 9 muda.
+  - **Configuração daqui em diante** (e a usada pelo C): o limiar do treino (`anchor_min_nota` = 1,6153357723089734).
+  - **Se a leitura LOGO reprovar**, o B1 é recusado mesmo que a leitura do limiar do treino passe, e o C é medido contra a linha de base.
+  - As duas leituras são reportadas lado a lado, por jogo.
+  | Decisão de Victor.
+- 2026-10-16 | **v2, B1: reinício do Windows no meio da rodada.** A primeira tentativa (`rodada_6c_dev.py b1_regra …`, iniciada em 15/10 23:34) terminou o 6c dos 115 clipes às 03:08 (115/115, 0 falhas) e caiu às 03:29, na leitura LOGO do jogo 9 (2 de 20 clipes; 18 com `BrokenProcessPool`). Causa: o Windows Update reiniciou o PC às 03:30 (evento 1074 do TrustedInstaller), sem relação com o código. O mesmo comando foi relançado às 11:06.
+  - **Conferência do que a tentativa interrompida gravou** entre 23:34 e o reinício. Cada arquivo foi relido; nada foi removido:
+    - `outputs/cache_v2/eval_6c/` (115 pickles, os últimos às 03:07): relidos pelo `verify_keys` do relançamento (115 ok, 0 falhas; chave gravada = chave da rodada `a2944af0b859` em todos, a mesma da tentativa interrompida) e de novo por fora (desserializam; 4 partes; 6.000 linhas = 750 frames × 8 variantes);
+    - `outputs/cache_v2/eval_6c_baseline/` (cópia da base feita no início da tentativa): 115 pickles, todos desserializam e com a chave da linha de base (`185cc175b823`, `chave_rodada` do manifesto do 6c da linha de base);
+    - `outputs/v2/debug/propagacao/` (1.030 imagens na janela, as últimas às 02:53, antes da leitura LOGO): todas legíveis (`cv2.imread`);
+    - `outputs/runs_v2/b1_regra/`: os três manifestos da tentativa são JSON válidos e ficam como registro (série 0 falhas; 6c 115/115; LOGO 2 ok + 18 falhas); o log ficou em `rodada_1_reinicio_windows.out`;
+    - `por_jogo.csv` e `clipes_que_perderam_ancora.csv` da tentativa foram regravados pelo relançamento a partir dos caches conferidos.
+    - A leitura LOGO não grava cache (`_eval_clip_6c` sem cache), e nada foi gravado em `outputs/cache` nem em `outputs/runs` (v1).
+  | Incidente; a conferência é minha.
