@@ -1016,3 +1016,24 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
     - `por_jogo.csv` e `clipes_que_perderam_ancora.csv` da tentativa foram regravados pelo relançamento a partir dos caches conferidos.
     - A leitura LOGO não grava cache (`_eval_clip_6c` sem cache), e nada foi gravado em `outputs/cache` nem em `outputs/runs` (v1).
   | Incidente; a conferência é minha.
+- 2026-10-16 | **v2, B1: ACEITO** (`scripts/v2/rodada_6c_dev.py b1_regra …`, commit `7301ddc`; `outputs/runs_v2/b1_regra/`). Três tentativas: a 1ª caiu no reinício do Windows (registro acima); a 2ª concluiu os 20 clipes do jogo 9 LOGO, mas o `json.dumps` do `decisao.json` quebrou com um `numpy.bool_` dos critérios, e o resultado, que só existia na memória, se perdeu (defeito do script, corrigido em `7301ddc`; desde `812fc09`, cada clipe e cada tabela por jogo vão para CSV antes da decisão, a pedido de Victor); a 3ª fechou com série 0 falhas, 6c 115/115 com a chave da rodada (`a2944af0b859`) e jogo 9 LOGO 20/20.
+  - **LocSim@5 penalizado do 6c, por jogo, nas duas leituras** (base → B1; Δ). Nos jogos 4, 6, 2, 3 e 5, as duas leituras recusam as mesmas âncoras e coincidem:
+
+    | jogo | base | limiar do treino | Δ treino | leave-one-game-out | Δ LOGO |
+    |---|---|---|---|---|---|
+    | 4 | 0,4884 | 0,5155 | +0,0272 | = | +0,0272 |
+    | 6 | 0,8245 | 0,8805 | +0,0560 | = | +0,0560 |
+    | 9 | 0,8098 | 0,8282 | +0,0184 | 0,8281 (limiar 1,6385) | +0,0184 |
+    | 2 | 0,6651 | 0,6427 | −0,0223 | = | −0,0223 |
+    | 3 | 0,1390 | 0,1410 | +0,0019 | = | +0,0019 |
+    | 5 | 0,6012 | 0,6273 | +0,0261 | = | +0,0261 |
+
+  - **Critério na leitura LOGO (a que decide):** ganho em 5 de 6 jogos, média +0,0179, pior −0,0223 (jogo 2) ≥ −0,03, ou seja, **aceito**. Na leitura do limiar do treino, também aceito (5 de 6, média +0,0179, pior −0,0223). Configuração daqui em diante: o limiar do treino.
+  - **Teto** (6c com âncoras de gabarito nas aceitas), base → B1: 0,604 → 0,607; 0,897 → 0,897; 0,827 → 0,827 (LOGO 0,827); 0,675 → 0,640; 0,315 → 0,205; 0,666 → 0,658. Nos jogos 2 e 3 o teto cai, porque há menos âncoras para receber o gabarito.
+  - **Cobertura do 6c:** só muda no jogo 2 (0,893 → 0,836) e no jogo 3 (0,390 → 0,244).
+  - **Aceitas erradas** (NPE > 0,05), base → B1: 4 → 2, 4 → 0, 8 → 1 (LOGO 1), 4 → 4, 19 → 8, 6 → 2. Aceitas com gabarito no jogo 9: 206 → 199 (LOGO 193).
+  - **Clipes que ficaram sem âncora por causa da regra:**
+    - SNGS-033 (jogo 2): LocSim 0,534 antes, com 1 âncora certa. Explica a queda do jogo 2, a fraqueza conhecida;
+    - SNGS-042 (jogo 3): 0,00006 antes, com 5 aceitas, as 5 erradas;
+    - SNGS-044 e SNGS-049 (jogo 3): 0,007 e 0,006 antes, com 1 aceita errada cada.
+  | Medição; decisão pelo critério congelado na leitura fixada antes do resultado.
