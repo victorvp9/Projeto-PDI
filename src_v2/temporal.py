@@ -617,11 +617,50 @@ def anchors(ser, cf, seg, verify=True):
     return out, cand, verifiable
 
 
-def fill_from_anchors(cf, anc, H_anchor, seg, mode="flow", dbg=None):
+def dlt_normalized(XY, uv):
+    """H (campo -> imagem) por DLT com a normalização de Hartley nos dois conjuntos de pontos."""
+    def norm(p):
+        c = p.mean(axis=0)
+        s = np.sqrt(2) / np.mean(np.linalg.norm(p - c, axis=1))
+        return np.array([[s, 0, -s * c[0]], [0, s, -s * c[1]], [0, 0, 1.0]])
+    Ta, Tb = norm(XY), norm(uv)
+    a, b = np.c_[XY, np.ones(len(XY))] @ Ta.T, np.c_[uv, np.ones(len(uv))] @ Tb.T
+    M = np.zeros((2 * len(a), 9))
+    M[0::2, 0:3], M[0::2, 6:9] = a, -b[:, [0]] * a
+    M[1::2, 3:6], M[1::2, 6:9] = a, -b[:, [1]] * a
+    H = np.linalg.inv(Tb) @ np.linalg.svd(M)[2][-1].reshape(3, 3) @ Ta
+    return H / H[2, 2]
+
+
+def fuse(Ha, Hb, wa, size):
+    """C (v2): fusão, no espaço da imagem, das H propagadas de duas âncoras (campo -> imagem), com
+    peso wa para Ha. Pontos da grade do campo (evaluate.FIELD_GRID) à frente da câmera e dentro da
+    imagem pelas duas H, com margem c_margin_frac·h; posições combinadas e H reestimada por DLT
+    normalizada. Com menos de c_min_points pontos, fica a H de maior peso. Devolve também a
+    discordância entre Ha e Hb nesses pontos (mediana, em fração da altura), só para diagnóstico."""
+    from src_v2.evaluate import FIELD_GRID
+    from src_v2.geometry import project
+    w, h = size
+    m = T["c_margin_frac"] * h
+    ua, oka = project(Ha, FIELD_GRID)
+    ub, okb = project(Hb, FIELD_GRID)
+    inside = lambda u: (u[:, 0] >= -m) & (u[:, 0] <= w - 1 + m) & (u[:, 1] >= -m) & (u[:, 1] <= h - 1 + m)
+    sel = oka & okb & inside(ua) & inside(ub)
+    if sel.sum() < T["c_min_points"]:
+        return (Ha if wa >= 0.5 else Hb), np.nan
+    d = float(np.median(np.linalg.norm(ua[sel] - ub[sel], axis=1)) / h)
+    return dlt_normalized(FIELD_GRID[sel], wa * ua[sel] + (1 - wa) * ub[sel]), d
+
+
+def fill_from_anchors(cf, anc, H_anchor, seg, mode="flow", dbg=None, diag=None):
     """H de cada frame pela âncora mais próxima do mesmo plano (`seg`, entre cortes):
     "flow" (propaga e reestima), "noflow" (a H da âncora copiada) ou "nolines" (propaga,
-    só pontos na reestimativa). Plano sem âncora fica sem H."""
+    só pontos na reestimativa). Plano sem âncora fica sem H. v2, C (`temporal.bidirectional`,
+    só no "flow"): entre duas âncoras a1 < a2, cada frame t recebe a fusão (`fuse`) das
+    propagações vindas de a1 e de a2, com peso (a2 - t)/(a2 - a1) para a de a1; nas pontas, nada
+    muda. `diag` (dict), se dado, recebe a discordância das duas propagações por frame."""
     Hs = np.full((len(seg), 3, 3), np.nan)
+    bidir = mode == "flow" and T["bidirectional"]
     for k in np.unique(seg):
         idx = np.nonzero(seg == k)[0]
         s0, s1 = idx[0], idx[-1] + 1
@@ -631,11 +670,23 @@ def fill_from_anchors(cf, anc, H_anchor, seg, mode="flow", dbg=None):
             lo = s0 if i == 0 else (A[i - 1] + a) // 2 + 1
             hi = s1 if i == len(A) - 1 else (a + A[i + 1]) // 2 + 1
             for stop, step in ((hi, 1), (lo - 1, -1)):
+                if bidir and ((step == 1 and i < len(A) - 1) or (step == -1 and i > 0)):
+                    continue                                # entre âncoras: fusão abaixo
                 if mode == "noflow":
                     Hs[list(range(a + step, stop, step))] = H_anchor[a]
                 else:
                     for t, H in propagate(cf, a, H_anchor[a], stop, step, lines=mode != "nolines", dbg=dbg).items():
                         Hs[t] = H
+        if bidir:
+            for a1, a2 in zip(A[:-1], A[1:]):
+                if a2 - a1 < 2:
+                    continue
+                fwd = propagate(cf, a1, H_anchor[a1], a2, 1, lines=True, dbg=dbg)
+                bwd = propagate(cf, a2, H_anchor[a2], a1, -1, lines=True)
+                for t in range(a1 + 1, a2):
+                    Hs[t], d = fuse(fwd[t], bwd[t], (a2 - t) / (a2 - a1), cf.size)
+                    if diag is not None:
+                        diag[t] = d
     return Hs
 
 
@@ -678,7 +729,7 @@ def _eval_clip_6c(clip):
         "detector": ser["H"],
         "6a Bassek": smooth_homographies(ser["H"], size, "matrix"),
         "6a robusto": smooth_homographies(hampel_homographies(ser["H"], size, T["hampel_half"], T["hampel_sigma"]), size, "matrix"),
-        "6c fluxo": fill_from_anchors(cf, anc, ser["H"], seg, "flow", dbg),
+        "6c fluxo": fill_from_anchors(cf, anc, ser["H"], seg, "flow", dbg, diag=(diag_c := {})),
         "6c sem fluxo": fill_from_anchors(cf, anc, ser["H"], seg, "noflow"),
         "6c sem linhas": fill_from_anchors(cf, anc, ser["H"], seg, "nolines"),
         "6c âncora ingênua /150": fill_from_anchors(cf, naive, ser["H"], seg, "flow"),
@@ -690,7 +741,8 @@ def _eval_clip_6c(clip):
         jit[name] = jitter(Hs, size)
         for i, (s, H) in enumerate(zip(samples, Hs)):
             rows.append(dict(**frame_metrics(H if np.isfinite(H).all() else None, s), variante=name, jogo=game,
-                             lacuna=int(gaps[i]), n_pessoas=0 if s.persons_XY is None else len(s.persons_XY)))
+                             lacuna=int(gaps[i]), n_pessoas=0 if s.persons_XY is None else len(s.persons_XY),
+                             discordancia_c=diag_c.get(i, np.nan) if name == "6c fluxo" else np.nan))   # v2, C: só diagnóstico
     anc_rows = [dict(clip=clip.name, t=int(t), verificavel=t in verifiable, aceita=t in anc,
                      npe=npe_re(ser["H"][t], H_gt[t], size)[0] if np.isfinite(H_gt[t]).all() else np.nan) for t in cand]
     print(f"{clip.name}: {n} frames, {int(cut.sum())} cortes, {len(cand)} candidatas, {len(verifiable)} verificáveis, "
