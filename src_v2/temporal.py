@@ -611,7 +611,8 @@ def anchors(ser, cf, seg, verify=True):
             if group:
                 prop = propagate(cf, t, ser["H"][t], max(group) + step if step > 0 else min(group) + step, step, lines=False)
                 agree += sum(image_grid_displacement(prop[u], ser["H"][u], cf.size) <= tol for u in group if u in prop)
-        if agree > len(nb) / 2:
+        # v2, B1: a maioria não recusa erro sistemático; a nota da âncora também tem que passar no limiar
+        if agree > len(nb) / 2 and (T["anchor_min_nota"] is None or a[t] >= T["anchor_min_nota"]):
             out.append(t)
     return out, cand, verifiable
 

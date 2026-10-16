@@ -250,6 +250,7 @@ temporal:
   verify_window: 10        # verificação: vizinhos com H do detector a até 10 frames (escolha)
   verify_tol_frac: 0.0111111   # ... a H da âncora levada pelo movimento concorda com a do vizinho a <= 8/720·h (grade da imagem)
   verify_min: 2            # ... com pelo menos 2 vizinhos conferidos, maioria concordando (escolha)
+  anchor_min_nota: 1.6153357723089734   # v2, B1: âncora verificada só é aceita com nota (iou + img) >= isto; limiar do treino (jogos 4, 6, 9) com <= 2% das candidatas certas recusadas (docs/decisoes.md, 2026-10-15); null desliga
   grid_m: [2.5, 2.0]       # grade de pontos auxiliares do campo, X x Y (AuxFlow)
   border_frac: 0.02        # pontos a menos disto·h da borda da imagem ficam fora (escolha)
   compact_dilate_frac: 0.01   # componentes compactos de não-gramado (jogadores, bola) dilatados em isto·h (escolha)
