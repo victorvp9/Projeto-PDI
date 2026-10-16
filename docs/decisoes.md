@@ -957,3 +957,14 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Mediana entre os 6 jogos do LocSim@5 penalizado:** detector 0,263, 6c 0,633, teto 0,670. Por jogo (4, 6, 9, 2, 3, 5), 6c: 0,488, 0,825, 0,810, 0,665, 0,139, 0,601. Mais: clipes sem âncora 4, 0, 1, 2, 13, 3; aceitas erradas 4,7%, 1,6%, 3,9%, 3,0%, 40,4%, 5,5%. A valid reproduz o registro do v1 (18 sem âncora; 29 de 290 aceitas erradas).
   - **"Vizinhos concordam e todos errados":** a verificação temporal foi refeita para cada aceita errada, a partir da série em cache e do Lucas–Kanade, sem o detector, e aceitou de novo as 45. Em 42 delas, todos os vizinhos que concordaram também estavam errados. As 3 exceções têm NPE de 0,050 a 0,056, no limite do critério.
   | Pedido de Victor (item 2), com a mudança dele: rodar pelo `src_v2`, para os caches novos ficarem no `cache_v2`.
+- 2026-10-15 | **v2: nova ordem das hipóteses, registrada depois da linha de base e antes de qualquer experimento.** A ordem passa a ser **B1 → C → A → D (só se a deriva continuar alta depois de C) → E por último**, no lugar de B, A, C, D, E (plano, seção 5). As regras de decisão do plano não mudam.
+  - **Motivos:**
+    - (i) Em 42 das 45 âncoras aceitas erradas do dev, todos os vizinhos que concordaram também estavam errados (linha de base, `outputs/runs_v2/baseline_dev/`). A verificação por maioria não recusa erro sistemático, e B1 ataca isso com uma verificação nova, sem mudar o detector.
+    - (ii) B1 e C não exigem rodar o detector: usam a série em cache e custam ~4 h cada.
+    - (iii) E atua sobretudo no jogo 3 (sombra).
+  - **Franqueza sobre E:** a prioridade baixa de E usa também um fato já publicado no relatório v1: no test, a falta de âncora vem do enquadramento, e não da segmentação. Esse fato vem do test, que está contaminado. Ele serve só para ordenar as hipóteses, nunca para escolher parâmetros.
+  - **Se E for rodado,** ele precisa de um critério próprio, registrado antes. Um efeito concentrado num jogo não passa em ≥ 4 de 6 jogos.
+  - **B1, etapa 1:** diagnóstico sem regra. Sinais independentes dos vizinhos imediatos, medidos em todas as candidatas de dev com gabarito: AUC e taxa de erradas recusadas com no máximo 2% das certas recusadas, por jogo. O sinal e o limiar são escolhidos só nos jogos do treino (4, 6, 9) e conferidos na valid (2, 3, 5). A regra entra no `src_v2` só depois da aprovação de Victor (etapa 2), com decisão pelo critério congelado.
+  - **C:** só o desenho por enquanto. O teto é recalculado com o código de C e os dois são reportados, mas a decisão é pelo LocSim@5 penalizado do 6c, e não pela fração ao teto.
+  - **A:** diagnóstico primeiro, nos 10 clipes de dev sem âncora fora do jogo 3 (jogos 4, 9, 2 e 5), com o método da Seção 7 do relatório v1.
+  | Decisão de Victor.
