@@ -1037,3 +1037,9 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
     - SNGS-042 (jogo 3): 0,00006 antes, com 5 aceitas, as 5 erradas;
     - SNGS-044 e SNGS-049 (jogo 3): 0,007 e 0,006 antes, com 1 aceita errada cada.
   | Medição; decisão pelo critério congelado na leitura fixada antes do resultado.
+- 2026-10-16 | **v2, hipótese futura e não testada: "B1b"** (Victor, depois do B1 aceito).
+  - **Ideia:** quando a regra do B1 deixa um clipe sem nenhuma âncora, recuperar a candidata de maior nota entre as recusadas.
+  - **Motivo:** a queda do jogo 2. O SNGS-033 perdeu a única âncora (certa) e o LocSim do clipe caiu de 0,534 para 0.
+  - **Risco conhecido:** no jogo 3, essa candidata costuma estar errada (SNGS-042, -044 e -049 perderam só aceitas erradas).
+  - **Status:** não implementar agora. Entra na fila depois do A, com o mesmo critério congelado.
+  | Decisão de Victor.
