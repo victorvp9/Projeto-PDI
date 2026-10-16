@@ -90,7 +90,7 @@ def logo9(n, out):
 
 def decide(delta):
     d = [delta[g] for g in GAMES]
-    ok = (sum(x > 0 for x in d) >= MIN_GAMES, float(np.mean(d)) > 0, min(d) >= MAX_DROP)
+    ok = (bool(sum(x > 0 for x in d) >= MIN_GAMES), float(np.mean(d)) > 0, bool(min(d) >= MAX_DROP))   # bool: numpy.bool_ não vai para o json
     return dict(jogos_com_ganho=int(sum(x > 0 for x in d)), media=float(np.mean(d)), pior=float(min(d)),
                 criterios=dict(ganho_em_4_de_6=ok[0], media_positiva=ok[1], nenhum_abaixo_de_menos_003=ok[2]), aceita=all(ok))
 
