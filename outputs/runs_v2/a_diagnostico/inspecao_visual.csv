@@ -1,0 +1,11 @@
+particao,clipe,jogo,frames,vista_central,area_com_linhas_do_fundo_mal_segmentadas,zona_meio_area,causa_pela_inspecao,causa_pela_regra,nota
+train,SNGS-060,4,10,7,3,0,vista central,segmentação,círculo e linha do meio na maioria; nas vistas da área as linhas do fundo saem tracejadas na máscara
+train,SNGS-065,4,10,7,3,0,vista central,vista central,os 3 primeiros frames mostram o círculo e a linha do meio com a grande área pequena no fundo
+train,SNGS-066,4,10,5,5,0,misto (vista central e área),outra,área oblíqua e comprimida no fundo com o gramado vazando para a arquibancada; depois vistas centrais
+train,SNGS-076,4,10,10,0,0,vista central,outra,"o ""2 + 2"" da regra vem do canto da área e da lateral no fundo, anotados mas quase invisíveis na máscara"
+train,SNGS-151,9,10,6,2,2,vista central,vista central,"jogo diurno: em f376 e f451 o gramado perde a parte na sombra (zona meio-área)"
+valid,SNGS-021,2,10,5,5,0,misto (vista central e área),segmentação,metade círculo e linha do meio; metade área oblíqua com as linhas do fundo fracas na máscara
+valid,SNGS-029,2,10,4,6,0,segmentação (linhas do fundo),segmentação,jogo noturno de contraste baixo: só a lateral próxima e a linha do meio entram bem na máscara
+valid,SNGS-094,5,10,6,4,0,vista central,segmentação,meio-campo na maioria; nas vistas da área as linhas do fundo saem tracejadas
+valid,SNGS-095,5,10,4,6,0,segmentação (linhas do fundo),segmentação,área no fundo com as linhas quase ausentes na máscara; os 4 primeiros frames são vistas centrais
+valid,SNGS-096,5,10,9,1,0,vista central,segmentação,"vista central aberta (as duas laterais); a regra contou como 2 + 2 os tocos das áreas nos cantos"

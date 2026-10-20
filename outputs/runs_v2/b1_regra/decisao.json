@@ -1,0 +1,35 @@
+{
+ "commit": "7301ddcee269317b71770139791addc81b6ab3ff",
+ "base": "outputs/runs_v2/baseline_dev/baseline_por_jogo.csv",
+ "decisao": {
+  "jogos_com_ganho": 5,
+  "media": 0.017874535116493114,
+  "pior": -0.022343495513848288,
+  "criterios": {
+   "ganho_em_4_de_6": true,
+   "media_positiva": true,
+   "nenhum_abaixo_de_menos_003": true
+  },
+  "aceita": true
+ },
+ "logo_jogo9": {
+  "limiar": 1.6385042528804652,
+  "locsim_pen_6c": 0.8281112741822719,
+  "locsim_pen_teto": 0.8268878871925788,
+  "delta_6c": 0.01835423960574123,
+  "aceitas_erradas": 1,
+  "aceitas": 193,
+  "sem_ancora": 1,
+  "decisao": {
+   "jogos_com_ganho": 5,
+   "media": 0.017867768443133456,
+   "pior": -0.022343495513848288,
+   "criterios": {
+    "ganho_em_4_de_6": true,
+    "media_positiva": true,
+    "nenhum_abaixo_de_menos_003": true
+   },
+   "aceita": true
+  }
+ }
+}

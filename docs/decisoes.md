@@ -934,3 +934,112 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Achado 6, anotado e não aplicado (sem efeito nos resultados entregues):** a seleção de clipes está escrita duas vezes no `main` (`run.py:451-456` e `460-463`).
   - **Achado 7, anotado e não aplicado (sem efeito nos resultados entregues):** o CSV das âncoras do 6c leva só a partição do primeiro clipe no nome (`temporal.py:725`), e uma rodada com várias partições sai rotulada pela primeira.
   | Decisão de Victor; a lista dos caches a apagar por item é minha, derivada das chaves.
+- 2026-10-14 | **Plano do v2 congelado** (`docs/05-melhorias-plano.md`, tag `plano-v2-congelado`, branch `v2-melhorias`), antes de qualquer experimento.
+  - **Decisões D1–D4:**
+    - **D1, aceite:** ganho em ≥ 4 dos 6 jogos de dev, com validação cruzada por jogo, e média dos ganhos por jogo > 0.
+    - **D2, queda máxima num jogo:** −0,03 de LocSim@5 penalizado.
+    - **D3, mudanças no detector (A, B, E):** checagem barata em todo o dev (detector sozinho, 1 frame em 25). Depois, confirmação na metade fixa de cada jogo: os clipes de índice par na ordem de ID, contando de 0, regra escrita antes de qualquer resultado.
+    - **D3, rodadas completas no dev:** só para a combinação final, no máximo 3 no ciclo; as mudanças de propagação (C, D) podem rodar completas.
+    - **D4:** ver o item abaixo.
+  - **Trabalho futuro (D4, fora do ciclo):** usar o sinal das pessoas para escolher ou rejeitar âncoras.
+    - **Por que fica fora:** mudaria a natureza do método, que passaria a usar as caixas das pessoas e não só as marcações do campo.
+    - **Referência:** o gabarito do AuxFlow por RANSAC nas pessoas dá LocSim@5 0,978, mas acurácia contra as linhas a 5 px de só 0,533 (relatório v1, Seção 6.3).
+    - **Se for feito:** trilha à parte, relatada separada e nunca somada ao v2.
+  | Decisões de Victor.
+- 2026-10-15 | **v2: esqueleto e correção dos achados 2 e 3 no `src_v2/`, com conferência bit a bit e regravação das chaves** (plano v2, regra 1; branch `v2-melhorias`).
+  - **Esqueleto** (`2beb6cf`, gerado por `scripts/v2/esqueleto.py`): `src_v2/` e `tests_v2/` são cópias do v1 com o pacote trocado (imports, caminhos literais, CLI). Os testes do v2 levam o prefixo `test_v2_`, para que o pytest colete `tests/` e `tests_v2/` juntos. O `config_v2.yaml` é o `config.yaml` com saídas próprias: caches em `outputs/cache_v2`, manifestos em `outputs/runs_v2` e o resto da CLI em `outputs/v2`, porque a CLI grava CSVs e `pred_*.npz` na raiz de `outputs/`, onde estão os do v1. O plano só nomeava os dois primeiros.
+  - **Achado 2:** `temporal.load_series` lê a série só com a chave atual e dá erro se ela diferir. Todas as leituras passam por ele: `temporal` (6a, 6c, Hampel, Kalman, o retorno do `build_series`), `consequence` e `sensitivity`.
+  - **Achado 3:** a chave da série ganha a seção `pitch`, o `eval.quality_grid_px` e os bytes de `evaluate.py` e `pitch_model.py`. A do 6c ganha as seções `eval`, `gsr`, `gsr_label_fixes` e `pitch`. A do ECC ganha `temporal.compact_dilate_frac`, as seções `segment` e `lines` e os bytes de `segment.py` e `lines.py`. Teste novo: `tests_v2/test_v2_chaves.py` (série velha recusada; cada item muda a chave certa).
+  - **Conferência bit a bit:** em cada jogo de dev, o primeiro clipe por ID com caches no v1 (no treino, com ECC): SNGS-060, 099 e 154 (treino; jogos 4, 6, 9) e SNGS-021, 039 e 078 (valid; jogos 2, 3, 5). O v2 calculou do zero pela CLI (`--detect-series --propagate-eval --consequence-eval`; manifestos com 0 falhas). O `scripts/v2/rekey.py confere` comparou valor a valor com o cache do v1: a H de gabarito, a série, o 6c e o ECC (este só nos três do treino, porque a valid não tem ECC no v1) saíram idênticos bit a bit nas 21 comparações. Saída em `outputs/runs_v2/rekey.json`.
+  - **Regravação das chaves** (`rekey.py regrava`, depois da conferência): todo cache de dev do v1 com a chave atual do v1 foi copiado para o `cache_v2` com a chave do v2, relido e conferido. Foram 75 séries, 75 caches do 6c, 106 H de gabarito e 3 ECC; os calculados pelo v2 ficaram como estavam. O cache do v1 só foi lido: nenhum arquivo de `outputs/cache` ou `outputs/runs` mudou. Faltam série e 6c em 34 clipes do treino, que o v1 nunca calculou.
+  | Pedido de Victor (item 1); a regra de escolha dos clipes e o `outputs/v2` são meus.
+- 2026-10-15 | **v2: linha de base nos 6 jogos de dev** (plano v2, seção 7; `src_v2` no commit `34c7307`, tag `baseline-dev`; `scripts/v2/baseline_dev.py`; relatório em `outputs/runs_v2/baseline_dev/relatorio_baseline.md`, CSVs ao lado). Os caches de 81 clipes vieram do `cache_v2` regravado. Série e 6c dos 34 clipes do treino que faltavam foram calculados aqui e ficaram no `cache_v2`. Manifestos: série 510/510, 6c 115/115, 0 falhas. Nada foi gravado nos caches nem nos manifestos do v1.
+  - **Mediana entre os 6 jogos do LocSim@5 penalizado:** detector 0,263, 6c 0,633, teto 0,670. Por jogo (4, 6, 9, 2, 3, 5), 6c: 0,488, 0,825, 0,810, 0,665, 0,139, 0,601. Mais: clipes sem âncora 4, 0, 1, 2, 13, 3; aceitas erradas 4,7%, 1,6%, 3,9%, 3,0%, 40,4%, 5,5%. A valid reproduz o registro do v1 (18 sem âncora; 29 de 290 aceitas erradas).
+  - **"Vizinhos concordam e todos errados":** a verificação temporal foi refeita para cada aceita errada, a partir da série em cache e do Lucas–Kanade, sem o detector, e aceitou de novo as 45. Em 42 delas, todos os vizinhos que concordaram também estavam errados. As 3 exceções têm NPE de 0,050 a 0,056, no limite do critério.
+  | Pedido de Victor (item 2), com a mudança dele: rodar pelo `src_v2`, para os caches novos ficarem no `cache_v2`.
+- 2026-10-15 | **v2: nova ordem das hipóteses, registrada depois da linha de base e antes de qualquer experimento.** A ordem passa a ser **B1 → C → A → D (só se a deriva continuar alta depois de C) → E por último**, no lugar de B, A, C, D, E (plano, seção 5). As regras de decisão do plano não mudam.
+  - **Motivos:**
+    - (i) Em 42 das 45 âncoras aceitas erradas do dev, todos os vizinhos que concordaram também estavam errados (linha de base, `outputs/runs_v2/baseline_dev/`). A verificação por maioria não recusa erro sistemático, e B1 ataca isso com uma verificação nova, sem mudar o detector.
+    - (ii) B1 e C não exigem rodar o detector: usam a série em cache e custam ~4 h cada.
+    - (iii) E atua sobretudo no jogo 3 (sombra).
+  - **Franqueza sobre E:** a prioridade baixa de E usa também um fato já publicado no relatório v1: no test, a falta de âncora vem do enquadramento, e não da segmentação. Esse fato vem do test, que está contaminado. Ele serve só para ordenar as hipóteses, nunca para escolher parâmetros.
+  - **Se E for rodado,** ele precisa de um critério próprio, registrado antes. Um efeito concentrado num jogo não passa em ≥ 4 de 6 jogos.
+  - **B1, etapa 1:** diagnóstico sem regra. Sinais independentes dos vizinhos imediatos, medidos em todas as candidatas de dev com gabarito: AUC e taxa de erradas recusadas com no máximo 2% das certas recusadas, por jogo. O sinal e o limiar são escolhidos só nos jogos do treino (4, 6, 9) e conferidos na valid (2, 3, 5). A regra entra no `src_v2` só depois da aprovação de Victor (etapa 2), com decisão pelo critério congelado.
+  - **C:** só o desenho por enquanto. O teto é recalculado com o código de C e os dois são reportados, mas a decisão é pelo LocSim@5 penalizado do 6c, e não pela fração ao teto.
+  - **A:** diagnóstico primeiro, nos 10 clipes de dev sem âncora fora do jogo 3 (jogos 4, 9, 2 e 5), com o método da Seção 7 do relatório v1.
+  | Decisão de Victor.
+- 2026-10-15 | **v2, B1 etapa 1: separabilidade das âncoras (diagnóstico, sem regra)** (`scripts/v2/b1_diagnostico.py`, commit `019d994`; `outputs/runs_v2/b1_diagnostico/`; 115/115 clipes, 0 falhas). São 1.908 candidatas de dev com gabarito, 771 delas erradas; entre as aceitas, 795 certas e 45 erradas.
+  - **Sinal escolhido pelo treino:** limiar com no máximo 2% das candidatas certas do treino recusadas. Nas aceitas, o melhor do treino é a nota do detector (`nota` = IoU + fração explicada, já na série), que recusa 81% das aceitas erradas do treino (13 de 16) e 52% na valid (15 de 29), com 0,2% e 0,4% das certas recusadas. Por jogo (4, 6, 9, 2, 3, 5), recusa 2/4, 4/4, 7/8, 0/4, 11/19 e 4/6 das erradas.
+  - **Linhas na imagem inteira** (`b_total`, `mod`): no jogo 3, recusam as 19 aceitas erradas; nos jogos 6 e 9, nenhuma.
+  - **Consistência com âncoras distantes** (`a_min`): separa bem as candidatas (AUC 0,96 no treino). Nas aceitas do jogo 3 falha (1 de 19), porque as âncoras distantes também estão erradas ali.
+  - **"nota OU b_total"**, com os limiares do treino, só como informação (não pré-escolhida): 41 de 45 aceitas erradas recusadas, contra 5 de 795 certas.
+  - A regra (etapa 2) espera a aprovação de Victor.
+  | Medição.
+- 2026-10-15 | **v2, A: diagnóstico das causas da falta de âncora** nos 10 clipes de dev sem âncora fora do jogo 3 (`scripts/v2/a_diagnostico.py`; `outputs/runs_v2/a_diagnostico/`; 1 frame a cada 75; segmentação comparada com os 65 clipes com âncora dos mesmos jogos).
+  - **A regra automática de enquadramento falhou:** contava como "2 + 2 disponível" qualquer classe anotada, inclusive as linhas do fundo que quase não aparecem na máscara e os tocos de área nos cantos do quadro.
+  - **Pela inspeção visual das figuras** (método da Seção 7 do v1; `inspecao_visual.csv`), dos 100 frames amostrados:
+    - 63 são vistas centrais (círculo e linha do meio), maioria em 7 dos 10 clipes;
+    - 35 são vistas da área com as linhas do fundo mal segmentadas (contraste baixo, jogos 2, 4 e 5);
+    - 2 são zona meio–área, com o gramado perdendo a sombra (SNGS-151, jogo 9).
+  - **Por clipe:** vista central em 6, segmentação das linhas do fundo em 2, misto em 2.
+  - **Leitura:** a vista central explica a maior parte, o que justifica desenhar o A (círculo central + linha do meio + lateral). As vistas da área com linhas do fundo fracas são o caso de E.
+  | Medição; a classificação visual é minha.
+- 2026-10-15 | **v2, decisões antes de rodar o B1 (etapa 2) e o C** (Victor, depois dos diagnósticos).
+  - **B1 = `nota` sozinha** (`iou + img` da série, a nota de escolha das âncoras), com o limiar fixado no treino pela regra do diagnóstico: no máximo 2% das candidatas certas dos jogos 4, 6 e 9 recusadas, ou seja `nota` < 1,6153357723089734. A âncora que passa na verificação por maioria só é aceita se a nota dela não estiver abaixo desse limiar. A regra vai no `config_v2.yaml` como `temporal.anchor_min_nota` e no `temporal.anchors` do `src_v2`; com `null`, nada muda. A série é reaproveitada, e o 6c roda inteiro no dev.
+  - **Não entra:** a combinação "nota OU b_total". No treino, o `b_total` quase nada acrescenta à nota, e o ganho dela vem da valid, sobretudo do jogo 3. Escolhê-la agora seria escolher pela valid. Fica registrada como ideia não testada.
+  - **Fraqueza conhecida:** no jogo 2, a nota recusa 0 das 4 aceitas erradas.
+  - **Validação cruzada por jogo** (plano, seção 4), conferida antes de rodar com o `sinais_por_candidata.csv`: o limiar leave-one-game-out (a mesma regra nos outros 5 jogos) recusa exatamente as mesmas aceitas que o limiar do treino nos jogos 4, 6, 2, 3 e 5, onde o Δ medido é o Δ da validação cruzada. No jogo 9, o limiar LOGO (1,6385) recusa 13 aceitas, contra 7 do limiar do treino. O jogo 9 é medido também com o limiar LOGO, sem cache e fora do `src_v2` (`scripts/v2`, limiar no config do processo), e o critério é reportado nas duas leituras.
+  - **Decisão** pelo critério congelado: Δ > 0 em ≥ 4 de 6 jogos, média > 0 e nenhum jogo abaixo de −0,03 de LocSim@5 penalizado do 6c. Os caches do 6c da linha de base são guardados antes em `outputs/cache_v2/eval_6c_baseline/`.
+  - **C** (propagação bidirecional entre âncoras), aprovado com três ajustes:
+    - (a) a fusão usa só os pontos da grade do campo (2,5 × 2 m) que caem dentro da imagem no frame t pelas duas homografias, com margem fixa de 0,02·h além da borda. Ela é feita por DLT normalizada (Hartley), com o peso (a₂ − t)/(a₂ − a₁) para a propagação vinda de a₁. Com menos de 8 pontos, o frame fica com a homografia da âncora mais próxima, como hoje;
+    - (b) registro, por frame e só como diagnóstico, da discordância entre as duas propagações nos mesmos pontos (mediana em fração da altura);
+    - (c) o C é medido em cima do B1, se o B1 for aceito, ou contra a linha de base, se for recusado. Roda só depois da decisão do B1. O teto é recalculado com o mesmo código, mas a decisão é pelo 6c.
+  - **A, quando chegar a vez:** o desenho vem antes do código e precisa ter:
+    - as hipóteses novas só nos frames em que as 2 + 2 não dão nenhuma candidata que passe nos portões;
+    - a contagem dos graus de liberdade e das combinações que fecham a homografia (a cônica restringe pouco, pela simetria do círculo);
+    - a ambiguidade de 180° resolvida pela regra atual do detector;
+    - a checagem barata (1 frame a cada 25) como primeira medida.
+  | Decisões de Victor; a margem de 0,02·h, o mínimo de 8 pontos e a medição LOGO do jogo 9 são meus, fixados antes de rodar.
+- 2026-10-16 | **v2, B1: regra de decisão fixada antes do resultado do jogo 9 com o limiar leave-one-game-out** (Victor, com a rodada no ar e a leitura LOGO do jogo 9 ainda não terminada).
+  - **Decisão:** o critério congelado (Δ > 0 em ≥ 4 de 6 jogos, média > 0, nenhum jogo abaixo de −0,03) é aplicado à **leitura leave-one-game-out**, a que corresponde à validação cruzada por jogo do plano (seção 4). Na leitura com o limiar do treino, os jogos 4, 6 e 9 são avaliados com o limiar ajustado neles mesmos, e ela fica só como informação.
+  - Nos jogos 4, 6, 2, 3 e 5, as duas leituras coincidem (mesmas aceitas recusadas; registro de 2026-10-15); só o jogo 9 muda.
+  - **Configuração daqui em diante** (e a usada pelo C): o limiar do treino (`anchor_min_nota` = 1,6153357723089734).
+  - **Se a leitura LOGO reprovar**, o B1 é recusado mesmo que a leitura do limiar do treino passe, e o C é medido contra a linha de base.
+  - As duas leituras são reportadas lado a lado, por jogo.
+  | Decisão de Victor.
+- 2026-10-16 | **v2, B1: reinício do Windows no meio da rodada.** A primeira tentativa (`rodada_6c_dev.py b1_regra …`, iniciada em 15/10 23:34) terminou o 6c dos 115 clipes às 03:08 (115/115, 0 falhas) e caiu às 03:29, na leitura LOGO do jogo 9 (2 de 20 clipes; 18 com `BrokenProcessPool`). Causa: o Windows Update reiniciou o PC às 03:30 (evento 1074 do TrustedInstaller), sem relação com o código. O mesmo comando foi relançado às 11:06.
+  - **Conferência do que a tentativa interrompida gravou** entre 23:34 e o reinício. Cada arquivo foi relido; nada foi removido:
+    - `outputs/cache_v2/eval_6c/` (115 pickles, os últimos às 03:07): relidos pelo `verify_keys` do relançamento (115 ok, 0 falhas; chave gravada = chave da rodada `a2944af0b859` em todos, a mesma da tentativa interrompida) e de novo por fora (desserializam; 4 partes; 6.000 linhas = 750 frames × 8 variantes);
+    - `outputs/cache_v2/eval_6c_baseline/` (cópia da base feita no início da tentativa): 115 pickles, todos desserializam e com a chave da linha de base (`185cc175b823`, `chave_rodada` do manifesto do 6c da linha de base);
+    - `outputs/v2/debug/propagacao/` (1.030 imagens na janela, as últimas às 02:53, antes da leitura LOGO): todas legíveis (`cv2.imread`);
+    - `outputs/runs_v2/b1_regra/`: os três manifestos da tentativa são JSON válidos e ficam como registro (série 0 falhas; 6c 115/115; LOGO 2 ok + 18 falhas); o log ficou em `rodada_1_reinicio_windows.out`;
+    - `por_jogo.csv` e `clipes_que_perderam_ancora.csv` da tentativa foram regravados pelo relançamento a partir dos caches conferidos.
+    - A leitura LOGO não grava cache (`_eval_clip_6c` sem cache), e nada foi gravado em `outputs/cache` nem em `outputs/runs` (v1).
+  | Incidente; a conferência é minha.
+- 2026-10-16 | **v2, B1: ACEITO** (`scripts/v2/rodada_6c_dev.py b1_regra …`, commit `7301ddc`; `outputs/runs_v2/b1_regra/`). Três tentativas: a 1ª caiu no reinício do Windows (registro acima); a 2ª concluiu os 20 clipes do jogo 9 LOGO, mas o `json.dumps` do `decisao.json` quebrou com um `numpy.bool_` dos critérios, e o resultado, que só existia na memória, se perdeu (defeito do script, corrigido em `7301ddc`; desde `812fc09`, cada clipe e cada tabela por jogo vão para CSV antes da decisão, a pedido de Victor); a 3ª fechou com série 0 falhas, 6c 115/115 com a chave da rodada (`a2944af0b859`) e jogo 9 LOGO 20/20.
+  - **LocSim@5 penalizado do 6c, por jogo, nas duas leituras** (base → B1; Δ). Nos jogos 4, 6, 2, 3 e 5, as duas leituras recusam as mesmas âncoras e coincidem:
+
+    | jogo | base | limiar do treino | Δ treino | leave-one-game-out | Δ LOGO |
+    |---|---|---|---|---|---|
+    | 4 | 0,4884 | 0,5155 | +0,0272 | = | +0,0272 |
+    | 6 | 0,8245 | 0,8805 | +0,0560 | = | +0,0560 |
+    | 9 | 0,8098 | 0,8282 | +0,0184 | 0,8281 (limiar 1,6385) | +0,0184 |
+    | 2 | 0,6651 | 0,6427 | −0,0223 | = | −0,0223 |
+    | 3 | 0,1390 | 0,1410 | +0,0019 | = | +0,0019 |
+    | 5 | 0,6012 | 0,6273 | +0,0261 | = | +0,0261 |
+
+  - **Critério na leitura LOGO (a que decide):** ganho em 5 de 6 jogos, média +0,0179, pior −0,0223 (jogo 2) ≥ −0,03, ou seja, **aceito**. Na leitura do limiar do treino, também aceito (5 de 6, média +0,0179, pior −0,0223). Configuração daqui em diante: o limiar do treino.
+  - **Teto** (6c com âncoras de gabarito nas aceitas), base → B1: 0,604 → 0,607; 0,897 → 0,897; 0,827 → 0,827 (LOGO 0,827); 0,675 → 0,640; 0,315 → 0,205; 0,666 → 0,658. Nos jogos 2 e 3 o teto cai, porque há menos âncoras para receber o gabarito.
+  - **Cobertura do 6c:** só muda no jogo 2 (0,893 → 0,836) e no jogo 3 (0,390 → 0,244).
+  - **Aceitas erradas** (NPE > 0,05), base → B1: 4 → 2, 4 → 0, 8 → 1 (LOGO 1), 4 → 4, 19 → 8, 6 → 2. Aceitas com gabarito no jogo 9: 206 → 199 (LOGO 193).
+  - **Clipes que ficaram sem âncora por causa da regra:**
+    - SNGS-033 (jogo 2): LocSim 0,534 antes, com 1 âncora certa. Explica a queda do jogo 2, a fraqueza conhecida;
+    - SNGS-042 (jogo 3): 0,00006 antes, com 5 aceitas, as 5 erradas;
+    - SNGS-044 e SNGS-049 (jogo 3): 0,007 e 0,006 antes, com 1 aceita errada cada.
+  | Medição; decisão pelo critério congelado na leitura fixada antes do resultado.
+- 2026-10-16 | **v2, hipótese futura e não testada: "B1b"** (Victor, depois do B1 aceito).
+  - **Ideia:** quando a regra do B1 deixa um clipe sem nenhuma âncora, recuperar a candidata de maior nota entre as recusadas.
+  - **Motivo:** a queda do jogo 2. O SNGS-033 perdeu a única âncora (certa) e o LocSim do clipe caiu de 0,534 para 0.
+  - **Risco conhecido:** no jogo 3, essa candidata costuma estar errada (SNGS-042, -044 e -049 perderam só aceitas erradas).
+  - **Status:** não implementar agora. Entra na fila depois do A, com o mesmo critério congelado.
+  | Decisão de Victor.
