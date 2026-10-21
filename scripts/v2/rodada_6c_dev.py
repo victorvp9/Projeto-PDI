@@ -13,7 +13,7 @@ perderam todas as âncoras e o LocSim que tinham antes.
 - `--logo9`: o B1 no jogo 9 também com o limiar leave-one-game-out (a regra do diagnóstico nos outros
   5 jogos), por _eval_clip_6c sem cache, com o limiar no config do processo e dos trabalhadores.
 Uso (da raiz): PYTHONPATH=. uv run python scripts/v2/rodada_6c_dev.py <nome> <arquivo da base>
-<csv da base por jogo> [--logo9] [trabalhadores]"""
+<csv da base por jogo> [--logo9] [--logo-c=<jogo>:<limiar> ...] [trabalhadores]"""
 import csv
 import json
 import pickle
@@ -118,6 +118,25 @@ def logo9(n, out):
     return thr, res
 
 
+def _init_c_threshold(v):
+    cv2.setNumThreads(1)
+    from src_v2.config import CFG
+    CFG["temporal"]["anchor_c_max_m"] = v
+
+
+def logo_c(n, out, game, thr):
+    """B2 no jogo `game` com o limiar leave-one-game-out do centro da câmera (`thr`, m), sem cache."""
+    import src_v2.temporal as T
+    from src_v2.executor import SafeProcessPool, exit_if_failed
+    from src_v2.io import gsr
+    clips = [c for c in clips_dev() if gsr.game_id(c) == game]
+    with SafeProcessPool(n, initializer=_init_c_threshold, initargs=(thr,), manifest_dir=out / "manifestos") as ex:
+        res = stream(out, f"por_clipe_logo_c{game}", clips, ex.map(T._eval_clip_6c, clips))
+    exit_if_failed()
+    assert all(r is not None for r in res.values())
+    return res
+
+
 def decide(delta):
     d = [delta[g] for g in GAMES]
     ok = (bool(sum(x > 0 for x in d) >= MIN_GAMES), float(np.mean(d)) > 0, bool(min(d) >= MAX_DROP))   # bool: numpy.bool_ não vai para o json
@@ -170,6 +189,19 @@ if __name__ == "__main__":
         meta["logo_jogo9"] = dict(limiar=thr, locsim_pen_6c=rows9[0]["locsim_pen_6c"], locsim_pen_teto=rows9[0]["locsim_pen_teto"], delta_6c=d9,
                                   aceitas_erradas=rows9[0]["aceitas_erradas"], aceitas=rows9[0]["aceitas"], sem_ancora=rows9[0]["sem_ancora"],
                                   decisao=decide({r["jogo"]: (d9 if r["jogo"] == "9" else r["delta_6c"]) for r in rows}))
+    # v2, B2: `--logo-c=<jogo>:<limiar>` (um por jogo em que o limiar LOGO recusa âncoras diferentes das
+    # do limiar do treino); a decisão usa o Δ LOGO nesses jogos e o da rodada nos outros
+    logo = dict(a.split("=", 1)[1].split(":") for a in flags if a.startswith("--logo-c="))
+    if logo:
+        dl, meta["logo_c"] = {}, {}
+        for g, thr in logo.items():
+            rg, _ = per_game(logo_c(n, out, g, float(thr)))
+            dl[g] = rg[0]["locsim_pen_6c"] - float(base[g]["locsim_pen_6c"])
+            write(out, f"por_jogo_logo_c{g}", [rg[0] | dict(limiar=float(thr), delta_6c=dl[g])])
+            meta["logo_c"][g] = dict(limiar=float(thr), locsim_pen_6c=rg[0]["locsim_pen_6c"], delta_6c=dl[g],
+                                     locsim_pen_teto=rg[0]["locsim_pen_teto"], aceitas=rg[0]["aceitas"],
+                                     aceitas_erradas=rg[0]["aceitas_erradas"], sem_ancora=rg[0]["sem_ancora"])
+        meta["decisao_logo"] = decide({r["jogo"]: dl.get(r["jogo"], r["delta_6c"]) for r in rows})
     (out / "decisao.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
     for r in rows:
         print(f"jogo {r['jogo']}: 6c {r['base_locsim_pen_6c']:.4f} -> {r['locsim_pen_6c']:.4f} (Δ {r['delta_6c']:+.4f}); teto {r['base_locsim_pen_teto']:.4f} -> "

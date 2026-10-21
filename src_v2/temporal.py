@@ -5,6 +5,7 @@ série de homografias (campo -> imagem), em duas representações: as entradas d
 matriz (H[2,2] = 1) e quatro pontos fixos da imagem levados ao campo, com a H
 reestimada deles.
 """
+import functools
 import hashlib
 import json
 from pathlib import Path
@@ -24,7 +25,7 @@ import src_v2.assign, src_v2.conics, src_v2.evaluate, src_v2.geometry, src_v2.ho
 # detector e o io/gsr.py não guardam os próprios bytes: editá-los mudaria a série do
 # detector (~11 h por partição) e o cache da H_gt.
 _KEY_SOURCES = ("segment.py", "lines.py", "conics.py", "assign.py", "homography.py", "geometry.py", "render.py")
-_SRC = {f: (ROOT / "src_v2" / f).read_bytes() for f in _KEY_SOURCES + ("temporal.py", "evaluate.py", "io/gsr.py", "pitch_model.py")}
+_SRC = {f: (ROOT / "src_v2" / f).read_bytes() for f in _KEY_SOURCES + ("temporal.py", "evaluate.py", "io/gsr.py", "pitch_model.py", "camera.py")}
 
 T = CFG["temporal"]
 SERIES_KEYS = ("ok", "img", "mod", "iou", "margem")
@@ -587,11 +588,35 @@ def propagate(cf, a, H_a, stop, step, lines=True, dbg=None):
     return out
 
 
-def anchors(ser, cf, seg, verify=True):
+@functools.lru_cache(maxsize=None)
+def game_camera_center(split_dir, game, size):
+    """v2, B2: mediana do centro da câmera (m, campo) das H do detector (séries em cache) de
+    todos os clipes do jogo na partição; sem gabarito. Ponto principal no centro da imagem."""
+    from src_v2.camera import center
+    Cs = []
+    for c in sorted(Path(split_dir).glob("SNGS-*")):
+        if gsr.game_id(c) != game:
+            continue
+        ser = load_series(c)
+        Cs += [x for x in (center(H, size) for H in ser["H"] if np.isfinite(H).all()) if x is not None]
+    return np.median(Cs, axis=0)
+
+
+def camera_ok(H, c_ref, size):
+    """v2, B2: o centro da câmera de H fica a <= anchor_c_max_m da referência do jogo; H sem
+    focal real (nenhuma câmera pinhole a produz) não passa."""
+    from src_v2.camera import center
+    C = center(H, size)
+    return C is not None and float(np.linalg.norm(C - c_ref)) <= T["anchor_c_max_m"]
+
+
+def anchors(ser, cf, seg, verify=True, c_ref=None):
     """Âncoras: máximos locais de (IoU com o gramado + fração explicada) entre os frames
     com H do detector; com `verify`, só as que concordam com o detector nos vizinhos (do
-    mesmo plano, `seg`) pelo movimento medido por Lucas–Kanade. Devolve (âncoras,
-    candidatas, verificáveis)."""
+    mesmo plano, `seg`) pelo movimento medido por Lucas–Kanade. v2, B1: a nota tem que
+    passar em anchor_min_nota; v2, B2: com `c_ref` (centro da câmera do jogo), o centro da
+    H da âncora tem que estar a <= anchor_c_max_m dele. Devolve (âncoras, candidatas,
+    verificáveis)."""
     from src_v2.evaluate import image_grid_displacement
     ok = np.isfinite(ser["H"]).all(axis=(1, 2))
     a = np.where(ok, np.nan_to_num(ser["iou"]) + np.nan_to_num(ser["img"]), -np.inf)
@@ -612,7 +637,8 @@ def anchors(ser, cf, seg, verify=True):
                 prop = propagate(cf, t, ser["H"][t], max(group) + step if step > 0 else min(group) + step, step, lines=False)
                 agree += sum(image_grid_displacement(prop[u], ser["H"][u], cf.size) <= tol for u in group if u in prop)
         # v2, B1: a maioria não recusa erro sistemático; a nota da âncora também tem que passar no limiar
-        if agree > len(nb) / 2 and (T["anchor_min_nota"] is None or a[t] >= T["anchor_min_nota"]):
+        if agree > len(nb) / 2 and (T["anchor_min_nota"] is None or a[t] >= T["anchor_min_nota"]) \
+                and (c_ref is None or camera_ok(ser["H"][t], c_ref, cf.size)):
             out.append(t)
     return out, cand, verifiable
 
@@ -719,7 +745,8 @@ def _eval_clip_6c(clip):
     hists = [frame_hist(s.image) for s in samples]
     cut = np.r_[False, [hist_distance(hists[i], hists[i + 1]) > T["cut_thr"] for i in range(n - 1)]]
     seg = np.cumsum(cut)
-    anc, cand, verifiable = anchors(ser, cf, seg)
+    c_ref = None if T["anchor_c_max_m"] is None else game_camera_center(str(clip.parent), gsr.game_id(clip), tuple(cf.size))
+    anc, cand, verifiable = anchors(ser, cf, seg, c_ref=c_ref)
     naive = [next(t for t in range(k, min(k + T["naive_step"], n)) if ok[t]) for k in range(0, n, T["naive_step"])
              if ok[k:k + T["naive_step"]].any()]
     H_gt = np.array([np.full((3, 3), np.nan) if s.H_gt is None else s.H_gt for s in samples])
@@ -759,7 +786,7 @@ def _eval_6c_key():
     h = hashlib.sha1(json.dumps(T, sort_keys=True).encode() + _series_key().encode())
     # v2, achado 3: as métricas (eval), o gabarito (gsr, gsr_label_fixes) e o molde (pitch)
     h.update(json.dumps({k: CFG[k] for k in ("eval", "gsr", "gsr_label_fixes", "pitch")}, sort_keys=True).encode())
-    for f in ("temporal.py", "evaluate.py", "io/gsr.py"):
+    for f in ("temporal.py", "evaluate.py", "io/gsr.py", "camera.py"):     # v2, B2: camera.py
         h.update(_SRC[f])
     return h.hexdigest()
 
