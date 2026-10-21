@@ -81,6 +81,18 @@ SoccerNet Game State Reconstruction (Somers et al., 2024). **200 clipes de 30 s*
   `train.zip` (9,76 GB), `valid.zip` (11,2 GB), `test.zip` (8,85 GB);
   `challenge.zip` não tem gabarito e não é necessário. Usar a versão 2024 (a dos
   artigos); a SN-GSR-2025 tem arquivos de mesmo tamanho.
+  - **Conferido em 2026-10-20** (revisão `3cc710eb6d53a23350a3d2863311c1c0a2e645d7` do repositório
+    no Hugging Face; a SN-GSR-2025 tem os mesmos SHA-256):
+    - `train.zip`: 9.755.097.159 B, SHA-256 `f216ebed0347f5af52ee7d975a9b5f6f33b5370bdbed75dd1aded9f8b5ae8316`;
+    - `valid.zip`: 11.169.497.921 B, SHA-256 `d60e517e0bfbce83d46a2805842d73bc98bbb65e84ba76be7b55af9bb3047a50`;
+    - `test.zip`: 8.845.186.210 B, SHA-256 `ac40080fadaebf3474477889576662de7970cae0cb375d7cd22d96f49aeefbfd`;
+    - WC14 (`soccer_data.tar.gz`): 58.788.328 B, SHA-256 `d9cb55ce5fd1c41870c1e51c3913d3f8ca3d94d2645136f0f6cdfd8224652527`.
+  - **Armadilha na extração:** os zips do GSR **não têm** a pasta da partição dentro; os
+    clipes `SNGS-XXX/` e o `sequences_info.json` ficam na raiz do zip. Extraia cada um na
+    pasta da sua partição (`tar -xf train.zip -C data/SoccerNet-GSR/train`), senão as
+    partições se misturam. O WC14 extrai para `raw/`: use `-C data/soccer_data_WC14`.
+  - **Ambiente:** os números do projeto saem com o Python 3.12 (`.python-version`); com o
+    3.11, o `uv.lock` instala outro NumPy/SciPy e o detector muda (`docs/decisoes.md`, 2026-10-20).
 - Molde 105 × 68 m, origem no centro, `y` positivo em direção à câmera — o mesmo
   do modelo interno deste projeto.
 - É onde **AuxFlow, BroadTrack e o baseline GSR** reportam números. O AuxFlow

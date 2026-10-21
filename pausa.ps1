@@ -1,4 +1,4 @@
-# Congela (pausar) ou retoma (continuar) todos os processos `python -m src.run` e os
+# Congela (pausar) ou retoma (continuar) todos os processos `python -m src.run` (ou src_v2.run, scripts/v2) e os
 # trabalhadores do pool deles. Congelado, o processo não usa CPU e mantém o estado na
 # memória: sobrevive a suspender/hibernar o Windows, NÃO a reiniciar ou desligar.
 # Uso: powershell -ExecutionPolicy Bypass -File pausa.ps1 pausar|continuar|estado
@@ -11,11 +11,13 @@ public static class Proc {
 }
 "@
 $all = Get-CimInstance Win32_Process -Filter "Name='python.exe'"
-$roots = @($all | Where-Object { $_.CommandLine -match 'src\.run' -and $_.CommandLine -notmatch 'spawn_main' })
+# v1 (src.run) e v2 (src_v2.run, scripts/v2/*.py e scripts/literatura/*.py)
+$pat = 'src(_v2)?\.run|scripts[\\/](v2|literatura)[\\/]'
+$roots = @($all | Where-Object { $_.CommandLine -match $pat -and $_.CommandLine -notmatch 'spawn_main' })
 $ids = @($roots.ProcessId)
 foreach ($r in $roots) { $ids += @($all | Where-Object { $_.CommandLine -match "parent_pid=$($r.ProcessId)\b" } | ForEach-Object ProcessId) }
-foreach ($r in $roots) { "{0}  {1}" -f $r.ProcessId, ($r.CommandLine -replace '.*src\.run', 'src.run') }
-if (-not $ids) { "nenhum processo src.run rodando"; exit }
+foreach ($r in $roots) { "{0}  {1}" -f $r.ProcessId, ($r.CommandLine -replace ".*?($pat)", '$1') }
+if (-not $ids) { "nenhum processo src.run, src_v2.run ou scripts/v2 rodando"; exit }
 # Conta as threads suspensas de um processo (0 = rodando ou esperando normalmente)
 function Suspended($p) { $p.Refresh(); @($p.Threads | Where-Object { $_.WaitReason -eq 'Suspended' }).Count }
 
