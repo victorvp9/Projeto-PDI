@@ -212,7 +212,7 @@ assign:
   guided_max_pts: 400      # pontos por classe no caminho guiado, subamostrados (escolha; custo)
   seg_step_px: 5           # amostragem dos segmentos classificados para o ajuste (escolha)
   refine_iters: 2          # reclassificação/reseleção + ajuste (escolha)
-  central_view: true       # v2, A: vista central (círculo central + linha do meio + lateral, forma fechada) só quando a 2 + 2 não dá H aceita (docs/decisoes.md, 2026-10-21); false = sem o A
+  central_view: false      # v2, A PARADO na checagem barata (docs/decisoes.md, 2026-10-22). v2, A: vista central (círculo central + linha do meio + lateral, forma fechada) só quando a 2 + 2 não dá H aceita (docs/decisoes.md, 2026-10-21); false = sem o A
 
 detector:
   # marco da Fatia 5: detector sozinho (Etapas 1-7), frame a frame

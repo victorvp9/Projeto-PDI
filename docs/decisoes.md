@@ -1105,3 +1105,18 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Configuração:** `temporal.anchor_c_max_m: null`. A base continua sendo o B1.
   - **Franqueza sobre o critério:** com Δ = 0 em 3 dos 6 jogos, uma mudança que só age onde há âncora errada não chega a 4 de 6, mesmo com média positiva na leitura LOGO. É a limitação que o plano já previa para efeitos concentrados (seção 5, sobre o E). O critério não muda depois do resultado. Registrado como ideia, **não testada**: a referência por clipe, que na valid recusaria menos certas no jogo 2; testá-la seria uma hipótese nova, com regra fixada antes e sem escolher pela valid.
   | Medição; decisão pelo critério congelado na leitura fixada antes do resultado.
+- 2026-10-22 | **v2, A (vista central em forma fechada): PARA NA CHECAGEM BARATA** (`scripts/v2/triagem_a.py`, merge `080fae1`; `outputs/runs_v2/a_triagem/`). Detector a 1 frame em 25 nos 115 clipes do dev (3.450 frames); o A só roda nos 2.281 frames em que a série da base não tem H (nos outros, a saída é a mesma), e 801 deles geraram hipóteses centrais.
+
+    | jogo | frames com H_gt | cobertura: base → A | aceitas: base → A | fração de aceitas erradas (NPE > 0,05): base → A | H novas (erradas) | NPE mediano das novas |
+    |---|---|---|---|---|---|---|
+    | 4 | 530 | 0,283 → 0,445 | 150 → 236 | 0,233 → 0,212 | 86 (15) | 0,0226 |
+    | 6 | 570 | 0,500 → 0,696 | 285 → 397 | 0,095 → 0,076 | 112 (3) | 0,0054 |
+    | 9 | 597 | 0,459 → 0,653 | 274 → 390 | 0,190 → 0,138 | 116 (2) | 0,0097 |
+    | 2 | 525 | 0,421 → 0,497 | 221 → 261 | 0,267 → 0,238 | 40 (3) | 0,0190 |
+    | 3 | 614 | 0,091 → 0,096 | 56 → 59 | 0,518 → 0,542 | 3 (3) | 0,1968 |
+    | 5 | 558 | 0,321 → 0,480 | 179 → 268 | 0,257 → 0,216 | 89 (12) | 0,0193 |
+
+  - **Regra do plano (seção 5):** para quem piora, em algum jogo, a fração de aceitas erradas em mais de 0,02. No jogo 3 ela sobe +0,024 (3 H novas, as 3 erradas, num jogo em que o detector já erra mais da metade). **O A para aqui** e não vai para a confirmação. `assign.central_view: false`.
+  - **O que o A fez nos outros 5 jogos:** a cobertura do detector sobe 16–20 pontos nos jogos 4, 6, 9 e 5 (8 no jogo 2), e a fração de aceitas erradas cai em todos os 5 (−0,021 a −0,052). O efeito sobre o LocSim do 6c não foi medido (a confirmação não roda).
+  - **Franqueza sobre a regra:** o limite de 0,02 é absoluto e sem mínimo de frames; no jogo 3, ele foi atingido por 3 frames de 614. A regra não muda depois do resultado, e o A não se repete com outro nome. Uma versão nova (por exemplo, um portão próprio para as hipóteses centrais) exigiria plano e regra registrados antes, e o jogo 3 e estes números já foram vistos.
+  | Medição; decisão pela regra congelada da triagem.
