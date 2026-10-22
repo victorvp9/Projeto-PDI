@@ -5,7 +5,8 @@ base tem H, a saída com o A é a mesma, e ela é copiada; o detector roda só n
 guardada intacta em outputs/cache_v2/detector_base/ (copiada uma vez, antes de qualquer gravação); a nova
 é gravada em outputs/cache_v2/detector/ com a chave do código atual, no formato de temporal.build_series,
 para o 6c (rodada_6c_dev.py --metade) a ler. Retomável: clipe já gravado com a chave atual é pulado.
-Uso (da raiz): PYTHONPATH=. uv run python scripts/v2/serie_a_metade.py [trabalhadores]"""
+Com `--outra`, os clipes da outra metade (depois do A' aceito: docs/decisoes.md, 2026-10-22).
+Uso (da raiz): PYTHONPATH=. uv run python scripts/v2/serie_a_metade.py [--outra] [trabalhadores]"""
 import shutil
 import sys
 from pathlib import Path
@@ -46,13 +47,14 @@ if __name__ == "__main__":
     from src_v2.executor import SafeProcessPool, exit_if_failed
     from src_v2.temporal import SERIES_KEYS, _series_key, _series_path
     assert CFG["assign"]["central_view"], "a série do A pede assign.central_view ligado"
-    n = int(sys.argv[1]) if len(sys.argv) > 1 else 10
+    n = int(next((a for a in sys.argv[1:] if a.isdigit()), 10))
     src, dst = path("cache") / "detector", path("cache") / "detector_base"
     if not dst.exists():
         shutil.copytree(src, dst)
         print(f"série da base guardada em {dst}", flush=True)
     key = _series_key()
-    clips = clips_dev(metade=True)
+    half = clips_dev(metade=True)
+    clips = [c for c in clips_dev() if c not in set(half)] if "--outra" in sys.argv else half
     todo = [c for c in clips if not (_series_path(c).exists() and str(np.load(_series_path(c))["key"]) == key)]
     print(f"série do A: {len(clips) - len(todo)} de {len(clips)} clipes já gravados", flush=True)
     base = {c: dict(np.load(base_path(c))) for c in todo}
@@ -67,7 +69,7 @@ if __name__ == "__main__":
             b = base[c]
             np.savez_compressed(_series_path(c), key=key, frames=b["frames"], H=b["H"], **{k: b[k] for k in SERIES_KEYS})
             print(f"   {c.parent.name}/{c.name}: nenhum frame a rodar", flush=True)
-    out_dir = path("runs") / "a_serie_metade"
+    out_dir = path("runs") / ("a_serie_outra" if "--outra" in sys.argv else "a_serie_metade")
     with SafeProcessPool(n, initializer=cv2.setNumThreads, initargs=(1,), manifest_dir=out_dir / "manifestos") as ex:
         for res in ex.map(chunk, tasks):
             if res is None:
