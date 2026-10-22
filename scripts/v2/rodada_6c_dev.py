@@ -13,7 +13,7 @@ perderam todas as âncoras e o LocSim que tinham antes.
 - `--logo9`: o B1 no jogo 9 também com o limiar leave-one-game-out (a regra do diagnóstico nos outros
   5 jogos), por _eval_clip_6c sem cache, com o limiar no config do processo e dos trabalhadores.
 Uso (da raiz): PYTHONPATH=. uv run python scripts/v2/rodada_6c_dev.py <nome> <arquivo da base>
-<csv da base por jogo> [--logo9] [--logo-c=<jogo>:<limiar> ...] [trabalhadores]"""
+<csv da base por jogo, ou - para tirar dos caches da base> [--logo9] [--logo-c=<jogo>:<limiar> ...] [--metade] [trabalhadores]"""
 import csv
 import json
 import pickle
@@ -34,8 +34,18 @@ GAMES = ("4", "6", "9", "2", "3", "5")
 MIN_GAMES, MAX_DROP = 4, -0.03
 
 
-def clips_dev():
-    return [c for s in DEV for c in sorted((path("gsr") / s).glob("SNGS-*"))]
+def clips_dev(metade=False):
+    """Clipes do dev; com `metade`, a metade fixa do plano (seção 4): em cada jogo, os clipes pela ordem
+    numérica do ID, numerados a partir de 0, e ficam os de índice par."""
+    clips = [c for s in DEV for c in sorted((path("gsr") / s).glob("SNGS-*"))]
+    if not metade:
+        return clips
+    from src_v2.io import gsr
+    by = {}
+    for c in clips:
+        by.setdefault(gsr.game_id(c), []).append(c)
+    keep = {c for cs in by.values() for c in sorted(cs, key=lambda c: int(c.name.split("-")[1]))[::2]}
+    return [c for c in clips if c in keep]
 
 
 def archive(name):
@@ -138,10 +148,14 @@ def logo_c(n, out, game, thr):
 
 
 def decide(delta):
+    """Critério de aceite. Desde 2026-10-22 (docs/decisoes.md, decisão de Victor, só para hipóteses futuras):
+    Δ >= 0 em >= 4 de 6 jogos (empates contam), média > 0, nenhum jogo abaixo de -0,03. Até B1b, a primeira
+    condição era Δ > 0 (`jogos_com_ganho`, mantido no json para comparação)."""
     d = [delta[g] for g in GAMES]
-    ok = (bool(sum(x > 0 for x in d) >= MIN_GAMES), float(np.mean(d)) > 0, bool(min(d) >= MAX_DROP))   # bool: numpy.bool_ não vai para o json
-    return dict(jogos_com_ganho=int(sum(x > 0 for x in d)), media=float(np.mean(d)), pior=float(min(d)),
-                criterios=dict(ganho_em_4_de_6=ok[0], media_positiva=ok[1], nenhum_abaixo_de_menos_003=ok[2]), aceita=all(ok))
+    ok = (bool(sum(x >= 0 for x in d) >= MIN_GAMES), float(np.mean(d)) > 0, bool(min(d) >= MAX_DROP))   # bool: numpy.bool_ não vai para o json
+    return dict(jogos_com_ganho=int(sum(x > 0 for x in d)), jogos_sem_perda=int(sum(x >= 0 for x in d)), media=float(np.mean(d)),
+                pior=float(min(d)), criterios=dict(sem_perda_em_4_de_6=ok[0], media_positiva=ok[1], nenhum_abaixo_de_menos_003=ok[2]),
+                aceita=all(ok))
 
 
 def write(out, name, rows):
@@ -161,8 +175,12 @@ if __name__ == "__main__":
     out.mkdir(parents=True, exist_ok=True)
     print("caches da base guardados agora" if archive(base_dir) else "caches da base já guardados", flush=True)
     from src_v2.io import gsr
-    clips = clips_dev()
+    clips = clips_dev(metade="--metade" in flags)
     game = {c: gsr.game_id(c) for c in clips}
+    if base_csv == "-":    # base pelos caches guardados da base, nos mesmos clipes (a metade fixa)
+        base_rows, base_med = per_game({c: pickle.loads((path("cache") / base_dir / c.parent.name / f"{c.name}.pkl").read_bytes())[1] for c in clips})
+        write(out, "base_por_jogo", base_rows + [base_med])
+        base_csv = str(out / "base_por_jogo.csv")
     res = run_6c(clips, n, out)
     rows, med = per_game(res)
     base = {r["jogo"]: r for r in csv.DictReader(open(base_csv, encoding="utf-8")) if r["particao"] != "mediana"}

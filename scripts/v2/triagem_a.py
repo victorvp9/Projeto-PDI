@@ -6,7 +6,7 @@ da base tem H, a saída do A é a mesma, e só os outros são rodados. A série 
 cache (a chave dela é a do código sem o A).
 Por jogo: cobertura (frames com H_gt), fração de H aceitas erradas (NPE > 0,05 contra a H_gt) e NPE
 mediano das aceitas, na base e com o A; e as H novas do A (quantas, quantas erradas, NPE mediano).
-Regra do plano: o A para aqui se, em algum jogo, a fração de aceitas erradas piorar mais que 0,02 em
+Regra (v2, A', docs/decisoes.md 2026-10-22): para se, em algum jogo com >= MIN_NEW H novas, a fração de aceitas erradas piorar mais que 0,02 em
 termos absolutos, ou se não aparecer H nova (a medida-alvo não muda).
 Uso (da raiz): PYTHONPATH=. uv run python scripts/v2/triagem_a.py [trabalhadores]"""
 import csv
@@ -19,6 +19,7 @@ import numpy as np
 from src_v2.config import CFG, path
 
 STEP, WRONG, MAX_WORSE = 25, 0.05, 0.02
+MIN_NEW = 20      # v2, A': a piora só conta num jogo com >= 20 H novas (~4% dos frames amostrados; docs/decisoes.md 2026-10-22)
 GAMES = ("4", "6", "9", "2", "3", "5")
 
 
@@ -81,7 +82,7 @@ if __name__ == "__main__":
             w.writeheader()
             w.writerows(data)
     s = summary(rows)
-    worse = [r["jogo"] for r in s if np.isfinite(r["piora_erradas"]) and r["piora_erradas"] > MAX_WORSE]
+    worse = [r["jogo"] for r in s if r["novas"] >= MIN_NEW and np.isfinite(r["piora_erradas"]) and r["piora_erradas"] > MAX_WORSE]
     novas = sum(r["novas"] for r in s)
     for r in s:
         print(f"jogo {r['jogo']}: cobertura {r['cob_base']:.3f} -> {r['cob_a']:.3f}; aceitas erradas {r['frac_erradas_base']:.3f} -> "

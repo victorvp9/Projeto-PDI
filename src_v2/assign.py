@@ -518,7 +518,11 @@ def detect_frame(frame_bgr, dataset, variants=None, refine=None):
             info["hipoteses_centrais"] = len(hc)
             if hc:
                 H3, info3 = estimate(marks, grass, segs[cid < 0], refine or D["refine"], hyps=hc)
-                if H3 is not None:
+                # v2, A': depois do refino, alguma elipse aceita tem de conferir com o círculo central
+                # projetado (ellipse_consistent, limiar ellipse_check_frac já existente; docs/decisoes.md 2026-10-22)
+                if H3 is not None and any(ellipse_consistent(E, H3, marks.shape[0], only="Circle central") for E in ells):
                     H, info = H3, {**info3, "hipoteses_centrais": len(hc), "vista_central": True}
+                elif H3 is not None:
+                    info["central_recusada_elipse"] = True
         out[name] = (H, info)
     return out

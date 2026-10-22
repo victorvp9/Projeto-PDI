@@ -212,7 +212,7 @@ assign:
   guided_max_pts: 400      # pontos por classe no caminho guiado, subamostrados (escolha; custo)
   seg_step_px: 5           # amostragem dos segmentos classificados para o ajuste (escolha)
   refine_iters: 2          # reclassificação/reseleção + ajuste (escolha)
-  central_view: true       # v2, A: vista central (círculo central + linha do meio + lateral, forma fechada) só quando a 2 + 2 não dá H aceita (docs/decisoes.md, 2026-10-21); false = sem o A
+  central_view: true       # v2, A: vista central (círculo central + linha do meio + lateral, forma fechada) só quando a 2 + 2 não dá H aceita (docs/decisoes.md, 2026-10-21); false = sem o A; v2, A': com o filtro de consistência da elipse depois do refino (docs/decisoes.md, 2026-10-22)
 
 detector:
   # marco da Fatia 5: detector sozinho (Etapas 1-7), frame a frame
