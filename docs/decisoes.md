@@ -1159,3 +1159,23 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
     - **critério novo** (registrado acima): Δ ≥ 0 em ≥ 4 de 6 jogos, média > 0, nenhum jogo abaixo de −0,03, com o LocSim@5 penalizado do 6c. Sem parâmetro livre, sem leitura LOGO.
   - **Se o A' for recusado,** o código do A sai de novo da branch principal e a série da base volta de `detector_base/`, como em `ecb8102`. **Se for aceito,** a série da outra metade é calculada antes de qualquer hipótese seguinte.
   | Decisão de Victor (caminho); o filtro, a contagem mínima de 20 e o reaproveitamento da série são meus, fixados antes de rodar.
+- 2026-10-22 | **v2, A' (vista central com filtro): ACEITO na confirmação da metade fixa** (`scripts/literatura/fila_a.ps1`; triagem `outputs/runs_v2/a_triagem/`; série `scripts/v2/serie_a_metade.py`; 6c `rodada_6c_dev.py a_central eval_6c_b1 - --metade`, commit `2d73d2e`, `outputs/runs_v2/a_central/`; relatório `outputs/runs_v2/a_central/relatorio_a2.md`, `scripts/literatura/a2_relatorio.py`). 59 clipes, 0 falhas.
+  - **Checagem barata:** passa. A piora da fração de erradas no jogo 3 (+0,0245) vem de 3 H novas, abaixo do mínimo de 20, e **não conta**; nos outros jogos, cobertura do detector +0,08 a +0,20 e fração de erradas caindo.
+  - **Série na metade fixa:** H novas por jogo 1.024 / 1.136 / 1.285 / 635 / 3 / 974 (jogos 4, 6, 9, 2, 3, 5); cobertura da série 0,197 → 0,348; 0,543 → 0,694; 0,455 → 0,627; 0,359 → 0,453; 0,089 → 0,089; 0,345 → 0,475. Nos frames com H na base, as H do A' são idênticas às da base (conferido nos 59 clipes).
+  - **Confirmação (LocSim@5 penalizado do 6c, metade fixa, base B1 nos mesmos clipes):**
+
+    | jogo | clipes | base | A' | Δ | clipes sem âncora | âncoras do A' (erradas) |
+    |---|---|---|---|---|---|---|
+    | 4 | 9 | 0,4219 | 0,8155 | +0,3936 | 3 → 0 | 35 (1) |
+    | 6 | 10 | 0,8898 | 0,9220 | +0,0322 | 0 → 0 | 37 (0) |
+    | 9 | 10 | 0,7665 | 0,8868 | +0,1203 | 1 → 0 | 50 (0) |
+    | 2 | 9 | 0,5499 | 0,8478 | +0,2978 | 3 → 0 | 17 (0) |
+    | 3 | 11 | 0,2471 | 0,2471 | 0 | 8 → 8 | 0 (0) |
+    | 5 | 10 | 0,6256 | 0,8504 | +0,2247 | 2 → 0 | 29 (2) |
+
+  - **Critério novo:** Δ ≥ 0 em 6 de 6 jogos, média +0,178, pior 0: **aceito**. (Pelo critério antigo, Δ > 0 em 5 de 6, também passaria.)
+  - **Itens pedidos por Victor** (relatório): (1) o filtro `ellipse_consistent` recusou 4 de 448 H centrais na checagem barata (2 no jogo 4, uma delas errada; 2 no jogo 9) e **zero** nos jogos 6, 2, 3 e 5: é quase vazio, porque a H do A é construída a partir da própria elipse; na série, a contagem não existe (a série não grava o motivo da recusa); (2) no jogo 3, a checagem passa **pela contagem mínima**, não por evidência de que o filtro barre encaixes errados: as 3 H erradas passam pelo filtro; (3) na confirmação, as 3 H do A' no jogo 3 viraram candidatas e **nenhuma** virou âncora (o B1 e a verificação as barraram); nos outros jogos, 168 âncoras vieram de H do A', 3 erradas (1,8%).
+  - **Conferência contra artefato (clipe a clipe):** os maiores ganhos são clipes sem âncora na base (LocSim 0) que passam a 0,83–0,93, com as âncoras do A' a NPE mediano de 0,005 a 0,024 contra o gabarito (SNGS-060, -033, -076, -029, -096, -021). Pioram 4 clipes, todos pouco: SNGS-099 −0,020, SNGS-165 −0,005, SNGS-107 −0,002, SNGS-105 −0,001.
+  - **Leitura:** confirma o diagnóstico do A e a decomposição do v1. O gargalo era ter âncora nas vistas centrais, e o A' resolve clipes inteiros. O jogo 3 (segmentação) segue sem solução: é o caso do E.
+  - **Base daqui em diante:** B1 + A' (`assign.central_view: true`). Pela regra registrada, a série e o 6c da **outra metade** (56 clipes) são calculados antes de qualquer hipótese seguinte, e a tabela da nova base no dev inteiro fica em `outputs/runs_v2/base_b1a_local/`.
+  | Medição; decisão pelo critério novo (registrado antes de rodar).
