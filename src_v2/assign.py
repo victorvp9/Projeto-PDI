@@ -143,95 +143,6 @@ def hypotheses(segs, size, P=A):
     return out, tried
 
 
-def _conic(E):
-    """Elipse E = (cx, cy, A, B, θ) -> matriz 3x3 da cônica (imagem, px)."""
-    cx, cy, a, b, t = E
-    R = np.array([[np.cos(t), -np.sin(t)], [np.sin(t), np.cos(t)]])
-    M = R @ np.diag([1 / a ** 2, 1 / b ** 2]) @ R.T
-    c = np.array([cx, cy])
-    return np.block([[M, (-M @ c)[:, None]], [(-M @ c)[None], np.array([[c @ M @ c - 1]])]])
-
-
-def _line_conic(l, C):
-    """Interseções reais da reta homogênea l com a cônica C (imagem): [] ou 2 pontos."""
-    a, b, c = l
-    n2 = a * a + b * b
-    if n2 == 0:
-        return []
-    p0, d = -c / n2 * np.array([a, b]), np.array([-b, a]) / np.sqrt(n2)
-    P, D = np.r_[p0, 1.0], np.r_[d, 0.0]
-    qa, qb, qc = D @ C @ D, 2 * D @ C @ P, P @ C @ P
-    disc = qb * qb - 4 * qa * qc
-    if qa == 0 or disc < 0:
-        return []
-    return [p0 + s * d for s in ((-qb - np.sqrt(disc)) / (2 * qa), (-qb + np.sqrt(disc)) / (2 * qa))]
-
-
-def central_view_homographies(E, l_mid, l_side, size, P=A):
-    """v2, A (docs/decisoes.md, 2026-10-21): H (campo -> imagem) da vista central, em forma
-    fechada, pela elipse do círculo central E, a linha do meio l_mid e uma lateral l_side.
-    O círculo + 1 reta deixam uma família de 1 parâmetro; o terceiro ponto da linha do meio
-    (S, na lateral) fecha: P1, P2 = linha do meio ∩ elipse (0, ±9,15); a projetividade 1D da
-    linha do meio por (P1, P2, S) dá o centro (0, 0) e o ponto de fuga V_Y; a polar de V_Y
-    em relação à elipse é a imagem do diâmetro Y = 0, que corta a elipse em (±9,15, 0).
-    Seis correspondências, DLT. As duas laterais e os dois lados de X são tentados; ficam as
-    H de orientação válida (`valid_orientation`, que separa o espelho e a rotação de 180°)."""
-    from src_v2.pitch_model import CENTER_CIRCLE_R as R_C, HW
-    w, h = size
-    C = _conic(E)
-    p = _line_conic(l_mid, C)
-    S = np.cross(l_mid, l_side)
-    if len(p) < 2 or abs(S[2]) < 1e-12:
-        return []
-    S = S[:2] / S[2]
-    b = P["corr_beyond"]
-    if not (-b * w <= S[0] <= (1 + b) * w and -b * h <= S[1] <= (1 + b) * h):
-        return []
-    p = sorted(p, key=lambda q: q[1])     # câmera principal: o lado oposto (Y = -9,15) fica mais alto na imagem
-    d = (p[1] - p[0]) / np.linalg.norm(p[1] - p[0])
-    s = [0.0, float((p[1] - p[0]) @ d), float((S - p[0]) @ d)]
-    out = []
-    for Ys in (-HW, HW):
-        try:   # s = (alpha·Y + beta) / (gamma·Y + 1) na linha do meio
-            alpha, beta, gamma = np.linalg.solve([[y, 1, -si * y] for y, si in zip((-R_C, R_C, Ys), s)], s)
-        except np.linalg.LinAlgError:
-            continue
-        VY = gamma * np.r_[p[0], 1.0] + alpha * np.r_[d, 0.0]              # Y -> infinito
-        q = _line_conic(C @ VY, C)
-        if len(q) < 2:
-            continue
-        fld = np.float32([[0, -R_C], [0, R_C], [0, Ys], [0, 0], [-R_C, 0], [R_C, 0]])
-        for q0, q1 in (q, q[::-1]):
-            H, _ = cv2.findHomography(fld, np.float32([p[0], p[1], S, p[0] + beta * d, q0, q1]), 0)
-            if H is not None and np.isfinite(H).all() and valid_orientation(H, size):
-                out.append(H)
-    return out
-
-
-def central_hypotheses(segs, ellipses, size, P=A):
-    """v2, A: hipóteses da vista central. Para cada elipse, linha do meio = segmento que a cruza
-    perto do centro (os critérios da âncora do círculo central em `conics.anchored`) e lateral =
-    um dos `top_k` segmentos mais longos que não cortam a elipse."""
-    L = CFG["lines"]
-    if not len(segs):
-        return []
-    length = np.hypot(segs[:, 2] - segs[:, 0], segs[:, 3] - segs[:, 1])
-    d = segs[:, 2:] - segs[:, :2]
-    out = []
-    for E in ellipses:
-        C, major = _conic(E), np.array([np.cos(E[4]), np.sin(E[4])])
-        ang = np.degrees(np.arccos(np.clip(np.abs(d @ major) / np.maximum(length, 1e-9), 0, 1)))
-        nrm = np.stack([-d[:, 1], d[:, 0]], 1) / np.maximum(length, 1e-9)[:, None]
-        dist_c = np.abs(((E[:2] - segs[:, :2]) * nrm).sum(1))
-        round_ = E[2] / E[3] < L["anchor_round_ratio"]
-        mids = [i for i in range(len(segs)) if (round_ or ang[i] >= L["anchor_cross_deg"]) and dist_c[i] <= L["anchor_center_b"] * E[3]]
-        sides = [i for i in np.argsort(-length) if not _line_conic(_hline(segs[i]), C)][:P["top_k"]]
-        for i in mids:
-            for j in sides:
-                out += central_view_homographies(E, _hline(segs[i]), _hline(segs[j]), size, P)
-    return out
-
-
 def _model_points(step):
     k = max(1, int(round(step / CFG["pitch"]["sample_step_m"])))
     pts = [p[::k] for p in POLYLINES.values()]
@@ -423,18 +334,14 @@ def accept(terms, P=A):
     return terms[0] >= P["gate_img"] and terms[2] >= P["gate_iou"]
 
 
-def estimate(marks, grass, segs, refine="segments", P=A, ransac=False, ellipses=(), hyps=None):
+def estimate(marks, grass, segs, refine="segments", P=A, ransac=False, ellipses=()):
     """Pipeline mínimo: hipóteses -> poda pelo IoU com o gramado -> verificação ->
     (refinamento) -> portão. `segs` sem as cordas marcadas. refine: None (só H₀),
     "segments" (pontos dos segmentos classificados + círculos guiados) ou "guided"
-    (pixels da máscara em volta de todas as linhas). `hyps`: hipóteses dadas no lugar
-    das 2 + 2 (v2, A: a vista central). Devolve (H ou None, info)."""
+    (pixels da máscara em volta de todas as linhas). Devolve (H ou None, info)."""
     h, w = marks.shape
     size = (w, h)
-    if hyps is not None:
-        Hs, tried = list(hyps), len(hyps)
-    else:
-        Hs, tried = hypotheses(segs, size, P) if len(segs) >= 4 else ([], 0)
+    Hs, tried = hypotheses(segs, size, P) if len(segs) >= 4 else ([], 0)
     info = dict(hipoteses=tried, validas=len(Hs), ok=False)
     if not Hs:
         return None, info
@@ -512,13 +419,5 @@ def detect_frame(frame_bgr, dataset, variants=None, refine=None):
             H2, info2 = estimate(marks, grass, segs[(cid < 0) | np.isin(cid, bad)], refine or D["refine"])
             if H2 is not None:
                 H, info = H2, {**info2, "elipses_rejeitadas": len(bad), "reclassificado": True}
-        # v2, A: só se a 2 + 2 não deu H aceita; mesmas pontuação, refino e portões
-        if H is None and len(ells) and A["central_view"]:
-            hc = central_hypotheses(segs[cid < 0], ells, marks.shape[::-1])
-            info["hipoteses_centrais"] = len(hc)
-            if hc:
-                H3, info3 = estimate(marks, grass, segs[cid < 0], refine or D["refine"], hyps=hc)
-                if H3 is not None:
-                    H, info = H3, {**info3, "hipoteses_centrais": len(hc), "vista_central": True}
         out[name] = (H, info)
     return out
