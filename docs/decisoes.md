@@ -1088,3 +1088,20 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Validação cruzada por jogo** (plano, seção 4; a leitura que decide, como no B1): o limiar LOGO (a mesma regra nos outros 5 jogos) recusa, entre as âncoras que passam no B1, as mesmas que o limiar do treino nos jogos 4, 6, 3 e 5 (10,93; 11,44; 10,63; 10,18 m), e outras nos jogos 9 (11,246353226545638 m: 0 contra 1) e 2 (8,480002295181055 m: 21 contra 29). Esses dois jogos são medidos também com o limiar LOGO, sem cache (`rodada_6c_dev.py --logo-c=9:… --logo-c=2:…`), e o critério congelado é aplicado à leitura LOGO; a do limiar do treino fica como informação.
   - **Medida-alvo:** aceitas erradas por jogo e o caso "vizinhos concordam e todos errados". Na etapa 1, entre as aceitas pelo B1, o limiar do treino recusaria 13 de 17 erradas e 27 de 793 certas (todas do jogo 2).
   | Decisão de Victor (aprovação); a regra da etapa 1, o mínimo de 50 H e a leitura LOGO nos jogos 9 e 2 são meus, fixados antes de rodar.
+- 2026-10-22 | **v2, B2 (centro da câmera da âncora): RECUSADO** (`scripts/v2/rodada_6c_dev.py b2_centro … --logo-c=9:… --logo-c=2:…`, commit `5d7b371`, `outputs/runs_v2/b2_centro/`; 6c 115/115, LOGO dos jogos 9 e 2 sem cache). Base: o B1 recalculado (`outputs/runs_v2/base_b1_local/por_jogo.csv`).
+
+    | jogo | base (B1) | B2, limiar do treino | Δ | leave-one-game-out | Δ LOGO | aceitas erradas (treino) |
+    |---|---|---|---|---|---|---|
+    | 4 | 0,5155 | 0,5331 | +0,0175 | = | +0,0175 | 2 → 0 |
+    | 6 | 0,8805 | 0,8805 | 0,0000 | = | 0,0000 | 0 → 0 |
+    | 9 | 0,8282 | 0,8282 | 0,0000 | 0,8282 (11,25 m) | 0,0000 | 1 → 0 (LOGO 1) |
+    | 2 | 0,6427 | 0,6130 | −0,0297 | 0,6344 (8,48 m) | −0,0083 | 4 → 2 (LOGO 2) |
+    | 3 | 0,1410 | 0,1452 | +0,0042 | = | +0,0042 | 8 → 0 |
+    | 5 | 0,6273 | 0,6273 | 0,0000 | = | 0,0000 | 2 → 2 |
+
+  - **Critério na leitura LOGO (a que decide):** ganho em 2 de 6 jogos (mínimo 4), média +0,0022, pior −0,0083: **recusado** só pela regra dos 4 de 6. Na leitura do limiar do treino: 3 de 6, média −0,0013, pior −0,0297.
+  - **Leitura:** o sinal faz o que o diagnóstico previa. Recusa as âncoras erradas nos jogos 4 e 3 (2 → 0 e 8 → 0) e não muda nada onde não há errada a recusar (jogos 6, 9 e 5: Δ = 0, que não conta como ganho). Paga no jogo 2, onde a câmera do jogo é a mais espalhada (D2) e o limiar recusa âncoras certas: cobertura 0,836 → 0,779 (LOGO), e o SNGS-022 perdeu as 5 aceitas certas. Os outros clipes que ficaram sem âncora: SNGS-062 (jogo 4; 1 aceita, errada) e SNGS-048 (jogo 3; 7 aceitas, todas erradas).
+  - **Teto**, base → B2 (limiar do treino): 0,6058 → 0,5581; 0,8968 → 0,8968; 0,8272 → 0,8272; 0,6400 → 0,5997; 0,2051 → 0,1407; 0,6581 → 0,6581. Cai onde há menos âncoras para receber o gabarito.
+  - **Configuração:** `temporal.anchor_c_max_m: null`. A base continua sendo o B1.
+  - **Franqueza sobre o critério:** com Δ = 0 em 3 dos 6 jogos, uma mudança que só age onde há âncora errada não chega a 4 de 6, mesmo com média positiva na leitura LOGO. É a limitação que o plano já previa para efeitos concentrados (seção 5, sobre o E). O critério não muda depois do resultado. Registrado como ideia, **não testada**: a referência por clipe, que na valid recusaria menos certas no jogo 2; testá-la seria uma hipótese nova, com regra fixada antes e sem escolher pela valid.
+  | Medição; decisão pelo critério congelado na leitura fixada antes do resultado.

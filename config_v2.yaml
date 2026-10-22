@@ -254,7 +254,7 @@ temporal:
   c_margin_frac: 0.02      # v2, C: pontos da grade do campo na fusão: dentro da imagem pelas duas H, com margem de 0,02·h além da borda (fixado antes de rodar)
   c_min_points: 8          # v2, C: com menos pontos, o frame fica com a H da âncora mais próxima (fixado antes de rodar)
   anchor_min_nota: 1.6153357723089734   # v2, B1: âncora verificada só é aceita com nota (iou + img) >= isto; limiar do treino (jogos 4, 6, 9) com <= 2% das candidatas certas recusadas (docs/decisoes.md, 2026-10-15); null desliga
-  anchor_c_max_m: 6.906861634313279      # v2, B2: âncora que passa no B1 só é aceita com o centro da câmera da H a <= isto (m) da mediana do centro das H do detector do jogo; limiar do treino (jogos 4, 6, 9) com <= 2% das candidatas certas recusadas, referência do jogo escolhida no treino (scripts/literatura/b2_diagnostico.py; docs/decisoes.md, 2026-10-21); null desliga
+  anchor_c_max_m: null                   # v2, B2 RECUSADO no dev (docs/decisoes.md, 2026-10-22); o limiar medido foi 6.906861634313279. v2, B2: âncora que passa no B1 só é aceita com o centro da câmera da H a <= isto (m) da mediana do centro das H do detector do jogo; limiar do treino (jogos 4, 6, 9) com <= 2% das candidatas certas recusadas, referência do jogo escolhida no treino (scripts/literatura/b2_diagnostico.py; docs/decisoes.md, 2026-10-21); null desliga
   grid_m: [2.5, 2.0]       # grade de pontos auxiliares do campo, X x Y (AuxFlow)
   border_frac: 0.02        # pontos a menos disto·h da borda da imagem ficam fora (escolha)
   compact_dilate_frac: 0.01   # componentes compactos de não-gramado (jogadores, bola) dilatados em isto·h (escolha)
