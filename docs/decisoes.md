@@ -1120,3 +1120,21 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **O que o A fez nos outros 5 jogos:** a cobertura do detector sobe 16–20 pontos nos jogos 4, 6, 9 e 5 (8 no jogo 2), e a fração de aceitas erradas cai em todos os 5 (−0,019 a −0,051). O efeito sobre o LocSim do 6c não foi medido (a confirmação não roda).
   - **Franqueza sobre a regra:** o limite de 0,02 é absoluto e sem mínimo de frames; no jogo 3, ele foi atingido por 3 frames de 614. A regra não muda depois do resultado, e o A não se repete com outro nome. Uma versão nova (por exemplo, um portão próprio para as hipóteses centrais) exigiria plano e regra registrados antes, e o jogo 3 e estes números já foram vistos.
   | Medição; decisão pela regra congelada da triagem.
+- 2026-10-22 | **v2: o A sai da base.** Com o código do A no `assign.py` e a chave `assign.central_view` no config, a chave da série do detector mudava mesmo com o A desligado, e as 115 séries em cache deixavam de valer (o B1b quebrou nisso: série gravada `24a637cb610f`, atual `3b84d59a2e60`). O `assign.py` e o config voltam ao estado de `dbd0e82`, o teste e o script da triagem do A saem da branch principal (ficam na `v2-A`), e a chave da série volta a conferir com a gravada (commit `ecb8102`).
+  | Correção; consequência do A parado.
+- 2026-10-22 | **v2, B1b (recuperar a melhor candidata quando o B1 deixa um clipe sem âncora): RECUSADO, como previsto por construção** (`scripts/literatura/b1b_efeito.py`, `outputs/runs_v2/b1b/`). Sem parâmetro livre. A regra: num clipe sem âncora depois do B1, entre as candidatas que passaram na verificação por maioria e só caíram pela nota, aceita a de maior nota.
+  - **Medição:** só os clipes sem âncora na base com candidata recusada só pela nota mudam: os 4 do registro de 2026-10-16 (SNGS-033, jogo 2, candidata certa; SNGS-042, -044 e -049, jogo 3, erradas). Eles foram recalculados com a regra aplicada por fora do `src_v2` (camada em volta de `temporal.anchors`); os outros 111 clipes vêm da base do B1, idênticos por construção.
+
+    | jogo | B1 | B1b | Δ |
+    |---|---|---|---|
+    | 4 | 0,5155 | 0,5155 | 0 |
+    | 6 | 0,8805 | 0,8805 | 0 |
+    | 9 | 0,8282 | 0,8282 | 0 |
+    | 2 | 0,6427 | 0,6651 | +0,0223 |
+    | 3 | 0,1410 | 0,1417 | +0,0007 |
+    | 5 | 0,6273 | 0,6273 | 0 |
+
+  - **Critério congelado:** ganho em 2 de 6 jogos (mínimo 4), média +0,0038, pior 0: recusado só pela regra dos 4 de 6, que uma mudança restrita a 4 clipes de 2 jogos não tinha como cumprir; ficou registrado antes de rodar (mensagem a Victor) que ela não podia passar.
+  - **Leitura:** com o B1b, o jogo 2 volta exatamente ao valor de antes do B1 (0,6651, linha de base): a única perda do B1 é o SNGS-033, que o B1b desfaz. No jogo 3, as três âncoras resgatadas são erradas, e os clipes já estavam perto de 0.
+  - **Sobre o critério (para Victor decidir, sem mudar nada agora):** B2, B1b e, na triagem, o A agiram só onde havia o que corrigir, com Δ = 0 exato nos outros jogos, e a regra "Δ > 0 em ≥ 4 de 6" recusa esse tipo de mudança mesmo sem perda (B1b) ou com média positiva (B2, LOGO). O plano já previa a limitação para efeitos concentrados (seção 5, sobre o E). Mudar o critério agora seria decidir depois de ver estes resultados; se for mudado, vale só para hipóteses futuras, com a regra registrada antes.
+  | Medição; decisão pelo critério congelado.
