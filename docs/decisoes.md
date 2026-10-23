@@ -1179,3 +1179,18 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Leitura:** confirma o diagnóstico do A e a decomposição do v1. O gargalo era ter âncora nas vistas centrais, e o A' resolve clipes inteiros. O jogo 3 (segmentação) segue sem solução: é o caso do E.
   - **Base daqui em diante:** B1 + A' (`assign.central_view: true`). Pela regra registrada, a série e o 6c da **outra metade** (56 clipes) são calculados antes de qualquer hipótese seguinte, e a tabela da nova base no dev inteiro fica em `outputs/runs_v2/base_b1a_local/`.
   | Medição; decisão pelo critério novo (registrado antes de rodar).
+- 2026-10-23 | **v2: a nova base (B1 + A') no dev inteiro** (`scripts/literatura/fila_a_outra.ps1`: série do A' na outra metade, 56 clipes, `serie_a_metade.py --outra`, 19:37–00:06; 6c e tabela, `base_a_completa.py`, 00:06–02:35; 0 falhas; `outputs/runs_v2/base_b1a_local/por_jogo.csv`). Os 115 caches do 6c com a chave atual. A outra metade não entrou na decisão do A' (tomada na metade fixa); ela só completa a base.
+
+    | jogo | linha de base | B1 | B1 + A' | Δ sobre o B1 | teto | cobertura do 6c | clipes sem âncora |
+    |---|---|---|---|---|---|---|---|
+    | 4 | 0,4884 | 0,5155 | 0,8165 | +0,3009 | 0,8755 | 0,774 → 1,000 | 4 → 0 |
+    | 6 | 0,8245 | 0,8805 | 0,9180 | +0,0375 | 0,9158 | 1,000 → 1,000 | 0 → 0 |
+    | 9 | 0,8098 | 0,8282 | 0,8952 | +0,0671 | 0,8970 | 0,950 → 1,000 | 1 → 0 |
+    | 2 | 0,6651 | 0,6427 | 0,8468 | +0,2040 | 0,8592 | 0,836 → 1,000 | 3 → 0 |
+    | 3 | 0,1390 | 0,1410 | 0,1410 | 0 | 0,2051 | 0,244 → 0,244 | 16 → 16 |
+    | 5 | 0,6012 | 0,6273 | 0,8333 | +0,2060 | 0,8480 | 0,838 → 1,000 | 3 → 0 |
+
+  - **Mediana dos 6 jogos do LocSim@5 penalizado do 6c:** linha de base 0,633 → B1 0,635 → **B1 + A' 0,840**. Teto (mediana) 0,867.
+  - **O que sobra:** o jogo 3 (sombra azulada; 16 clipes sem âncora, 8 aceitas erradas) não muda com o A', e os outros 5 jogos têm cobertura do 6c de 1,000, com o 6c a 0,002–0,059 do teto. A próxima alavanca grande é o jogo 3 (segmentação: o E); o D e o C corrigido atacam a distância ao teto, que agora é pequena.
+  - **A série guardada da base** (`outputs/cache_v2/detector_base/`, sem o A) continua guardada; a de `outputs/cache_v2/detector/` é a do A' nos 115 clipes.
+  | Medição.
