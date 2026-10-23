@@ -48,6 +48,8 @@ Step t_extrai {
 Step t_serie { & $uv run python -m src_v2.run --detect-series --splits test --clip-step 1 }
 Step t_confere_v1 { & $uv run python scripts/v2/rodada_test_v2/confere_v1_test.py }
 Step t_6c { & $uv run python -m src_v2.run --propagate-eval --splits test --clip-step 1 --workers 6 }
+# pedido de Victor: nos clipes sem H nova do A' e sem recusa do B1, 6c, teto e aceitas iguais aos do v1; senão a fila para aqui
+Step t_confere_v1_6c { & $uv run python scripts/v2/rodada_test_v2/confere_v1_6c.py }
 Step t_extras { & $uv run python scripts/v2/rodada_test_v2/extras_test_v2.py 8 }
 Step t_tabelas { & $uv run python scripts/v2/rodada_test_v2/tabelas_test_v2.py test }
 Note "fila do test concluída"
