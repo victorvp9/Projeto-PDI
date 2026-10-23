@@ -1194,3 +1194,26 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **O que sobra:** o jogo 3 (sombra azulada; 16 clipes sem âncora, 8 aceitas erradas) não muda com o A', e os outros 5 jogos têm cobertura do 6c de 1,000, com o 6c a 0,002–0,059 do teto. A próxima alavanca grande é o jogo 3 (segmentação: o E); o D e o C corrigido atacam a distância ao teto, que agora é pequena.
   - **A série guardada da base** (`outputs/cache_v2/detector_base/`, sem o A) continua guardada; a de `outputs/cache_v2/detector/` é a do A' nos 115 clipes.
   | Medição.
+- 2026-10-23 | **v2: o E não entra agora** (decisão de Victor). O objetivo do ciclo é a comparação no test, e pela análise de falhas do v1, já publicada (relatório v1, seção 7), o test não tem jogo com sombra: lá a falta de âncora vinha do enquadramento, que o A' ataca. O E fica para depois, **só no dev**, como resultado de robustez, com critério próprio registrado antes, e sem tocar o test.
+  | Decisão de Victor.
+- 2026-10-23 | **v2 FINAL CONGELADO = B1 + A' (tag `v2-final`), antes de qualquer número do test** (decisão de Victor).
+  - **Configuração:** `src_v2/` e `config_v2.yaml` idênticos aos do commit `67ae704` (o A' registrado e medido). B1: `temporal.anchor_min_nota` = 1,6153357723089734. A': `assign.central_view: true`, com o filtro de consistência da elipse. Desligados: C (`temporal.bidirectional: false`) e B2 (`temporal.anchor_c_max_m: null`). Chaves gravadas em `outputs/runs_v2/congelamento_v2.json`.
+  - **Rótulo de todo número do test:** "v2 exploratória (test já visto no v1)". O test foi inspecionado clipe a clipe na análise de falhas do v1; os números não são estimativa limpa de generalização.
+  - **Nenhuma hipótese nova depois de ver o test.** A rodada é única; um defeito de execução (falha, chave errada) é corrigido e registrado, nunca um parâmetro.
+  - **O que será reportado**, com as mesmas tabelas do v1 (`scripts/rodada_test/tabelas_test.py`, adaptado para o `src_v2` em `scripts/v2/rodada_test_v2/`, com o bootstrap de jogos do v1):
+    - T1: GSR test inteiro, séries detector, 6a Bassek, 6a robusto, Kalman + RTS, 6c fluxo, 6c sem linhas, 6c sem fluxo, âncora ingênua /150, teto condicionado às âncoras (cobertura, LocSim@5 penalizado e nos cobertos, mAP-LocSim, NPE mediano e médio, IoU_whole mediano, fração ao teto);
+    - T6: por jogo (cobertura, LocSim@5 penalizado do detector, do 6c e do teto), com o v1 ao lado;
+    - T1b: o conjunto comum (frames com H do detector do v2);
+    - T2: HSB (as três medições do v1: só propagação a partir da `H_gt_auxflow`, detector, pipeline);
+    - T5: comparação com a tabela 7 do AuxFlow (NBJW 0,885; AuxFlow 0,929), com a ressalva de que o conjunto e o protocolo diferem;
+    - T7: âncoras (candidatas, verificáveis, aceitas, erradas com NPE > 0,05; clipes sem âncora aceita);
+    - T8: lacunas do detector (1–3, 4–25, > 25, pontas): cobertura e NPE mediano. As lacunas são as do detector do v2, que tem mais cobertura que o do v1; a comparação por lacuna é entre conjuntos de frames diferentes, e isso vai dito na tabela.
+    - **Fora:** WC14 (T3, T3b), estabilidade e visibilidade (T4, T4b) e custo (T9) não entram no adendo; se forem pedidos depois, são calculados com o mesmo congelamento.
+  - **Procedimento** (a série do v1 no test não está neste PC: `outputs/cache` do v1 nunca veio para cá, então não há rekey):
+    1. baixar `test.zip` (revisão `3cc710eb`), conferir o SHA-256 de `docs/02-dados.md` e extrair em `data/SoccerNet-GSR/test`;
+    2. série do A' no test do zero (`python -m src_v2.run --detect-series --splits test --clip-step 1`), em `outputs/cache_v2/`;
+    3. **conferência bit a bit contra o v1:** nos 1.470 frames do test em `outputs/pred_td6_e1_test_wc14-test.npz` (detector v1, 1 frame em 25), toda H do v1 tem de sair idêntica na série do v2; onde o v1 não tinha H, o v2 só pode ter H vinda da vista central (o A' só roda nesses frames). Qualquer outra diferença para a rodada antes do 6c;
+    4. 6c no test com a configuração congelada, e as tabelas pelos scripts adaptados, antes ensaiados na valid (`tabelas_test.py` já tem o modo de ensaio em outra partição);
+    5. nada em `outputs/cache` nem em `outputs/runs` do v1; tudo em `outputs/cache_v2/` e `outputs/runs_v2/rodada_test_v2/`.
+  - **Depois:** o relatório v1 × v2 por jogo vai a Victor; o adendo `docs/04-relatorio-v2.md` só é escrito depois da aprovação dos números. O relatório v1 não é reescrito.
+  | Decisão de Victor; o procedimento sem rekey e a conferência contra as H do v1 a 1 frame em 25 são meus, porque a série do v1 não está neste PC.
