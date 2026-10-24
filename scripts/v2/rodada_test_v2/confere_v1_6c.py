@@ -71,7 +71,8 @@ res = dict(aprovado=not falhas, falhas=falhas,
                           for c in V1_SEM_ANCORA])
 out = path("runs") / "rodada_test_v2"
 out.mkdir(parents=True, exist_ok=True)
-(out / "conferencia_v1_6c.json").write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
+# tipos do numpy (contagens de bool) viram tipos do Python no json
+(out / "conferencia_v1_6c.json").write_text(json.dumps(res, ensure_ascii=False, indent=1, default=lambda o: o.item()), encoding="utf-8")
 with (out / "clipes_test_v2.csv").open("w", newline="", encoding="utf-8") as fh:
     w = csv.DictWriter(fh, fieldnames=list(rows[0]))
     w.writeheader()
