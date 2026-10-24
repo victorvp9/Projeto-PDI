@@ -34,6 +34,24 @@ dos que faltam.
 
 Comece por `docs/00-problema.md`. Dados não versionados — ver `docs/02-dados.md`.
 
+## Reprodução do v2 (exploratória)
+
+O v2 (`src_v2/`, `config_v2.yaml`) é o v1 com duas mudanças aceitas no dev: o limiar de nota das
+âncoras (B1) e as hipóteses de vista central (A'). Os números do test levam o rótulo
+"v2 exploratória (test já visto no v1)"; resultados e ressalvas em `docs/04-relatorio-v2.md`.
+
+```bash
+git checkout v2-final    # método congelado (src_v2/ e config_v2.yaml)
+uv sync                  # Python 3.12 (.python-version); outra versão muda o NumPy/SciPy do uv.lock
+powershell -ExecutionPolicy Bypass -File scripts/literatura/fila_test.ps1
+```
+
+A fila baixa e confere o `test.zip`, roda a série do detector e o 6c no test, as conferências
+contra o v1 e as tabelas, e retoma de onde parou (log em `outputs/runs_v2/fila/`). As tabelas
+saem em `outputs/runs_v2/rodada_test_v2/tabelas/` (T1, T1b, T2, T5, T6, T7, T8); os caches, em
+`outputs/cache_v2/`. Nada do v1 (`outputs/cache`, `outputs/runs`) é tocado. As tabelas e os
+números do adendo são conferidos por `scripts/relatorio/numeros_v2.py` (da raiz, com `PYTHONPATH=.`).
+
 ## Limitações conhecidas
 
 Dois defeitos dos caches, achados na revisão de código de 2026-10-14 e não corrigidos
