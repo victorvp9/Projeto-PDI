@@ -6,3 +6,8 @@ __pycache__/
 .pytest_cache/
 outputs/cache/
 outputs/runs/
+
+# v2 (branch v2-melhorias): caches, manifestos e saídas da CLI do v2
+outputs/cache_v2/
+outputs/runs_v2/
+outputs/v2/

@@ -1,0 +1,397 @@
+# v2 (branch v2-melhorias): cópia do config.yaml do v1; muda só por entrada em docs/decisoes.md.
+# Todos os parâmetros do projeto, cada um com a origem.
+# Caminhos relativos à raiz do repositório.
+
+paths:
+  wc14: data/soccer_data_WC14/raw   # layout em docs/02-dados.md
+  gsr: data/SoccerNet-GSR           # layout em docs/02-dados.md
+  outputs: outputs/v2               # v2: saídas da CLI fora das do v1 (docs/05-melhorias-plano.md, regra 1)
+  debug: outputs/v2/debug
+  cache: outputs/cache_v2           # caches do v2 (os do v1 ficam em outputs/cache, só leitura)
+  runs: outputs/runs_v2             # manifestos do v2
+
+executor:
+  # trabalhadores do pool de processos (src/executor.py)
+  worker_blas_threads: 1   # OPENBLAS_NUM_THREADS dos trabalhadores: com o padrão (16), cada processo confirmava ~1 GB de buffers sem usar; H idênticas bit a bit com e sem (decisão de Victor, decisoes.md 2026-10-01)
+
+pitch:
+  sample_step_m: 0.25   # passo de amostragem de toda polilinha, inclusive retas (docs/03-plano.md, Fatia 1)
+
+gsr:
+  person_categories: [1, 2, 3, 7]  # player, goalkeeper, referee, other; bola (4) fora (docs/decisoes.md)
+  min_persons: 4          # mínimo de pessoas para a DLT da H_gt (docs/03-plano.md, Fatia 1)
+  auxflow_ransac_px: 3    # H_gt do "protocolo AuxFlow": RANSAC nas bases-meio das pessoas; 3 px reproduz a mediana e a distância da tabela 2 deles (docs/decisoes.md)
+  border_margin_px: 2     # pontos anotados a até 2 px da borda são recorte, não linha (docs/decisoes.md)
+  dubious_median_px: 5    # resíduo do ajuste em (5, 10] px = "gabarito duvidoso": homografia só aproxima (lente); ~2x o p99 do treino (decisão de Victor)
+  label_suspect_px: 50    # classe com mediana acima disso na maioria dos frames = rótulo suspeito (decisão de Victor, docs/decisoes.md)
+  label_suspect_frac: 0.5 # "maioria dos frames" (idem)
+
+# Rótulos de classe trocados na anotação das linhas do GSR, corrigidos na leitura
+# e só nas linhas anotadas. Evidência de cada um em docs/decisoes.md.
+# rótulo errado: certo  |  rótulo errado: [certo, primeiro frame, último frame] (troca só num trecho)
+# certo = null descarta a classe (anotação congelada)
+gsr_label_fixes:
+  SNGS-038: {"Big rect. right bottom": "Small rect. right main"}
+  SNGS-055: {"Big rect. right main": ["Big rect. left main", 442, 750]}
+  SNGS-058: {"Big rect. left top": "Side line right"}
+  SNGS-065: {"Big rect. right bottom": "Big rect. right main"}
+  SNGS-069: {"Side line bottom": "Side line left"}
+  SNGS-073: {"Big rect. left bottom": "Big rect. left top"}
+  SNGS-119: {"Small rect. left top": "Small rect. right main"}
+  SNGS-121: {"Big rect. left top": "Side line right"}
+  SNGS-133: {"Big rect. right main": ["Big rect. left main", 144, 750]}
+  SNGS-148: {"Circle right": "Circle left"}
+  SNGS-149: {"Circle right": ["Circle central", 1, 582]}   # em 583-750 é o arco direito de verdade
+  SNGS-153: {"Middle line": [null, 479, 750]}
+  SNGS-187: {"Side line bottom": "Big rect. right bottom"}
+  SNGS-199: {"Big rect. left bottom": "Big rect. left top"}
+
+fit:
+  # Ajuste ponto-linha (src/homography.py): H_gt do GSR e refinamento da Etapa 7
+  loss: soft_l1        # perda robusta; a cauchy abandonava classes certas em planos abertos (docs/decisoes.md; decisão de Victor)
+  f_scale_px: 3        # escala da perda robusta, px (decisão de Victor)
+  resid_cap_px: 1000   # distância infinita (classe inteira atrás da câmera) vira isto (escolha)
+  min_points: 8        # menos pontos que parâmetros (8): nem tenta
+  max_cond: 3000       # [EMPÍRICO] condição máxima do jacobiano; vão da distribuição no treino do GSR (docs/decisoes.md)
+  max_resid_px: 10     # [EMPÍRICO] resíduo mediano máximo para aceitar; acima disso, só ajustes errados no treino do GSR
+
+eval:
+  grid_dx_m: 2.5       # grade do campo para NPE e RE (AuxFlow, seção 4.2)
+  grid_dy_m: 2.0       # idem
+  iou_px_per_m: 5      # resolução da vista de cima no IoU_whole (escolha)
+  iou_margin_m: 52.5   # folga do canvas do IoU_whole além do campo (escolha; truncar só afeta desastres)
+  iou_part_scale: 0.5  # IoU_part num raster 2x menor: dif. máx. 0,0007 no SNGS-070, 1/10 do tempo (empírico)
+  locsim_taus_m: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  # mAP-LocSim = média nesses τ (AuxFlow, tabela 7)
+  sncalib_size: [960, 540]         # resolução da acurácia contra as linhas (SN-Calib, evaluate_camera.py)
+  sncalib_thresholds_px: [5, 10, 20]  # idem
+  quality_grid_px: 40  # passo da grade da imagem na discordância pessoas x linhas do GSR (escolha)
+
+segment:
+  # Etapas 1 e 2 (src/segment.py). Tamanhos em fração da altura da imagem.
+  common:
+    grass_method: lab_hue      # [EMPÍRICO] hsv | lab | lab_hue; maior IoU médio no WC14 treino (0,9838; sombra 0,9797) (Fatia 3)
+    hsv_green_band: [25, 95]   # faixa larga de matiz (OpenCV, 0-179) onde se procura o pico do verde (escolha)
+    hsv_dh: 12                 # [EMPÍRICO] meia-largura em torno do pico de matiz; a varrer
+    hsv_s_min: 40              # [EMPÍRICO] saturação mínima; a varrer
+    hsv_v_min: 30              # [EMPÍRICO] valor mínimo; a varrer
+    lab_l_min: 20              # [EMPÍRICO] L* mínimo (abaixo, a cromaticidade é ruído); varredura no WC14 treino
+    lab_r: 12                  # [EMPÍRICO] raio cromático em (a*, b*) em torno do pico; a varrer
+    lab_dhue_deg: 20           # [EMPÍRICO] lab_hue: meia-largura do ângulo de matiz em (a*, b*); varredura no WC14 treino
+    lab_c_min: 10              # [EMPÍRICO] lab_hue: croma mínimo; varredura no WC14 treino
+    open_frac: 0.01            # [EMPÍRICO] abertura, fração da altura; interior do platô 0,9855-0,9862 (decisão de Victor: menos dano às bordas finas)
+    close_frac: 0.01           # [EMPÍRICO] fechamento, fração da altura; idem
+    grass_steps: [open, close, largest, fill]   # [EMPÍRICO] ablação no WC14 treino: todos os passos ficam
+    component_min_frac: 0.05   # [EMPÍRICO] área mínima de componente, fração da imagem ("components"); a varrer
+    # variante kmeans (grass_method: kmeans): grupos de cv2.kmeans em Lab por quadro; grama = centro na faixa de matiz verde
+    # REPROVADA no treino: nenhuma das 72 configurações fica no ruído do GSR train (vazamento 0,03-0,12 x 0,007); docs/decisoes.md
+    kmeans_k: 3                # [EMPÍRICO] a calibrar (3-4) no WC14 train_val + GSR train (decisão de Victor)
+    kmeans_hue_deg: [100, 170] # [EMPÍRICO] faixa larga do ângulo de matiz do centro em (a*, b*); a calibrar (idem)
+    kmeans_c_min: 3            # [EMPÍRICO] croma mínimo do centro (tira grupos cinzentos); a calibrar (idem)
+    kmeans_step: 4             # amostra do k-means: 1 a cada 4 px em cada eixo (escolha; custo)
+    kmeans_attempts: 3         # reinícios do cv2.kmeans (escolha)
+    kmeans_term: [20, 0.5]     # iterações máximas e ε do cv2.kmeans (escolha)
+    # variante histerese (grass_method: hysteresis), REPROVADA na rodada da GSR valid (jogo 5 além do ruído): sementes = lab_hue acima; fraco = faixa mais larga em torno do mesmo pico e croma menor;
+    # gramado = componentes do fraco que tocam as sementes (decisão de Victor)
+    hyst_dhue_deg: 40          # [EMPÍRICO] meia-largura da faixa do fraco: a mais permissiva das 10 (de 42) no ruído do atual no treino (docs/decisoes.md)
+    hyst_c_min: 10             # [EMPÍRICO] croma mínimo do fraco; idem (igual ao das sementes: o fraco só alarga o matiz)
+    line_method: filter        # [EMPÍRICO] tophat | filter; F1 a 3 px no WC14 treino 0,579 x 0,560, confirmado no GSR
+    line_bands: 3              # faixas horizontais com escala própria (escolha)
+    line_k: 1.0                # [EMPÍRICO] escala = k·w(v); F1 máximo no WC14 treino (0,575; k = 0,75 dá 0,529)
+    line_scales: [1.0]         # [EMPÍRICO] escala única pelo F1; opção [1.0, 2.0] (linhas largas 0,32 -> 0,57 no WC14, F1 -0,024) decidida na Fatia 5 pelo erro da homografia
+    grass_dilate_w: 1.0        # gramado dilatado em larguras de linha antes de restringir as marcações (escolha)
+    # limiar relativo ao quadro: α × percentil da resposta no gramado; null = limiar fixo (line_thr, por base)
+    line_alpha: null           # [EMPÍRICO] a calibrar no treino das duas bases juntas (decisão de Victor)
+    line_pct: 98               # [EMPÍRICO] com α = 1,41 (eval_segment.variants): máximo do F1 médio WC14 train_val + GSR train (0,596; fixos 15/30: 0,575 e 0,611)
+  wc14:
+    width_ab: [0.00158, 0.00447]  # w(v)/h = a + b·v/h: larguras de 0,12 m projetadas pela H_gt no WC14 train_val (ajuste linear das medianas por faixa)
+    line_thr: 15                  # [EMPÍRICO] contraste mínimo em L* (0-255); F1 a 3 px máximo no WC14 train_val
+  gsr:
+    width_ab: [0.00109, 0.00780]  # idem, GSR train (1 frame a cada 50)
+    line_thr: 30                  # [EMPÍRICO] idem, F1 (cobertura a 2 px x precisão a 3 px) máximo no GSR train (decisão de Victor: cada base no seu treino)
+
+shadow:
+  dL_min: 48          # [EMPÍRICO] ΔL mínimo entre as classes de Otsu do L* no gramado: 158 (faixa de corte, 46) x 184 (sombra, 51); folha de contato, aprovado por Victor
+  f_dark_min: 0.10    # maior componente escuro >= 10% do gramado: separa sombra (região) de faixas de corte (bandas) (plano da Fatia 3)
+  f_light_min: 0.02   # maior componente claro >= 2% do gramado: faixa de sol estreita (0,022-0,057) x campo todo na sombra com pontos claros soltos (0,003-0,013) (folha do WC14)
+  hue_deg: 30         # só pixels de grama pelo ângulo de matiz em (a*, b*): +-30 graus do pico (sol x sombra diferem 10-17 graus nas imagens 201, 206, 150)
+  c_min: 10           # croma mínimo: tira as linhas brancas (a grama na sombra tem croma 17-33 nas mesmas imagens)
+
+eval_segment:
+  gsr_frame_step: 25        # amostra do GSR: 1 frame a cada 25 (plano da Fatia 3)
+  wc14_gamma_px: [2, 3, 5]  # tolerâncias das marcações no WC14 (plano da Fatia 3)
+  decision_gamma_px: 3      # F1 a 3 px decide top-hat x filtro (decisão de Victor)
+  gsr_coverage_px: 2        # cobertura dos pontos anotados (decisão de Victor)
+  gsr_precision_px: 3       # precisão contra as linhas da H_gt; a lente desloca alguns px nas bordas (decisão de Victor)
+  leak_m: 4.1               # vazamento: além disso fora das linhas; p99 da grass do WC14 train_val além das linhas
+  border_px: 5              # margem de borda excluída do alvo das marcações (escolha)
+  variants:                 # candidatas da rodada única na GSR valid; ambas REPROVADAS (docs/decisoes.md), ficam só para reproduzir a tabela
+    histerese: {grass_method: hysteresis}   # parâmetros hyst_* em segment.common
+    relativo: {line_alpha: 1.41}   # limiar = 1,41 × percentil 98 da resposta no gramado
+
+sweep_segment:
+  # grades da calibração da Fatia 3 (só no treino); os valores escolhidos vão para segment
+  hsv: {hsv_dh: [8, 12, 16, 20], hsv_s_min: [20, 40, 60], hsv_v_min: [20, 40]}
+  lab: {lab_r: [8, 12, 16, 20, 25], lab_l_min: [10, 20, 40]}
+  lab_hue: {lab_dhue_deg: [10, 15, 20, 25, 30], lab_c_min: [4, 6, 10, 15], lab_l_min: [10, 20]}
+  open_frac: [0.002, 0.005, 0.01, 0.015, 0.02, 0.03]   # estendida: o ótimo caiu em 0,01, borda da grade inicial
+  close_frac: [0.005, 0.0075, 0.01, 0.02, 0.04]       # estendida: o ótimo caiu em 0,01, borda da grade inicial
+  component_min_frac: [0.01, 0.02, 0.05]
+  line_k: [0.75, 1.0, 1.25, 1.5, 2.0]   # estendida para baixo duas vezes: o ótimo caiu na borda (1,5, depois 1,0); abaixo de 0,5 o filtro não funciona
+  line_thr: [5, 10, 15, 20, 30, 40]
+  line_scales: [[1.0], [1.0, 2.0], [1.0, 2.0, 3.0]]   # multiescala (máximo das escalas): linhas largas no WC14 caíram (0,50 em 6-8 px)
+  width_bins_px: [0, 2, 4, 6, 8, 1000]   # faixas de largura projetada para a cobertura (análise)
+  wc14_model_step_m: 1.0                  # amostragem das linhas do modelo para a cobertura por largura no WC14
+  # variantes da Fatia 3 (docs/decisoes.md): calibradas no treino; a GSR valid só escolhe entre elas
+  kmeans: {kmeans_k: [3, 4], hue_lo: [90, 100, 110], hue_hi: [150, 160, 170, 180], kmeans_c_min: [0, 3, 6]}
+  hysteresis: {hyst_dhue_deg: [22, 25, 30, 35, 40, 50, 60], hyst_c_min: [2, 4, 6, 8, 9, 10]}   # estendida para o lado do atual (±20°, croma 10): a 1ª grade não teve nenhuma aprovada, a mais próxima no canto
+  line_pct: [90, 95, 98, 99, 99.5]
+  line_alpha: [0.25, 0.35, 0.5, 0.71, 1.0, 1.41, 2.0, 2.83, 4.0, 5.66, 8.0, 11.3, 16.0]   # fator √2
+  noise_grass: 0.005   # ruído no gramado (decisão de Victor; = ganho mínimo da ablação)
+  noise_lines: 0.01    # ruído nas marcações (decisão de Victor)
+
+lines:
+  # Etapas 3 e 4 (src/lines.py, src/conics.py). Tolerâncias em fração da altura (decisão de Victor, plano da Fatia 4)
+  tol_frac: 0.0041667   # 3/720: casamento e falso positivo a 3 px no WC14 (720p), 4,5 px no GSR (1080p)
+  match_min: 0.8        # segmento casa com a classe se >= 80% dos seus pontos estão a <= tol dela (plano da Fatia 4)
+  visible_min_frac: 0.05   # linha do gabarito conta como visível com >= 0,05·h de eixo na imagem (escolha)
+  # Etapa 3 (src/lines.py). Parâmetros comuns às duas bases, em fração da altura; calibrados só no GSR train (decisão de Victor)
+  hough_rho_px: 1         # resolução radial do acumulador (plano da Fatia 4)
+  hough_theta_deg: 0.5    # resolução angular (idem)
+  hough_votes_frac: 0.04  # [EMPÍRICO] votos mínimos, fração da altura; varredura no GSR train (topo plano: 0,02 dá o mesmo F1)
+  hough_min_len_frac: 0.06  # [EMPÍRICO] comprimento mínimo do segmento; varredura no GSR train (borda de cima da grade; não estendida, topo plano)
+  hough_gap_frac: 0.015   # [EMPÍRICO] vão máximo dentro de um segmento do Hough; varredura no GSR train (idem)
+  shape_filter: true      # [EMPÍRICO] tira da entrada do Hough os componentes pouco alongados (pessoas: alongamento mediano 2,7); ablação: F1 +0,044
+  shape_elong_min: 4      # alongamento mínimo (momentos) do componente, se shape_filter (escolha, pela amostra de falsos positivos)
+  fuse: true              # [EMPÍRICO] fusão de colineares; ablação: fragmentação 4,70 -> 1,17
+  fuse_theta_deg: 1.0     # [EMPÍRICO] diferença máxima de ângulo para fundir; varredura no GSR train (2° dá o mesmo)
+  fuse_d_frac: 0.0083333  # [EMPÍRICO] distância máxima dos extremos de um à reta do outro: 6/720·h pela varredura; 3/720 x 6/720 decidido na Fatia 5 pelo NPE (td6); o detector lê a cópia em detector.variants.td6_e1, e esta é lida pelas varreduras da Fatia 4
+  fuse_gap_frac: 0.3      # [EMPÍRICO] vão máximo ao longo da reta (as linhas de cima das duas grandes áreas são colineares); varredura no GSR train
+  # Etapa 4 (src/conics.py): elipses ajustadas na máscara inteira; as cordas das aceitas saem das retas (decisão de Victor)
+  ellipse_tol_frac: 0.0041667   # [EMPÍRICO] τ: distância de apoio à elipse (3/720·h); rodada no GSR train (6/720: precisão 0,33)
+  ellipse_arc_min_frac: 0.4     # [EMPÍRICO] perímetro apoiado mínimo, fração da altura; rodada única no GSR train (borda de cima da grade; sem nova rodada)
+  ellipse_ratio_max: 8          # razão máxima dos semieixos: oráculo do GSR train (círculo projetado pela H_gt), p90 5,7 no central e 7,6 nos arcos (decisão de Victor)
+  # âncora geométrica (decisão de Victor), limites folgados sobre o oráculo do GSR train (clipes [::3], 1 frame a cada 50):
+  anchor_cross_deg: 60         # central: reta cruzando com ângulo >= isto ao eixo maior (oráculo: linha do meio >= 84,5°, p1)
+  anchor_center_b: 0.75        # central: ... e a <= isto·B do centro da elipse (oráculo: mediana 0,16, máximo 0,58)
+  anchor_round_ratio: 1.3      # central: abaixo desta razão dos semieixos o teste de ângulo não vale (eixo maior sem direção; vista de cima) (escolha)
+  anchor_parallel_deg: 30      # arco: reta a <= isto do eixo maior (oráculo: reta main a 9,5-13,7°)
+  anchor_end_b: 0.3            # arco: pontas do trecho apoiado a <= isto·B da reta (oráculo: 0, as pontas estão sobre ela)
+  anchor_bulge_b: 0.5          # arco: o arco se afasta da reta >= isto·B (oráculo: 0,71-0,81)
+  ellipse_support_min: 0.25     # fração mínima do perímetro dentro da imagem apoiada: o arco da grande área é ~1/3 da elipse (escolha)
+  ellipse_chords_min: 3        # cordas mínimas (segmentos com a maior parte dos pontos sobre a elipse): evidência de curvatura (escolha)
+  ellipse_turn_min_deg: 30     # [EMPÍRICO] leque mínimo de direções das cordas; rodada única no GSR train (borda de baixo da grade; sem nova rodada)
+  ellipse_b_min_frac: 0.02      # semieixo menor mínimo, fração da altura (escolha)
+  ellipse_a_max_frac: 3.0       # semieixo maior máximo, fração da altura (escolha)
+  ellipse_hough_min_len_frac: 0.02   # [EMPÍRICO] comprimento mínimo (e votos) do Hough das candidatas: cordas curtas cobrem as pontas (oráculo: leque 36° -> 100°); rodada no GSR train (borda de baixo; sem nova rodada)
+  ellipse_neighbors: 6          # vizinhos por ponto médio nos trios de candidatas (escolha; custo)
+  ellipse_max: 2                # círculo central e um arco da grande área (plano da Fatia 4)
+  chord_min: 0.5                # segmento é corda de uma elipse com mais da metade dos pontos a <= τ dela (decisão de Victor)
+
+assign:
+  # Etapas 5-7 (src/assign.py), pipeline mínimo da Fatia 5: tudo "escolha, sem calibrar" até a varredura
+  family_mode: vp           # vp | angle: famílias pelo ponto de fuga ou pelo ângulo com a horizontal (teto medido no GSR train)
+  vp_min_segs: 3            # ponto de fuga só com >= 3 segmentos (reforço; escolha)
+  vp_both_deg: 2.0          # [EMPÍRICO] fronteira: segmento a <= isto do ponto de fuga de uma família entra nela também (= vp_tol_deg: desligado)
+  angle_split_deg: 30       # modo angle: família ao longo do comprimento com ângulo <= isto (erra >= 32% no GSR train: não serve)
+  vp_tol_deg: 2.0          # segmento pertence à família se aponta para o ponto de fuga a <= isto (escolha)
+  top_k: 4                 # segmentos mais longos por família usados nas hipóteses (escolha; 6 não sobe o teto no GSR train)
+  pair_min_frac: 0.02      # duas retas da mesma família precisam estar a >= isto·h (escolha)
+  score_step_m: 1.0        # amostragem do modelo na verificação (escolha; custo)
+  score_tol_frac: 0.0083333   # apoio na verificação: a <= 6/720·h de uma marca (escolha; folga para a lente)
+  iou_scale: 0.125         # IoU campo projetado x gramado em 1/8 da resolução (escolha; custo)
+  verify_max_pts: 200      # pontos dos segmentos na verificação, em passo fixo (escolha; custo)
+  iou_prune: 0.5           # poda barata: hipótese com IoU campo x gramado < isto nem é verificada (H_gt no GSR train: p5 0,889)
+  gate_img: 0.45           # [EMPÍRICO] portão: fração explicada das marcas >= isto (H_gt no subconjunto do GSR train: p5 0,49); provisório
+  gate_iou: 0.85           # [EMPÍRICO] portão: IoU campo projetado x gramado >= isto (H_gt: p5 0,889); provisório
+  ambig_disp_frac: 0.03    # hipótese estruturalmente diferente: desloca a grade da imagem em > isto·h (escolha)
+  ambig_margin: 0.0        # [EMPÍRICO] portão de ambiguidade: a melhor vence a diferente por >= isto; a calibrar no treino sem perder H certa
+  ellipse_check_frac: 0.0083333   # elipse confere com um círculo projetado pela H se a mediana <= 6/720·h (escolha: a H tem ~7 px de erro)
+  corr_beyond: 0.5         # interseção prolongada (pe) até 50% além da imagem (PnLCalib)
+  ransac_frac: 0.0111111   # limiar de inlier do RANSAC, 8/720·h (Maglo et al., referência)
+  band_frac: 0.0083333     # faixa do caminho guiado (pixels da máscara em volta da linha projetada), 6/720·h (escolha)
+  guided_max_pts: 400      # pontos por classe no caminho guiado, subamostrados (escolha; custo)
+  seg_step_px: 5           # amostragem dos segmentos classificados para o ajuste (escolha)
+  refine_iters: 2          # reclassificação/reseleção + ajuste (escolha)
+  central_view: true       # v2, A: vista central (círculo central + linha do meio + lateral, forma fechada) só quando a 2 + 2 não dá H aceita (docs/decisoes.md, 2026-10-21); false = sem o A; v2, A': com o filtro de consistência da elipse depois do refino (docs/decisoes.md, 2026-10-22)
+
+detector:
+  # marco da Fatia 5: detector sozinho (Etapas 1-7), frame a frame
+  refine: guided           # ablação no subconjunto do GSR train: NPE mediano 0,0062 (guiado) x 0,0076 (segmentos)
+  gsr_frame_step: 25       # 1 frame a cada 25 (como as avaliações das Fatias 3 e 4)
+  variants:                # td 6/720 x escala única, escolhida pelo NPE mediano no GSR train entre td 3/6 x escala 1/"1+2" (docs/decisoes.md)
+    td6_e1: {segment: {line_scales: [1.0]}, lines: {fuse_d_frac: 0.0083333}}
+
+temporal:
+  # Etapa 8 (src/temporal.py), Fatia 6
+  series_chunk: 50         # frames por tarefa na série do detector (escolha; paralelismo)
+  max_gap: 25              # lacunas de até 25 frames preenchidas por interpolação linear antes do filtro (Bassek et al.)
+  sg_window: 31            # Savitzky–Golay: janela 31 (Bassek et al.)
+  sg_poly: 3               # grau 3 (Bassek et al.)
+  points_u: [0.25, 0.75]   # representação por pontos: 4 pontos fixos da imagem (fração da largura)...
+  points_v: [0.6, 0.95]    # ... e da altura, na metade de baixo: no gramado nas vistas de transmissão (escolha)
+  subset_clips: [SNGS-060, SNGS-070, SNGS-099, SNGS-109, SNGS-154, SNGS-164]   # desenvolvimento: treino [::10]
+  hist_scale: 0.25         # 6b: histograma numa imagem reduzida a 1/4 (escolha; custo)
+  hist_bins: [8, 8, 8]     # 6b: histograma HSV 8x8x8, distância de Bhattacharyya (escolha)
+  hampel_half_grid: [3, 7, 12, 15]   # 6a robusto: Hampel antes do SG, meia janela (frames); grade calibrada no train[::3] (decisão de Victor)
+  hampel_sigma_grid: [2, 3, 4, 6]    # ... limiar em desvios robustos (1,4826·MAD); grade calibrada no train[::3]
+  hampel_half: 12                    # escolhida na grade: maior LocSim@5 penalizado (0,442, empate com 12/4 desfeito por cobertura, mAP e precisão dos descartes; decisoes.md 2026-09-29)
+  hampel_sigma: 6                    # idem
+  stability_grid_m: [5.0, 4.0]             # grade de pontos do campo (X, Y, m) do tremor e do deslize (escolha; a do 6a)
+  kalman_q: 0.01           # Kalman escolhido na grade do train[::3] pela regra fixada (maior LocSim@5 penalizado, empate a 0,01 pelo menor tremor; decisoes.md 2026-09-30)
+  kalman_r: 10.0           # idem
+  kalman_q_grid: [0.001, 0.01, 0.1, 1.0]   # Kalman (7b): ruído de processo, aceleração branca (m²/frame⁴); grade calibrada no train[::3]
+  kalman_r_grid: [0.01, 0.1, 1.0, 10.0]    # ... ruído de medição (m²) das coordenadas dos pontos; grade calibrada no train[::3]
+  kalman_v0: 1.0                           # variância inicial da velocidade (m²/frame²) (escolha: panorâmica típica < 1 m/frame)
+  kalman_gate_chi2: 20.09                  # porta de Mahalanobis: χ² com 8 graus de liberdade a 99% (tabela)
+  kalman_reset: 5                          # medições rejeitadas seguidas que reiniciam o filtro (escolha)
+  hampel_min_valid: 3              # janela com menos frames com H que isto não julga (escolha: mediana de 3 é o mínimo com maioria)
+  cut_thr: 0.202           # [EMPÍRICO] 6b: corte se a distância > isto: logo acima do maior salto dentro dos clipes (0,201, placa de LED), 19 clipes do treino; folga mínima para o corte sintético do mesmo jogo (0,205)
+  # 6c: propagação por Lucas–Kanade a partir de âncoras (tudo escolha até a calibração)
+  anchor_window: 12        # âncora candidata: máximo local de (IoU com o gramado + fração explicada) em +-12 frames (escolha)
+  verify_window: 10        # verificação: vizinhos com H do detector a até 10 frames (escolha)
+  verify_tol_frac: 0.0111111   # ... a H da âncora levada pelo movimento concorda com a do vizinho a <= 8/720·h (grade da imagem)
+  verify_min: 2            # ... com pelo menos 2 vizinhos conferidos, maioria concordando (escolha)
+  bidirectional: false     # v2, C: entre duas âncoras, fusão da propagação direta e da reversa, peso pela distância (docs/decisoes.md, 2026-10-15); false = v1. RECUSADO no dev (docs/decisoes.md, 2026-10-21): false
+  c_margin_frac: 0.02      # v2, C: pontos da grade do campo na fusão: dentro da imagem pelas duas H, com margem de 0,02·h além da borda (fixado antes de rodar)
+  c_min_points: 8          # v2, C: com menos pontos, o frame fica com a H da âncora mais próxima (fixado antes de rodar)
+  anchor_min_nota: 1.6153357723089734   # v2, B1: âncora verificada só é aceita com nota (iou + img) >= isto; limiar do treino (jogos 4, 6, 9) com <= 2% das candidatas certas recusadas (docs/decisoes.md, 2026-10-15); null desliga
+  anchor_c_max_m: null                   # v2, B2 RECUSADO no dev (docs/decisoes.md, 2026-10-22); o limiar medido foi 6.906861634313279. v2, B2: âncora que passa no B1 só é aceita com o centro da câmera da H a <= isto (m) da mediana do centro das H do detector do jogo; limiar do treino (jogos 4, 6, 9) com <= 2% das candidatas certas recusadas, referência do jogo escolhida no treino (scripts/literatura/b2_diagnostico.py; docs/decisoes.md, 2026-10-21); null desliga
+  grid_m: [2.5, 2.0]       # grade de pontos auxiliares do campo, X x Y (AuxFlow)
+  border_frac: 0.02        # pontos a menos disto·h da borda da imagem ficam fora (escolha)
+  compact_dilate_frac: 0.01   # componentes compactos de não-gramado (jogadores, bola) dilatados em isto·h (escolha)
+  lk_win: 21               # janela do Lucas–Kanade piramidal (px) (escolha)
+  lk_levels: 3             # níveis da pirâmide (escolha)
+  lk_fb_px: 1.0            # erro ida-e-volta máximo (AuxFlow)
+  resample_min: 20         # reamostra a grade pela H atual abaixo de 20 pontos... (escolha)
+  resample_every: 25       # ... ou a cada 25 frames (limita a deriva do rastreio) (escolha)
+  h_cond_max: 1.0e+12      # H dos pontos rastreados só entra com condição <= isto: as 19.171 H aceitas pelo detector vão até 4,6e9 (mediana 1,3e5); a do SNGS-049 que derrubou o 6c na valid, 5e19 (empírico)
+  alpha_points: 1.0       # peso dos pontos propagados contra os pixels das linhas na reestimativa (escolha)
+  naive_step: 150          # âncora ingênua a cada 150 frames (AuxFlow)
+  use_gpu: true            # máscaras do 6c na GPU (src/gpu.py) se o extra `gpu` e uma placa existirem; mesma saída da CPU (decisão de Victor)
+  debug_every: 50         # depuração: um frame propagado a cada 50 em outputs/debug/propagacao/
+
+sweep_lines:
+  # análise da Fatia 4, só no treino (WC14 train_val, GSR train a cada eval_segment.gsr_frame_step)
+  fp_n: 100             # pixels falsos positivos sorteados por base; erro-padrão ~5 p.p. (plano da Fatia 4)
+  fp_seed: 0
+  fp_crop_frac: 0.15    # recorte ampliado, fração da altura: cabe um jogador inteiro (escolha)
+  fp_context_frac: 0.5  # recorte de contexto, fração da altura (escolha)
+  fp_panel_px: 160      # lado de cada painel na folha de contato (escolha)
+  fp_per_sheet: 15      # 3 colunas x 5 linhas por folha (escolha)
+  # grade modesta das retas (decisão de Victor: o número que decide é o erro da homografia na Fatia 5)
+  hough_votes_frac: [0.02, 0.04]
+  hough_min_len_frac: [0.03, 0.06]
+  hough_gap_frac: [0.005, 0.015]
+  shape_filter: [false, true]
+  fuse_theta_deg: [1.0, 2.0]
+  fuse_d_frac: [0.0041667, 0.0083333]   # 3/720 e 6/720 da altura
+  fuse_gap_frac: [0.1, 0.3]
+  wc14_check_px: [3, 8]   # verificação no WC14: 3 px (= 3/720·h) e 8 px (p75 do deslocamento do gabarito; conservador)
+  # grade modesta das elipses (mesmo protocolo: escolha no GSR train, WC14 como verificação)
+  ellipse_tol_frac: [0.0041667, 0.0083333]   # τ: 3/720 e 6/720 da altura
+  ellipse_arc_min_frac: [0.2, 0.4]
+  ellipse_turn_min_deg: [30, 60]
+  ellipse_hough_min_len_frac: [0.02, 0.03]
+
+render:
+  px_per_m: 25      # vista de cima; 25 px/m faz a linha de 0,12 m ter 3 px inteiros (escolha)
+  margin_m: 1        # borda da vista de cima além do campo; basta cobrir meia largura de linha (escolha)
+  supersample: 4     # renderiza 4x maior e reduz por média de área: linha sub-pixel vira cinza em vez de sumir (empírico)
+  grass_bgr: [40, 120, 40]      # cor sintética arbitrária
+  line_bgr: [255, 255, 255]
+
+overlay:
+  model_bgr: [0, 0, 255]        # modelo projetado pela H
+  annotated_bgr: [0, 255, 255]  # pontos das linhas anotadas (GSR)
+  thickness_px: 2
+
+visibility:
+  # Fatia 7c: taxa de inversão de visibilidade (src/visibility.py)
+  margin_m: 5.0            # campo de visão recortado no campo mais 5 m (escolha: jogadores fora disso não contam)
+  horizon_rel: 0.0001      # folga do horizonte no recorte da imagem, relativa ao maior |w| (escolha: numérica)
+  grid_m: 1.0              # grade de pontos de teste no gramado, 1 m (escolha)
+  debug_px_per_m: 8        # vista de cima da depuração (escolha)
+  debug_min_flips: 1       # depuração: salva a vista de cima dos frames (1 a cada 50) com pelo menos 1 jogador invertido
+
+stability:
+  # Fatia 7a: deslize contra o movimento real da imagem, por ECC (src/stability.py)
+  ecc_scale: 0.25          # ECC numa imagem reduzida a 1/4 (escolha: custo)
+  ecc_iters: 50            # iterações máximas do ECC (escolha)
+  ecc_eps: 0.00001         # critério de parada do ECC (escolha)
+  ecc_gauss: 5             # filtro gaussiano do ECC (padrão do OpenCV)
+
+sensitivity:
+  # Fatia 7d: sensibilidade descritiva, um parâmetro de cada vez (src/sensitivity.py; decisão de Victor)
+  steps: [-0.5, -0.25, 0.25, 0.5]   # passos relativos: ±25% e ±50% (plano aprovado)
+  matters: 0.01                     # "importa" se |Δ| de cobertura ou de LocSim@5 (IoU no WC14) >= 0,01 (plano aprovado)
+  bounded: [assign.gate_img, assign.gate_iou, assign.iou_prune, lines.match_min, lines.ellipse_arc_min_frac]   # frações limitadas a 1
+  audit_sections: [segment, lines, assign, fit, temporal]
+  detector:                         # [EMPÍRICO] e escolhas do detector que definem o que ele aceita
+    - segment.common.lab_dhue_deg
+    - segment.common.lab_c_min
+    - segment.common.lab_l_min
+    - segment.common.open_frac
+    - segment.common.close_frac
+    - segment.common.line_k
+    - segment.common.grass_dilate_w
+    - segment.gsr.line_thr
+    - segment.wc14.line_thr
+    - lines.hough_votes_frac
+    - lines.hough_min_len_frac
+    - lines.hough_gap_frac
+    - lines.shape_elong_min
+    - lines.fuse_theta_deg
+    - detector.variants.td6_e1.lines.fuse_d_frac   # o valor que o detector lê: a variante sombreia lines.fuse_d_frac (decisoes.md, 2026-10-01)
+    - lines.fuse_gap_frac
+    - lines.ellipse_tol_frac
+    - lines.ellipse_arc_min_frac
+    - lines.ellipse_turn_min_deg
+    - assign.vp_tol_deg
+    - assign.top_k
+    - assign.score_tol_frac
+    - assign.iou_prune
+    - assign.gate_img
+    - assign.gate_iou
+    - assign.band_frac
+    - fit.max_resid_px
+    - fit.max_cond
+  temporal:                         # parâmetros do 6c (escolhas até aqui)
+    - temporal.anchor_window
+    - temporal.verify_window
+    - temporal.verify_tol_frac
+    - temporal.grid_m
+    - temporal.border_frac
+    - temporal.compact_dilate_frac
+    - temporal.lk_win
+    - temporal.lk_fb_px
+    - temporal.resample_min
+    - temporal.resample_every
+    - temporal.alpha_points
+  confirm:                          # confirmação dos candidatos num subconjunto maior (decisão de Victor, 2026-10-01; regra em docs/decisoes.md)
+    gsr_frame_step: 25              # GSR train: 1 frame a cada 25 dos 57 clipes, ~1.700 frames (decisão de Victor)
+    wc14_split: train_val           # WC14 train inteiro, 209 imagens (decisão de Victor)
+    wc14_chunk: 10                  # imagens do WC14 por tarefa (escolha; paralelismo)
+    n_boot: 2000                    # reamostragens do bootstrap pareado (decisão de Victor)
+    seed: 20261001                  # semente fixa do bootstrap (escolha)
+    ci: 0.95                        # intervalo do Δ (decisão de Victor)
+    min_gain: 0.02                  # Δ mínimo para virar proposta (decisão de Victor)
+    max_loss: 0.01                  # perda máxima tolerada na outra base (decisão de Victor)
+    resolution_factor: 2            # |Δ| < isto × a resolução (um frame/imagem) = "indistinguível" (decisão de Victor)
+    detector:                       # lista fechada (decisão de Victor): [parâmetro, passo, base em que ganhou]
+      - [segment.gsr.line_thr, -0.5, gsr]
+      - [lines.shape_elong_min, -0.25, gsr]
+      - [segment.common.grass_dilate_w, 0.25, gsr]
+      - [segment.common.lab_dhue_deg, 0.5, gsr]
+      - [segment.common.open_frac, 0.25, gsr]
+      - [lines.hough_min_len_frac, 0.25, gsr]
+      - [segment.common.lab_c_min, 0.5, gsr]
+      - [lines.hough_votes_frac, 0.25, gsr]
+      - [segment.common.line_k, 0.25, gsr]
+      - [lines.fuse_theta_deg, -0.5, gsr]
+      - [segment.common.line_k, -0.25, wc14]
+      - [segment.common.grass_dilate_w, -0.5, wc14]
+      - [detector.variants.td6_e1.lines.fuse_d_frac, 0.25, gsr]   # exceção: primeira medição invalidada pelo sombreamento (decisão de Victor, 2026-10-01)
+    temporal:                       # lista fechada (decisão de Victor): [parâmetro, passo]
+      - [temporal.anchor_window, 0.5]
+      - [temporal.verify_window, -0.5]
+    combos: []                      # combinação dos aprovados, se mais de um passar (regra): [[base, [[parâmetro, passo], ...]], ...]
