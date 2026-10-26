@@ -33,7 +33,7 @@ O plano foi congelado antes de qualquer experimento (`docs/05-melhorias-plano.md
 | C | propagação bidirecional entre âncoras | dev | antigo | 1 | — | −0,0051 | −0,0123 | recusada |
 | B2 | centro da câmera da âncora | dev, leave-one-game-out | antigo | 2 | — | +0,0022 | −0,0083 | recusada |
 | B1b | recupera a melhor candidata recusada pelo B1 | dev (4 clipes recalculados) | antigo | 2 | — | +0,0038 | 0,0000 | recusada |
-| A' | vista central em forma fechada, com filtro da elipse | dev, metade fixa | novo | 5 | 6 | +0,1781 | 0,0000 | aceita |
+| A' | vista central em forma fechada (o filtro da elipse quase não age) | dev, metade fixa | novo | 5 | 6 | +0,1781 | 0,0000 | aceita |
 
 : Tabela 1 — O ciclo v2 no dev: LocSim@5 penalizado da propagação, Δ por jogo contra a base de cada hipótese (`outputs/runs_v2/<hipótese>/decisao.json`). O A, antes do A', parou na checagem barata e não tem confirmação.
 
@@ -42,7 +42,7 @@ O plano foi congelado antes de qualquer experimento (`docs/05-melhorias-plano.md
 - **B1, aceito.** A âncora verificada só entra com nota (IoU com o gramado + fração explicada) de pelo menos `1.6153357723089734`, limiar do treino; ganho em 5 de 6 jogos na leitura leave-one-game-out.
 - **C, recusado.** A propagação bidirecional entre âncoras piorou em 5 de 6 jogos. **Lição, registrada como defeito de desenho:** a homografia fundida das duas propagações era reestimada por DLT sem passar de novo pelo ajuste às linhas do frame, que é o que segura a deriva na propagação de um lado só. A recusa mede essa versão, e não a ideia da fusão; uma correção só entra como hipótese nova, registrada antes de rodar.
 - **B2, recusado.** O limite na distância do centro da câmera da âncora ao do jogo recusou as âncoras erradas onde havia, mas deu Δ = 0 em 3 dos 6 jogos e perda no jogo 2.
-- **A, parado na checagem barata; A', aceito.** A vista central em forma fechada (linha do meio, círculo central e laterais) parou no jogo 3, com 3 H novas, todas erradas. O A' acrescentou o filtro de consistência da elipse e a contagem mínima de 20 H novas por jogo na regra de parada, ambos fixados antes de rodar, e foi aceito na metade fixa (59 clipes) com Δ ≥ 0 em 6 de 6 jogos.
+- **A, parado na checagem barata; A', aceito.** A vista central em forma fechada (linha do meio, círculo central e laterais) parou no jogo 3, com 3 H novas, todas erradas. O A' acrescentou o filtro de consistência da elipse e a contagem mínima de 20 H novas por jogo na regra de parada, ambos fixados antes de rodar, e foi aceito na metade fixa (59 clipes) com Δ ≥ 0 em 6 de 6 jogos. **O filtro da elipse é quase vazio:** na checagem barata, recusou 4 de 448 H centrais, e nenhuma nos jogos 6, 2, 3 e 5 (`outputs/runs_v2/a_central/relatorio_a2.md`), porque a H central é construída a partir da própria elipse. Quem barra as H erradas do A' são a verificação temporal e o B1. No jogo 3, na base B1 + A' do dev inteiro, das 15 H do A', 11 viraram candidatas, todas erradas (NPE de 0,14 a 0,20), e nenhuma é verificável, porque têm menos de 2 vizinhos com H; nenhuma vira âncora (`scripts/relatorio/ancoras_a_v2.py`). Na confirmação da metade fixa, foram 3 candidatas do A' no jogo 3, nenhuma aceita. Nos outros jogos, a barreira não é completa: das 168 âncoras do A' na metade fixa, 3 são erradas. **O ganho vem da construção da vista central, e não do filtro.**
 - **B1b, recusado por construção.** Recuperar a melhor candidata quando o B1 deixa um clipe sem âncora mexia em 4 clipes de 2 jogos e não tinha como cumprir os 4 de 6 jogos.
 - **Fora do ciclo:** o D espera, o E não entra agora (Seção 1) e o sinal das pessoas (F) muda a natureza do método.
 
@@ -217,7 +217,7 @@ Com a ressalva da Seção 1, o v2 fica 0,027 abaixo do AuxFlow e 0,017 acima do 
 
 <!-- fim: sem_ancora -->
 
-Os 5 ganharam âncora, todas certas (NPE de no máximo 0,035; o limiar de âncora errada é 0,05). Os três de vista central e o SNGS-138 passam a 0,69–0,92. O SNGS-147, de grande e pequena área oblíquas, e não de vista central, fica com 1 âncora e 0,205.
+Os 5 ganharam âncora, todas certas (NPE de no máximo 0,035; o limiar de âncora errada é 0,05). Os três de vista central e o SNGS-138 passam a 0,69–0,92. O SNGS-147, de grande e pequena área oblíquas, e não de vista central, fica com 1 âncora e 0,205. **A origem dessa âncora (f246) não foi apurada.** O clipe ganhou H novas (a cobertura do detector vai de 0,159 a 0,203), mas a série do v2 não marca quais H vieram do A', e a série do v1 não está neste PC. Nos frames da amostra de 1 em 25 do v1, as H do v1 e do v2 são as mesmas, e a f246 não está entre eles (`outputs/runs_v2/rodada_test_v2/sngs147.csv`). Saber se ela é uma H do A' ou uma H de 2 + 2 retas que agora passa na verificação exigiria rodar o detector nesse frame sem a vista central.
 
 ## 3.7 Os clipes que pioram
 
@@ -276,6 +276,9 @@ Dos 49 clipes, 36 melhoram, 8 ficam iguais e 5 pioram. Três pioram menos de 0,0
 # 5. Limitações
 
 - **O limiar de nota do B1 pode inverter a qualidade das âncoras num clipe.** No SNGS-136, ele manteve âncoras com NPE de 0,020 a 0,032 e recusou candidatas certas com NPE de 0,006 a 0,020 (Seção 3.7): a nota (IoU com o gramado + fração explicada) não ordena as candidatas pela precisão da homografia.
+- **O jogo 3 do dev continua sem solução:** na base B1 + A', 16 dos 21 clipes seguem sem âncora, por causa da segmentação na sombra azulada. A hipótese que ataca isso, o E, ficou fora do ciclo.
+- **O test tem só 3 jogos.** O ganho da propagação vai de +0,037 (jogo 11) a +0,238 (jogo 7); a generalização a outros estádios e outra luz não foi medida.
+- **No SNGS-123, que H do A' tenham mudado o voto da verificação é hipótese, não testada** (Seção 3.7).
 
 # 6. Errata do v1
 

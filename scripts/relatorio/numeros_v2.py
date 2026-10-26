@@ -87,6 +87,28 @@ X("59", "A': clipes da metade fixa", DEC, "59 clipes, de 9 a 11 por jogo", sec="
 X("4", "B1b: clipes que a regra mexe", DEC, "restrita a 4 clipes de 2 jogos", sec="2")
 X("2", "B1b: jogos que a regra mexe", DEC, "restrita a 4 clipes de 2 jogos", sec="2")
 
+A2, AJ3 = f"{RV2}/a_central/relatorio_a2.md", f"{RV2}/base_b1a_local/a_jogo3.csv"
+X("4", "A': H centrais recusadas pelo filtro da elipse (checagem barata)", A2, "O filtro recusou 4 de 448 H centrais", sec="2")
+X("448", "A': H centrais da checagem barata", A2, "O filtro recusou 4 de 448 H centrais", sec="2")
+J3 = lambda col=None: [r for r in rows(AJ3) if col is None or r[col] == "True"]
+D("15", "jogo 3 do dev, base B1 + A': H do A'", f"linhas de {AJ3}", lambda v: len(J3()), sec="2")
+D("11", "jogo 3: H do A' que viraram candidatas", f"candidata = True em {AJ3}", lambda v: len(J3("candidata")), sec="2")
+D("0", "jogo 3: candidatas do A' verificáveis ou aceitas", f"verificavel ou aceita = True em {AJ3}",
+  lambda v: len(J3("verificavel")) + len(J3("aceita")), sec="2")
+D("0,14", "jogo 3: menor NPE das candidatas do A'", f"mín. de npe em {AJ3}", lambda v: min(float(r["npe"]) for r in J3("candidata")), sec="2")
+D("0,20", "jogo 3: maior NPE das candidatas do A'", f"máx. de npe em {AJ3}", lambda v: max(float(r["npe"]) for r in J3("candidata")), sec="2")
+X("2", "verificação: vizinhos mínimos com H", CFG2, "verify_min: 2", sec="2")
+X("3", "jogo 3, metade fixa: candidatas do A' (nenhuma aceita)", A2, "| 3 | 3 | 0 | 0 | 23 → 23", sec="2")
+X("168", "metade fixa, fora o jogo 3: âncoras do A'", DEC, "168 âncoras vieram de H do A', 3 erradas", sec="2")
+X("3", "metade fixa, fora o jogo 3: âncoras do A' erradas", DEC, "168 âncoras vieram de H do A', 3 erradas", sec="2")
+BA = f"{RV2}/base_b1a_local/por_jogo.csv"
+C("16", "jogo 3 do dev, base B1 + A': clipes sem âncora", BA, {"jogo": "3"}, "sem_ancora", sec="5")
+C("21", "jogo 3 do dev: clipes", BA, {"jogo": "3"}, "clipes", sec="5")
+D("3", "jogos do GSR test (linhas da T6)", f"linhas de {T2D}/T6.csv", lambda v: len(rows(f"{T2D}/T6.csv")), sec="5")
+C("0,159", "SNGS-147: cobertura do detector, v1", CL1, {"clipe": "SNGS-147"}, "cob_det", sec="3.6")
+C("0,203", "SNGS-147: cobertura do detector, v2", CL2, {"clipe": "SNGS-147"}, "cob_det", sec="3.6")
+X("2", "H de 2 + 2 retas (detector do v1)", "docs/04-relatorio.md", "o detector depende de 2 + 2 retas de duas famílias", sec="3.6")
+
 # ------------------------------------------------------------------ 3.1 test inteiro
 for s, cols in (("detector", (("0,419", "0,624", "locsim_pen"), ("0,505", "0,702", "cobertura"))),
                 ("6c fluxo", (("0,749", None, "locsim_pen"), ("0,897", None, "cobertura"), ("0,959", "0,959", "fracao_teto"))),
@@ -102,8 +124,11 @@ J("290", "H novas no v2 (frames sem H no v1)", f"{R2}/conferencia_v1.json", ("no
 
 # ------------------------------------------------------------------ 3.2 por jogo
 for jogo, a, b in (("7", "0,676", "0,914"), ("8", "0,650", "0,839"), ("11", "0,920", "0,956")):
-    C(a, f"LocSim@5 pen. da propagação, jogo {jogo}, v1", "v2:T6", {"jogo": jogo}, "v1_locsim_pen_6c", sec="3.2")
-    C(b, f"LocSim@5 pen. da propagação, jogo {jogo}, v2", "v2:T6", {"jogo": jogo}, "locsim_pen_6c", sec="3.2")
+    C(a, f"LocSim@5 pen. da propagação, jogo {jogo}, v1", "v2:T6", {"jogo": jogo}, "v1_locsim_pen_6c", key=f"p1_{jogo}", sec="3.2")
+    C(b, f"LocSim@5 pen. da propagação, jogo {jogo}, v2", "v2:T6", {"jogo": jogo}, "locsim_pen_6c", key=f"p2_{jogo}", sec="3.2")
+for jogo, t in (("11", "+0,037"), ("7", "+0,238")):
+    D(t, f"ganho da propagação v1 -> v2, jogo {jogo} (limitações)", f"T6, jogo {jogo}: locsim_pen_6c − v1_locsim_pen_6c",
+      lambda v, j=jogo: v[f"p2_{j}"] - v[f"p1_{j}"], sec="5")
 C("0,954", "LocSim@5 pen. do teto condicionado, jogo 11, v2", "v2:T6", {"jogo": "11"}, "locsim_pen_teto", sec="3.2")
 C("0,946", "H_gt pelas linhas como predição: LocSim@5 nos frames com gabarito (análise posterior do v1)", B134,
   {"conjunto": "test inteiro", "serie": "H_gt pelas linhas"}, "locsim_cob", sec="3.2")
@@ -216,7 +241,7 @@ def tabelas():
            ("C", "propagação bidirecional entre âncoras", "dev", "antigo", "c_bidirecional", ("decisao",)),
            ("B2", "centro da câmera da âncora", "dev, leave-one-game-out", "antigo", "b2_centro", ("decisao_logo",)),
            ("B1b", "recupera a melhor candidata recusada pelo B1", "dev (4 clipes recalculados)", "antigo", "b1b", ("decisao",)),
-           ("A'", "vista central em forma fechada, com filtro da elipse", "dev, metade fixa", "novo", "a_central", ("decisao",)))
+           ("A'", "vista central em forma fechada (o filtro da elipse quase não age)", "dev, metade fixa", "novo", "a_central", ("decisao",)))
     rs = []
     for h, o, onde, crit, d, path in hip:
         x = json.loads(Path(f"{RV2}/{d}/decisao.json").read_text(encoding="utf-8"))
