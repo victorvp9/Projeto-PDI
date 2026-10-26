@@ -1227,3 +1227,8 @@ Uma linha por decisão não óbvia. Data | decisão | por quê.
   - **Pioram:** 5 clipes; os maiores, SNGS-136 (−0,061) e SNGS-123 (−0,060).
   - O relatório v1 × v2 vai a Victor; o adendo `docs/04-relatorio-v2.md` espera a aprovação dos números.
   | Medição; rodada única, sem escolha.
+- 2026-10-26 | **Tags da entrega do v2** (decisão de Victor). Duas tags anotadas na `main`, nenhuma movida depois de criada:
+  - `entrega-v2` → `9c01ebc`, o merge do ciclo v2 na `main` ("Merge do ciclo v2 (exploratório): B1 + A', adendo 04-relatorio-v2"), feito depois das conferências (diffs de `src`/`config.yaml` contra `38512a5` e de `src_v2`/`config_v2.yaml` contra `v2-final` vazios, `docs/04-relatorio.md` igual, `numeros.py` e `numeros_v2.py` com código 0, suíte rápida);
+  - `entrega-v2.1` → `d298d15`, o adendo final (`docs/04-relatorio-v2.md`: o filtro da elipse do A' quase vazio, as limitações e a origem não apurada da âncora do SNGS-147; `numeros_v2.py` com 144 números e código 0).
+  - As branches `v2-A`, `v2-melhorias` e `v2-testes-melhorias` ficam no remoto, porque este registro cita commits delas.
+  | Decisão de Victor.
