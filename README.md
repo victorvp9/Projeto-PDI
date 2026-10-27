@@ -5,6 +5,8 @@ processamento digital de imagens clássico — cor, morfologia, Hough, ajuste de
 cônica, RANSAC — e mede quanto a propagação temporal por fluxo óptico recupera
 dos erros do detector.
 
+**Documento principal:** [`docs/trabalho-final.md`](docs/trabalho-final.md), o trabalho final, que reúne o v1 (rodada única e limpa no test) e o v2 (exploratório).
+
 ## Instalação e reprodução
 
 Instale com `uv sync` e rode tudo com `uv run`:
