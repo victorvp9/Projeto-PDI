@@ -119,7 +119,7 @@ for t, a in (("105", "modelo do campo 105 × 68 m"), ("68", "modelo do campo 105
              ("180", "simetria de 180° do campo"), ("0,45", "portão: fração explicada"), ("0,85", "portão: IoU com o gramado"),
              ("5", "portões logo abaixo do percentil 5"), ("12", "janela das âncoras candidatas")):
     R(t, "v1", a, "3")
-# Tabela 2: medidas das Fatias 4 e 5, calibração no treino/valid (entradas de 2026-09-28 do docs/decisoes.md)
+# Tabela 2: medidas das Fatias 4 e 5, calibração no treino (GSR train) (entradas de 2026-09-28 do docs/decisoes.md)
 for anchor, nums in (("**Elipses: calibração no GSR train, com uma repetição.**", "0,668 0,740 643 0,202 1.105"),
                      ("**Decisões pendentes resolvidas pelo erro da homografia: td da fusão 6/720 e escala única**",
                       "3 720 6 1 2 1.697 0,388 0,0057 3,05 0,418 0,0064 0,58 0,339 0,0060 0,71 0,398 1,02 0,030 0,01"),
@@ -127,7 +127,7 @@ for anchor, nums in (("**Elipses: calibração no GSR train, com uma repetição
                       "60 31 37 84 9 6 4 0,48 300 0,483 0,0216 10 0,467 0,0076 8 0,433 0,0062 24"),
                      ("**Elipses conferidas depois da H e ablação correspondências + RANSAC**", "33 10 7 0,433 0,0058 6 0,417 0,200 0,226 5")):
     for t in nums.split():
-        X(t, f"Fatias 4 e 5, calibração no treino/valid: {anchor.strip('*')[:60]}", DEC, anchor, sec="3.1, Tabela 2")
+        X(t, f"Fatias 4 e 5, calibração no treino (GSR train): {anchor.strip('*')[:60]}", DEC, anchor, sec="3.1, Tabela 2")
 
 # ------------------------------------------------------------------ 4. dados e métricas
 for t, a in (("209", "imagens de treino do WC14"), ("186", "imagens do WC14 test"), ("1280", "resolução do WC14"), ("720", "resolução do WC14"),
@@ -455,11 +455,11 @@ for a in ("pinhole camera model augmented with one radial distortion coefficient
           "A similar version of the Two-Point PTZ algorithm", "an industrial tool is used"):
     P("14", "calibração do GSR (material suplementar)", GS, 14, a, "9.1")
 for t in ("0,9319", "0,9330", "0,9333", "3.362", "1", "25", "0,029", "+0,001"):
-    X(t, "D1, lente (calibração no treino/valid)", DEC, "**D1, lente (negativo):**", sec="9.1")
+    X(t, "D1, lente (diagnóstico no dev do v2)", DEC, "**D1, lente (negativo):**", sec="9.1")
 for t in ("0,4", "1,3", "1,2", "2,4"):
-    X(t, "D2, centro da câmera por clipe e por frame (calibração no treino/valid)", DEC, "**D2, centro da câmera C**", sec="9.1, 9.5")
+    X(t, "D2, centro da câmera por clipe e por frame (diagnóstico no dev do v2)", DEC, "**D2, centro da câmera C**", sec="9.1, 9.5")
 for t in ("0,855", "0,918", "0,984", "0,966"):
-    X(t, "D3, AUC da nota e do centro da câmera (calibração no treino/valid)", DEC, "**D3, C contra âncoras erradas**", sec="9.2")
+    X(t, "D3, AUC da nota da âncora e do centro da câmera (diagnóstico no dev do v2)", DEC, "**D3, C contra âncoras erradas**", sec="9.2")
 for t in ("5", "6", "+0,0179", "−0,0223"):
     X(t, "B1: critério na leitura leave-one-game-out", DEC, "**Critério na leitura LOGO (a que decide):**", sec="9.2")
 for t in ("0", "4"):
@@ -469,6 +469,16 @@ for t in ("0,5", "1", "12"):
 for t, a in (("+0,037", "ganho da propagação v1 -> v2, jogo 11"), ("+0,238", "ganho da propagação v1 -> v2, jogo 7"),
              ("16", "jogo 3 do dev, base B1 + A': clipes sem âncora"), ("21", "jogo 3 do dev: clipes")):
     R(t, "v2", a, "9.4")
+# 9.4: jogo 3 do dev, base → B1 (outputs/runs_v2/b1_regra/por_jogo.csv; os 3 clipes no registro do B1 aceito, 2026-10-16)
+B1J = "outputs/runs_v2/b1_regra/por_jogo.csv"
+C("13", "jogo 3 do dev, v1 (base do B1): clipes sem âncora", B1J, {"jogo": "3"}, "base_sem_ancora", sec="9.4")
+R("1", "v1", "lacuna de 4-25 com borda sem gabarito", "7")
+C("+0,002", "jogo 3 do dev: Δ do LocSim@5 penalizado do 6c, base → B1", B1J, {"jogo": "3"}, "delta_6c", sec="9.4")
+X("3", "B1: clipes do jogo 3 que perderam só aceitas erradas (SNGS-042, -044, -049)", DEC, "SNGS-044 e SNGS-049 (jogo 3): 0,007 e 0,006 antes", sec="9.4")
+# 9.1 e Conclusão: o gabarito pelas linhas como predição, penalizado no test inteiro e no jogo 11 (análise posterior à rodada)
+GTP = "outputs/runs/rodada_test/pos_rodada/B1_B3_B4.csv"
+C("0,929", "H_gt pelas linhas como predição: LocSim@5 penalizado no test inteiro", GTP, {"conjunto": "test inteiro", "serie": "H_gt pelas linhas"}, "locsim_pen", sec="9.1, 10")
+C("0,956", "H_gt pelas linhas como predição: LocSim@5 penalizado no jogo 11", GTP, {"conjunto": "test inteiro", "serie": "H_gt pelas linhas"}, "locsim_pen_jogo11", sec="9.1")
 
 # 5. defeitos de chave do v1 achados na revisão de 2026-10-14, depois da rodada
 X("735", "revisão de 2026-10-14: chaves da série conferidas na rodada do test", DEC, "as 735/735 chaves da série foram conferidas", sec="5")

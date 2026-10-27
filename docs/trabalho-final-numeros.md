@@ -70,58 +70,58 @@ As origens em PDF (artigos da pasta do projeto) dizem a página do arquivo e o t
 | 62 | 0,85 | portão: IoU com o gramado | 3 | `docs/04-relatorio-numeros.md` | 347 | nº 339 | (no texto da linha) |
 | 63 | 5 | portões logo abaixo do percentil 5 | 3 | `docs/04-relatorio-numeros.md` | 348 | nº 340 | (no texto da linha) |
 | 64 | 12 | janela das âncoras candidatas | 3 | `docs/04-relatorio-numeros.md` | 349 | nº 341 | (no texto da linha) |
-| 65 | 0,668 | Fatias 4 e 5, calibração no treino/valid: Elipses: calibração no GSR train, com uma repetição. | 3.1, Tabela 2 | `docs/decisoes.md` | 103 | — | (no texto da linha) |
-| 66 | 0,740 | Fatias 4 e 5, calibração no treino/valid: Elipses: calibração no GSR train, com uma repetição. | 3.1, Tabela 2 | `docs/decisoes.md` | 103 | — | (no texto da linha) |
-| 67 | 643 | Fatias 4 e 5, calibração no treino/valid: Elipses: calibração no GSR train, com uma repetição. | 3.1, Tabela 2 | `docs/decisoes.md` | 103 | — | (no texto da linha) |
-| 68 | 0,202 | Fatias 4 e 5, calibração no treino/valid: Elipses: calibração no GSR train, com uma repetição. | 3.1, Tabela 2 | `docs/decisoes.md` | 103 | — | (no texto da linha) |
-| 69 | 1.105 | Fatias 4 e 5, calibração no treino/valid: Elipses: calibração no GSR train, com uma repetição. | 3.1, Tabela 2 | `docs/decisoes.md` | 103 | — | (no texto da linha) |
-| 70 | 3 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 71 | 720 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 72 | 6 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 73 | 1 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 74 | 2 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 75 | 1.697 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 76 | 0,388 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 77 | 0,0057 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 78 | 3,05 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 79 | 0,418 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 80 | 0,0064 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 81 | 0,58 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 82 | 0,339 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 83 | 0,0060 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 84 | 0,71 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 85 | 0,398 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 86 | 1,02 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 87 | 0,030 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 88 | 0,01 | Fatias 4 e 5, calibração no treino/valid: Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
-| 89 | 60 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 90 | 31 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 91 | 37 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 92 | 84 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 93 | 9 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 94 | 6 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 95 | 4 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 96 | 0,48 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 97 | 300 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 98 | 0,483 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 99 | 0,0216 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 100 | 10 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 101 | 0,467 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 102 | 0,0076 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 103 | 8 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 104 | 0,433 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 105 | 0,0062 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 106 | 24 | Fatias 4 e 5, calibração no treino/valid: Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
-| 107 | 33 | Fatias 4 e 5, calibração no treino/valid: Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
-| 108 | 10 | Fatias 4 e 5, calibração no treino/valid: Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
-| 109 | 7 | Fatias 4 e 5, calibração no treino/valid: Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
-| 110 | 0,433 | Fatias 4 e 5, calibração no treino/valid: Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
-| 111 | 0,0058 | Fatias 4 e 5, calibração no treino/valid: Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
-| 112 | 6 | Fatias 4 e 5, calibração no treino/valid: Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
-| 113 | 0,417 | Fatias 4 e 5, calibração no treino/valid: Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
-| 114 | 0,200 | Fatias 4 e 5, calibração no treino/valid: Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
-| 115 | 0,226 | Fatias 4 e 5, calibração no treino/valid: Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
-| 116 | 5 | Fatias 4 e 5, calibração no treino/valid: Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
+| 65 | 0,668 | Fatias 4 e 5, calibração no treino (GSR train): Elipses: calibração no GSR train, com uma repetição. | 3.1, Tabela 2 | `docs/decisoes.md` | 103 | — | (no texto da linha) |
+| 66 | 0,740 | Fatias 4 e 5, calibração no treino (GSR train): Elipses: calibração no GSR train, com uma repetição. | 3.1, Tabela 2 | `docs/decisoes.md` | 103 | — | (no texto da linha) |
+| 67 | 643 | Fatias 4 e 5, calibração no treino (GSR train): Elipses: calibração no GSR train, com uma repetição. | 3.1, Tabela 2 | `docs/decisoes.md` | 103 | — | (no texto da linha) |
+| 68 | 0,202 | Fatias 4 e 5, calibração no treino (GSR train): Elipses: calibração no GSR train, com uma repetição. | 3.1, Tabela 2 | `docs/decisoes.md` | 103 | — | (no texto da linha) |
+| 69 | 1.105 | Fatias 4 e 5, calibração no treino (GSR train): Elipses: calibração no GSR train, com uma repetição. | 3.1, Tabela 2 | `docs/decisoes.md` | 103 | — | (no texto da linha) |
+| 70 | 3 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 71 | 720 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 72 | 6 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 73 | 1 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 74 | 2 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 75 | 1.697 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 76 | 0,388 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 77 | 0,0057 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 78 | 3,05 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 79 | 0,418 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 80 | 0,0064 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 81 | 0,58 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 82 | 0,339 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 83 | 0,0060 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 84 | 0,71 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 85 | 0,398 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 86 | 1,02 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 87 | 0,030 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 88 | 0,01 | Fatias 4 e 5, calibração no treino (GSR train): Decisões pendentes resolvidas pelo erro da homografia: td da | 3.1, Tabela 2 | `docs/decisoes.md` | 111 | — | (no texto da linha) |
+| 89 | 60 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 90 | 31 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 91 | 37 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 92 | 84 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 93 | 9 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 94 | 6 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 95 | 4 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 96 | 0,48 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 97 | 300 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 98 | 0,483 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 99 | 0,0216 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 100 | 10 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 101 | 0,467 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 102 | 0,0076 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 103 | 8 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 104 | 0,433 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 105 | 0,0062 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 106 | 24 | Fatias 4 e 5, calibração no treino (GSR train): Fatia 5, pipeline mínimo: diagnóstico e nova verificação | 3.1, Tabela 2 | `docs/decisoes.md` | 107 | — | (no texto da linha) |
+| 107 | 33 | Fatias 4 e 5, calibração no treino (GSR train): Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
+| 108 | 10 | Fatias 4 e 5, calibração no treino (GSR train): Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
+| 109 | 7 | Fatias 4 e 5, calibração no treino (GSR train): Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
+| 110 | 0,433 | Fatias 4 e 5, calibração no treino (GSR train): Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
+| 111 | 0,0058 | Fatias 4 e 5, calibração no treino (GSR train): Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
+| 112 | 6 | Fatias 4 e 5, calibração no treino (GSR train): Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
+| 113 | 0,417 | Fatias 4 e 5, calibração no treino (GSR train): Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
+| 114 | 0,200 | Fatias 4 e 5, calibração no treino (GSR train): Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
+| 115 | 0,226 | Fatias 4 e 5, calibração no treino (GSR train): Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
+| 116 | 5 | Fatias 4 e 5, calibração no treino (GSR train): Elipses conferidas depois da H e ablação correspondências +  | 3.1, Tabela 2 | `docs/decisoes.md` | 113 | — | (no texto da linha) |
 | 117 | 209 | imagens de treino do WC14 | 4 | `docs/04-relatorio-numeros.md` | 351 | nº 343 | (no texto da linha) |
 | 118 | 186 | imagens do WC14 test | 4 | `docs/04-relatorio-numeros.md` | 145 | nº 137 | 186 |
 | 119 | 1280 | resolução do WC14 | 4 | `docs/04-relatorio-numeros.md` | 352 | nº 344 | (no texto da linha) |
@@ -442,22 +442,22 @@ As origens em PDF (artigos da pasta do projeto) dizem a página do arquivo e o t
 | 434 | 14 | calibração do GSR (material suplementar) | 9.1 | `C:/Users/victo/Downloads/Topicos Av pdi/SoccerNet Game State Reconstruction__End-to-End Athlete Tracking and Identification on a Minimap_compressed.pdf` | — | p. 14 | “It is estimated as the median 3D position” |
 | 435 | 14 | calibração do GSR (material suplementar) | 9.1 | `C:/Users/victo/Downloads/Topicos Av pdi/SoccerNet Game State Reconstruction__End-to-End Athlete Tracking and Identification on a Minimap_compressed.pdf` | — | p. 14 | “A similar version of the Two-Point PTZ algorithm” |
 | 436 | 14 | calibração do GSR (material suplementar) | 9.1 | `C:/Users/victo/Downloads/Topicos Av pdi/SoccerNet Game State Reconstruction__End-to-End Athlete Tracking and Identification on a Minimap_compressed.pdf` | — | p. 14 | “an industrial tool is used” |
-| 437 | 0,9319 | D1, lente (calibração no treino/valid) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
-| 438 | 0,9330 | D1, lente (calibração no treino/valid) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
-| 439 | 0,9333 | D1, lente (calibração no treino/valid) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
-| 440 | 3.362 | D1, lente (calibração no treino/valid) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
-| 441 | 1 | D1, lente (calibração no treino/valid) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
-| 442 | 25 | D1, lente (calibração no treino/valid) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
-| 443 | 0,029 | D1, lente (calibração no treino/valid) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
-| 444 | +0,001 | D1, lente (calibração no treino/valid) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
-| 445 | 0,4 | D2, centro da câmera por clipe e por frame (calibração no treino/valid) | 9.1, 9.5 | `docs/decisoes.md` | 1072 | — | (no texto da linha) |
-| 446 | 1,3 | D2, centro da câmera por clipe e por frame (calibração no treino/valid) | 9.1, 9.5 | `docs/decisoes.md` | 1072 | — | (no texto da linha) |
-| 447 | 1,2 | D2, centro da câmera por clipe e por frame (calibração no treino/valid) | 9.1, 9.5 | `docs/decisoes.md` | 1072 | — | (no texto da linha) |
-| 448 | 2,4 | D2, centro da câmera por clipe e por frame (calibração no treino/valid) | 9.1, 9.5 | `docs/decisoes.md` | 1072 | — | (no texto da linha) |
-| 449 | 0,855 | D3, AUC da nota e do centro da câmera (calibração no treino/valid) | 9.2 | `docs/decisoes.md` | 1074 | — | (no texto da linha) |
-| 450 | 0,918 | D3, AUC da nota e do centro da câmera (calibração no treino/valid) | 9.2 | `docs/decisoes.md` | 1074 | — | (no texto da linha) |
-| 451 | 0,984 | D3, AUC da nota e do centro da câmera (calibração no treino/valid) | 9.2 | `docs/decisoes.md` | 1074 | — | (no texto da linha) |
-| 452 | 0,966 | D3, AUC da nota e do centro da câmera (calibração no treino/valid) | 9.2 | `docs/decisoes.md` | 1074 | — | (no texto da linha) |
+| 437 | 0,9319 | D1, lente (diagnóstico no dev do v2) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
+| 438 | 0,9330 | D1, lente (diagnóstico no dev do v2) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
+| 439 | 0,9333 | D1, lente (diagnóstico no dev do v2) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
+| 440 | 3.362 | D1, lente (diagnóstico no dev do v2) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
+| 441 | 1 | D1, lente (diagnóstico no dev do v2) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
+| 442 | 25 | D1, lente (diagnóstico no dev do v2) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
+| 443 | 0,029 | D1, lente (diagnóstico no dev do v2) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
+| 444 | +0,001 | D1, lente (diagnóstico no dev do v2) | 9.1 | `docs/decisoes.md` | 1071 | — | (no texto da linha) |
+| 445 | 0,4 | D2, centro da câmera por clipe e por frame (diagnóstico no dev do v2) | 9.1, 9.5 | `docs/decisoes.md` | 1072 | — | (no texto da linha) |
+| 446 | 1,3 | D2, centro da câmera por clipe e por frame (diagnóstico no dev do v2) | 9.1, 9.5 | `docs/decisoes.md` | 1072 | — | (no texto da linha) |
+| 447 | 1,2 | D2, centro da câmera por clipe e por frame (diagnóstico no dev do v2) | 9.1, 9.5 | `docs/decisoes.md` | 1072 | — | (no texto da linha) |
+| 448 | 2,4 | D2, centro da câmera por clipe e por frame (diagnóstico no dev do v2) | 9.1, 9.5 | `docs/decisoes.md` | 1072 | — | (no texto da linha) |
+| 449 | 0,855 | D3, AUC da nota da âncora e do centro da câmera (diagnóstico no dev do v2) | 9.2 | `docs/decisoes.md` | 1074 | — | (no texto da linha) |
+| 450 | 0,918 | D3, AUC da nota da âncora e do centro da câmera (diagnóstico no dev do v2) | 9.2 | `docs/decisoes.md` | 1074 | — | (no texto da linha) |
+| 451 | 0,984 | D3, AUC da nota da âncora e do centro da câmera (diagnóstico no dev do v2) | 9.2 | `docs/decisoes.md` | 1074 | — | (no texto da linha) |
+| 452 | 0,966 | D3, AUC da nota da âncora e do centro da câmera (diagnóstico no dev do v2) | 9.2 | `docs/decisoes.md` | 1074 | — | (no texto da linha) |
 | 453 | 5 | B1: critério na leitura leave-one-game-out | 9.2 | `docs/decisoes.md` | 1031 | — | (no texto da linha) |
 | 454 | 6 | B1: critério na leitura leave-one-game-out | 9.2 | `docs/decisoes.md` | 1031 | — | (no texto da linha) |
 | 455 | +0,0179 | B1: critério na leitura leave-one-game-out | 9.2 | `docs/decisoes.md` | 1031 | — | (no texto da linha) |
@@ -471,5 +471,11 @@ As origens em PDF (artigos da pasta do projeto) dizem a página do arquivo e o t
 | 463 | +0,238 | ganho da propagação v1 -> v2, jogo 7 | 9.4 | `docs/04-relatorio-v2-numeros.md` | 69 | nº 61 | 0.237551 |
 | 464 | 16 | jogo 3 do dev, base B1 + A': clipes sem âncora | 9.4 | `docs/04-relatorio-v2-numeros.md` | 42 | nº 34 | 16 |
 | 465 | 21 | jogo 3 do dev: clipes | 9.4 | `docs/04-relatorio-v2-numeros.md` | 43 | nº 35 | 21 |
-| 466 | 735 | revisão de 2026-10-14: chaves da série conferidas na rodada do test | 5 | `docs/decisoes.md` | 929 | — | (no texto da linha) |
-| 467 | 49 | revisão de 2026-10-14: chaves do 6c conferidas na rodada do test | 5 | `docs/decisoes.md` | 930 | — | (no texto da linha) |
+| 466 | 13 | jogo 3 do dev, v1 (base do B1): clipes sem âncora | 9.4 | `outputs/runs_v2/b1_regra/por_jogo.csv` | 6 | base_sem_ancora | 13.0 |
+| 467 | 1 | lacuna de 4-25 com borda sem gabarito | 7 | `docs/04-relatorio-numeros.md` | 221 | nº 213 | 1 |
+| 468 | +0,002 | jogo 3 do dev: Δ do LocSim@5 penalizado do 6c, base → B1 | 9.4 | `outputs/runs_v2/b1_regra/por_jogo.csv` | 6 | delta_6c | 0.0019449552048399765 |
+| 469 | 3 | B1: clipes do jogo 3 que perderam só aceitas erradas (SNGS-042, -044, -049) | 9.4 | `docs/decisoes.md` | 1038 | — | (no texto da linha) |
+| 470 | 0,929 | H_gt pelas linhas como predição: LocSim@5 penalizado no test inteiro | 9.1, 10 | `outputs/runs/rodada_test/pos_rodada/B1_B3_B4.csv` | 12 | locsim_pen | 0.9290600721915224 |
+| 471 | 0,956 | H_gt pelas linhas como predição: LocSim@5 penalizado no jogo 11 | 9.1 | `outputs/runs/rodada_test/pos_rodada/B1_B3_B4.csv` | 12 | locsim_pen_jogo11 | 0.956388918558158 |
+| 472 | 735 | revisão de 2026-10-14: chaves da série conferidas na rodada do test | 5 | `docs/decisoes.md` | 929 | — | (no texto da linha) |
+| 473 | 49 | revisão de 2026-10-14: chaves do 6c conferidas na rodada do test | 5 | `docs/decisoes.md` | 930 | — | (no texto da linha) |

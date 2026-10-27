@@ -8,11 +8,11 @@ lang: pt-BR
 
 # Resumo
 
-Este trabalho estima a homografia entre o gramado e o frame de uma transmissão de futebol só com processamento digital de imagens clássico, sem redes neurais, e mede quanto a propagação temporal por fluxo óptico recupera das falhas desse detector. O detector segmenta o gramado pelo matiz, realça as marcações com um filtro de linha, detecta retas por Hough e elipses, forma hipóteses com duas retas de cada uma de duas famílias de paralelas, verifica-as contra a imagem e refina a melhor por um ajuste ponto-linha; cada etapa entrou por uma medição na partição de treino. A propagação parte de âncoras verificadas e leva a homografia aos frames vizinhos com Lucas–Kanade.
+Este trabalho estima a homografia entre o gramado e o frame de uma transmissão de futebol só com processamento digital de imagens clássico, sem redes neurais, e mede quanto a propagação temporal por fluxo óptico recupera das falhas desse detector. O detector segmenta o gramado pelo matiz, realça as marcações com um filtro de linha, detecta retas por Hough e elipses, forma hipóteses com duas retas de cada uma de duas famílias de paralelas, verifica-as contra a imagem e refina a melhor por um ajuste ponto-linha. Cada etapa de PDI foi medida no treino; as estruturais (geração e refino) não têm ablação, e uma (a conferência das elipses) foi neutra. A propagação parte de âncoras verificadas e leva a homografia aos frames vizinhos com Lucas–Kanade.
 
 Na rodada única e limpa no test do SoccerNet-GSR (49 clipes de 3 jogos), o detector produz homografia em 0,505 dos frames, com LocSim@5 penalizado de 0,419. Com a propagação, a cobertura sobe para 0,897 e o LocSim@5 penalizado para 0,749 (mín.–máx. entre os 3 jogos: 0,650–0,920). Nos frames que o detector cobre, a propagação reduz o erro residual em cerca de 40%, fração parecida com os cerca de 38% que o AuxFlow tira de um detector treinado no test inteiro (comparação indicativa, em conjuntos diferentes): o ganho a mais sobre o detector fraco vem de preencher os frames sem homografia, e não de corrigir homografias. Entre as estratégias de consistência temporal, o filtro de Kalman dá a série mais lisa, e a propagação é a que melhor acompanha o movimento real da câmera e a que menos inverte a visibilidade dos jogadores.
 
-A análise de falhas dessa rodada mostrou que as vistas do meio-campo ficavam sem âncora. Um segundo ciclo, decidido em seis jogos de desenvolvimento com critério fixado antes, mediu seis mudanças: aceitou duas (B1 e A'), recusou três (C, B2, B1b) e parou uma na checagem barata (A, redesenhada como A'); as recusas entram como resultado. No mesmo test, a segunda versão chega a 0,902, um número **exploratório**: a hipótese que o produziu nasceu da análise de falhas do próprio test. Na comparação indicativa com a tabela 7 do AuxFlow (0,929), nenhuma das duas versões alcança o estado da arte, numa métrica em que a própria homografia de gabarito ajustada às linhas pintadas tira só 0,946.
+A análise de falhas dessa rodada mostrou que as vistas do meio-campo ficavam sem âncora. Um segundo ciclo, decidido em seis jogos de desenvolvimento com critério fixado antes, mediu seis mudanças: aceitou duas (B1 e A'), recusou três (C, B2, B1b) e parou uma na checagem barata (A, redesenhada como A'); as recusas entram como resultado. No mesmo test, a segunda versão chega a 0,902, um número **exploratório**: a hipótese que o produziu nasceu da análise de falhas do próprio test. Na comparação indicativa com a tabela 7 do AuxFlow (0,929), nenhuma das duas versões alcança o estado da arte, numa métrica em que a própria homografia de gabarito ajustada às linhas pintadas tira 0,946 nos frames com gabarito, uma referência, e não um teto.
 
 # 1. Introdução
 
@@ -25,6 +25,8 @@ Para levar um pixel de uma transmissão de futebol a uma coordenada em metros no
 A área migrou para detectores de pontos-chave treinados (Seção 2). Este trabalho faz a pergunta oposta:
 
 > Até onde chega um pipeline de registro de campo puramente clássico — cor, morfologia, Hough, ajuste de cônica, RANSAC — e quanto da diferença para o estado da arte a propagação temporal por fluxo óptico consegue fechar?
+
+A lista da pergunta é a do enunciado do projeto (`docs/00-problema.md`). O caminho principal acabou sem RANSAC: ele só aparece na ablação das correspondências de pontos, que foi neutra e ficou fora (Tabela 2), e na `H_gt_auxflow` da comparação com o AuxFlow (Seção 4.1).
 
 A hipótese é que a propagação tenha ganho marginal maior sobre um detector fraco do que sobre um forte: se o detector acerta metade dos frames, os frames bons podem sustentar os ruins. O resultado das âncoras ingênuas do AuxFlow (Seção 2) indica a condição: isso só vale se as âncoras forem bem escolhidas. Se a hipótese se confirmar, um sistema leve e sem GPU pode ser viável para aplicações offline.
 
@@ -80,7 +82,7 @@ O pipeline tem duas partes (Figura 1): um detector que estima a homografia em ca
 
 ## 3.1 Detector frame a frame
 
-A regra do projeto é que cada etapa justifique a sua existência com um número, medido só no treino. A Tabela 1 traz essas medições, e a Figura 2 mostra as etapas num frame do treino.
+A regra do projeto é que cada etapa justifique a sua existência com um número, medido só no treino. Cada etapa de PDI foi medida no treino; as estruturais (geração e refino) não têm ablação, e uma (a conferência das elipses) foi neutra. A Tabela 1 traz essas medições, e a Figura 2 mostra as etapas num frame do treino.
 
 1. **Gramado.** Converte-se o frame para Lab e mede-se o ângulo de matiz em (a\*, b\*) em relação ao pico do próprio frame, o que absorve o balanço de branco de cada transmissão. O gramado são os pixels a até 20° do pico, com croma mínimo, seguidos de abertura, fechamento, maior componente conexo e preenchimento de buracos (Gonzalez & Woods, 2018†). O espaço de cor foi escolhido pelo IoU contra as máscaras anotadas do WC14, e cada operação morfológica ficou porque subiu esse IoU (Tabela 1): o maior componente conexo é a que mais pesa. Com os tamanhos finais dos elementos estruturantes, o IoU médio no WC14 de treino é 0,9861.
 2. **Marcações.** Um filtro de linha marca o pixel significativamente mais claro, em L\*, que os vizinhos a uma distância proporcional à largura esperada da linha naquela altura da imagem, dos dois lados. Venceu o top-hat morfológico nas duas bases (Tabela 1). O filtro só atua dentro do gramado dilatado. O limiar de contraste foi calibrado em cada base no próprio treino: 15 no WC14 e 30 no GSR.
@@ -101,10 +103,10 @@ Sem quatro retas utilizáveis, ou sem hipótese que passe nos portões, o frame 
 | Retas: filtro de forma | com × sem | F1 dos segmentos, GSR | 0,641 × 0,597 |
 | Retas: fusão de segmentos | com × sem | fragmentação (F1), GSR | 1,17 × 4,70 (0,641 × 0,634) |
 
-: Tabela 1 — Contribuição de cada etapa de PDI, medida na calibração, só nas partições de treino (WC14 `train_val`, GSR `train`). A sombra é o subconjunto do WC14 com sombra, definido por regra sobre um limiar de Otsu (1979†) no L\*. Fragmentação: segmentos por linha do campo detectada. Copiada do relatório v1.
+: Tabela 1 — Contribuição de cada etapa de PDI, medida na calibração, só nas partições de treino (WC14 `train_val`, GSR `train`). A sombra é o subconjunto do WC14 com sombra, definido por regra sobre um limiar de Otsu (1979†) no L\*. Fragmentação: segmentos por linha do campo detectada. Nas marcações, o F1 do WC14 é a 3 px; o do GSR combina a cobertura dos pontos anotados a 2 px e a precisão a 3 px (`config.yaml`). Copiada do relatório v1.
 <!-- fim: copia -->
 
-**As etapas de elipses a refino (calibração no treino/valid).** Essas etapas foram medidas durante a construção do detector, no GSR train, e as medidas estão no registro de decisões do projeto (`docs/decisoes.md`), não nos relatórios. A Tabela 2 as reúne, com o rótulo "calibração no treino/valid"; a origem de cada número é a linha do registro.
+**As etapas de elipses a refino (calibração no treino, GSR train).** Essas etapas foram medidas durante a construção do detector, no GSR train, e as medidas estão no registro de decisões do projeto (`docs/decisoes.md`), não nos relatórios. A Tabela 2 as reúne, com o rótulo "calibração no treino (GSR train)"; a origem de cada número é a linha do registro.
 
 | Etapa | Comparação | Conjunto | Resultado |
 |---|---|---|---|
@@ -116,7 +118,7 @@ Sem quatro retas utilizáveis, ou sem hipótese que passe nos portões, o frame 
 | Elipses conferidas depois da homografia | 33 elipses, 10 falsas pelo gabarito; 7 rejeitadas | subconjunto de 60 frames | cobertura, NPE e aceitas erradas iguais (0,433; 0,0058; 6) |
 | Correspondências + RANSAC antes do refino | cobertura / NPE médio / aceitas erradas: sem → com | subconjunto de 60 frames | 0,433 → 0,417; 0,200 → 0,226; 6 → 5 (NPE mediano igual, 0,0058) |
 
-: Tabela 2 — Medidas das etapas de elipses a refino, calibração no treino/valid (GSR train; o subconjunto tem 60 frames de clipes do treino). td é a tolerância de distância da fusão de retas, em fração da altura da imagem; a variante escolhida está em negrito. Origem: `docs/decisoes.md`, entradas de 2026-09-28 das Fatias 4 e 5 (linha de cada número em `docs/trabalho-final-numeros.md`).
+: Tabela 2 — Medidas das etapas de elipses a refino, calibração no treino (GSR train; o subconjunto tem 60 frames de clipes do treino). O NPE mediano das duas últimas linhas (0,0058) vem de uma rodada posterior no mesmo subconjunto, com base diferente da linha do refino (0,0062); o registro não explica a diferença. td é a tolerância de distância da fusão de retas, em fração da altura da imagem; a variante escolhida está em negrito. Origem: `docs/decisoes.md`, entradas de 2026-09-28 das Fatias 4 e 5 (linha de cada número em `docs/trabalho-final-numeros.md`).
 
 O que as medidas dizem:
 
@@ -137,7 +139,7 @@ O detector roda em todos os frames de cada clipe, e a série resultante (homogra
 - **Suavização S-G (Bassek).** A versão de Bassek et al. (2025), na nossa implementação: lacunas de até 25 frames preenchidas por interpolação linear dos nove elementos da matriz normalizada, seguidas de Savitzky–Golay (Savitzky & Golay, 1964†) de janela 31 e grau 3. A **S-G robusta** aplica antes um filtro de Hampel (Hampel, 1974†) na representação por pontos, que descarta homografias discrepantes da vizinhança; a janela e o limiar foram calibrados no treino.
 - **Kalman + RTS.** Filtro de Kalman (Kalman, 1960†) de velocidade constante com o suavizador RTS (Rauch et al., 1965†). É uma versão simplificada, e não o BHITK. Roda sobre as coordenadas no campo de quatro pontos fixos da imagem, com uma porta de Mahalanobis contra homografias erradas; os ruídos de processo e de medição foram calibrados no treino.
 - **Detecção de corte.** A distância de Bhattacharyya (1943†) entre histogramas HSV de frames consecutivos, na forma de Hellinger que o OpenCV calcula, detecta os cortes, e nenhuma estratégia atravessa um corte. O limiar foi calibrado no treino com cortes sintéticos.
-- **Propagação por Lucas–Kanade.** As âncoras candidatas são os máximos locais da nota do detector, em ±12 frames. Cada candidata passa por uma verificação temporal: a homografia dela, levada pelo movimento que o Lucas–Kanade mede, tem que concordar com a do detector em pelo menos 2 vizinhos, com maioria. Cada frame recebe a homografia da âncora mais próxima do mesmo plano (entre cortes), propagada nos dois sentidos do tempo. A cada frame, uma grade de 2,5 × 2 m de pontos do campo, projetada pela homografia corrente, é rastreada por Lucas–Kanade (Lucas & Kanade, 1981†) piramidal (Bouguet, 2001†) com verificação de ida e volta (Kalal et al., 2010†; erro ≤ 1 px), sem os pontos sobre jogadores e bola (os componentes compactos de não-gramado). A homografia é reestimada com os pontos rastreados e com os pixels das marcações em volta das linhas do modelo projetado. **A saída da propagação é a homografia propagada e reestimada**; a do detector só entra na escolha e na verificação das âncoras. Um plano sem âncora fica sem homografia.
+- **Propagação por Lucas–Kanade.** As âncoras candidatas são os máximos locais da **nota da âncora**, em ±12 frames: a soma do IoU com o gramado e da fração explicada, dois dos três termos da nota de verificação da Seção 3.1, sem a fração do modelo que cai numa marcação (`src/temporal.py`). Cada candidata passa por uma verificação temporal: a homografia dela, levada pelo movimento que o Lucas–Kanade mede, tem que concordar com a do detector em pelo menos 2 vizinhos, com maioria. Cada frame recebe a homografia da âncora mais próxima do mesmo plano (entre cortes), propagada nos dois sentidos do tempo. A cada frame, uma grade de 2,5 × 2 m de pontos do campo, projetada pela homografia corrente, é rastreada por Lucas–Kanade (Lucas & Kanade, 1981†) piramidal (Bouguet, 2001†) com verificação de ida e volta (Kalal et al., 2010†; erro ≤ 1 px), sem os pontos sobre jogadores e bola (os componentes compactos de não-gramado). A homografia é reestimada com os pontos rastreados e com os pixels das marcações em volta das linhas do modelo projetado. **A saída da propagação é a homografia propagada e reestimada**; a do detector só entra na escolha e na verificação das âncoras. Um plano sem âncora fica sem homografia.
 
 Os componentes da propagação também precisam justificar a sua existência, e cada um tem uma ablação, medida no test (Seção 6.2):
 
@@ -158,7 +160,7 @@ A âncora de gabarito separa o erro da âncora do erro da propagação, dado ond
 
 - **Gabarito.** A homografia de gabarito de cada frame é um ajuste ponto-linha às linhas anotadas, com aceite só quando bem determinado. É a referência do NPE, do IoU e da classificação das âncoras em certas ou erradas (NPE > 0,05).
 - **O gabarito e o detector não são independentes.** O gabarito é produzido pela mesma função de ajuste ponto-linha que refina a hipótese do detector (Seção 3.1, etapa 7), e os dois usam homografia pura, sem modelo de lente. Onde a lente curva as linhas, os dois tendem a errar do mesmo jeito, e o NPE e o IoU contra esse gabarito favorecem o método. Por isso entra também a acurácia contra as linhas anotadas, que não usa gabarito nenhum.
-- **O limite do LocSim para quem acerta as linhas.** O LocSim mede contra o `bbox_pitch`, e a calibração do dataset não coincide com as linhas anotadas. A nossa homografia de gabarito, ajustada às linhas, tira só 0,946 de LocSim@5 no test (análise posterior à rodada; 0,933 no train, medido antes da rodada). O gabarito do AuxFlow tira 0,9928 de média (tabela 2 deles), e a leitura de RANSAC sobre as pessoas reproduz a mediana e a distância da tabela 2 deles, mas não a média: a nossa reprodução (abaixo) tira 0,978 no test. Um método que acerte as linhas pintadas fica, portanto, perto de 0,946 nessa métrica. Esse limite pesa em toda comparação com o AuxFlow.
+- **A referência do LocSim para quem acerta as linhas.** O LocSim mede contra o `bbox_pitch`, e a calibração do dataset não coincide com as linhas anotadas. A nossa homografia de gabarito, ajustada às linhas, tira 0,946 de LocSim@5 nos frames com gabarito do test (análise posterior à rodada; 0,933 no train, medido antes da rodada). O gabarito do AuxFlow tira 0,9928 de média (tabela 2 deles), e a leitura de RANSAC sobre as pessoas reproduz a mediana e a distância da tabela 2 deles, mas não a média: a nossa reprodução (abaixo) tira 0,978 no test. Um método que acerte as linhas pintadas tende, portanto, a ficar perto de 0,946 nesses frames: é uma referência, e não um teto (Seção 9.1). Essa referência pesa em toda comparação com o AuxFlow.
 - **Correções de rótulo.** Foram corrigidas trocas de classe na anotação das linhas, achadas por uma varredura do gabarito, sem nenhuma saída do método. Sete clipes do test têm correção. Elas não afetam o LocSim, que usa as posições anotadas das pessoas, e sim o NPE e o IoU contra o gabarito.
 - **Protocolo do AuxFlow.** Para comparar com o AuxFlow, usa-se também a `H_gt_auxflow`: RANSAC (3 px) sobre os pés das pessoas e as posições delas no campo, que reproduz a mediana e a distância da tabela 2 do AuxFlow, mas não a média. É a homografia inicial da medição de "só propagação" no HSB.
 - **HSB.** O subconjunto difícil do AuxFlow (tabela 3 deles) tem 10 clipes, todos no test, cada um com um intervalo de frames e o LocSim@5 do NBJW. Os intervalos foram transcritos do artigo, com duas suposições registradas: a numeração a partir de 0 e a leitura do intervalo "90–0" do SNGS-128 como 0–90, propagado de trás para frente.
@@ -276,7 +278,7 @@ As ablações justificam cada componente da propagação:
 
 - **A ordem das séries se mantém.** No test inteiro, a propagação sobe a acurácia penalizada de 0,387 para 0,551, e as suavizações e o Kalman ficam perto do detector. Nos frames cobertos por cada série, a propagação fica abaixo do detector (0,613 contra 0,784), porque cobre também os frames difíceis, como no LocSim.
 - **A correção nos frames comuns é menor contra as linhas que no LocSim.** No conjunto comum, a acurácia vai de 0,784 para 0,807: o erro (1 − acurácia) cai cerca de 11%, contra cerca de 40% no LocSim. As suavizações S-G pioram esses frames (0,735 na de Bassek).
-- **O LocSim e as linhas discordam.** A `H_gt_auxflow`, ajustada às próprias pessoas, tira 0,978 de LocSim@5 e acerta só 0,533 das linhas a 5 px; o gabarito pelas linhas acerta 0,869 e tira 0,946 (Seção 4.1). Nem o gabarito pelas linhas chega a 1: a métrica exige todos os pontos de uma linha a menos de 5 px, e uma homografia sem lente não segue a linha curvada.
+- **O LocSim e as linhas discordam.** A `H_gt_auxflow`, ajustada às próprias pessoas, tira 0,978 de LocSim@5 e acerta só 0,533 das linhas a 5 px; o gabarito pelas linhas acerta 0,869 e tira 0,946, nos frames com gabarito (Seção 4.1). Nem o gabarito pelas linhas chega a 1: a métrica exige todos os pontos de uma linha a menos de 5 px, e uma homografia sem lente não segue a linha curvada.
 
 ## 6.4 O subconjunto difícil (HSB)
 
@@ -323,8 +325,8 @@ A comparação com a tabela 7 do AuxFlow (Tabela 7) é indicativa, pelas razões
 
 - **A favor do método:** a propagação isolada é comparável à do AuxFlow (Seção 6.4), e o ganho da propagação sobre o detector é muito maior (+0,330 contra +0,044).
 - **Contra:** o ganho maior parte de uma base muito mais baixa. O nosso detector é bem mais fraco que o NBJW (0,419 contra 0,885), e o pipeline completo, com 0,749, fica abaixo do NBJW sozinho. Da distância entre o nosso detector e o AuxFlow, a propagação fecha cerca de 65%.
-- **O ganho a mais vem da cobertura, e não da correção.** No conjunto inteiro, a propagação tira 57% do erro residual do detector; nos frames que o detector cobre, tira cerca de 40%, fração parecida com os cerca de 38% que o AuxFlow tira do NBJW. Nos frames cobertos por cada série, a propagação fica até 0,035 abaixo do detector (mín.–máx. entre os 3 jogos: de −0,078 a −0,003), porque cobre também os frames difíceis. **Ressalva:** o nosso conjunto comum são os frames fáceis do nosso detector, e o do AuxFlow é o test inteiro.
-- **O limite do LocSim.** O gabarito pelas linhas tira 0,946 de LocSim@5 nos frames com gabarito, e a `H_gt_auxflow`, ajustada às próprias pessoas, 0,978, mas acerta só 0,533 das linhas anotadas a 5 px (Seção 6.3). Parte da diferença para o NBJW (0,885) e o AuxFlow (0,929) pode vir daí. No conjunto comum, a propagação chega a 0,930 nos frames que cobre.
+- **O ganho a mais vem da cobertura, e não da correção.** No conjunto inteiro, a propagação tira 57% do erro residual do detector; nos frames que o detector cobre, tira cerca de 40%, fração parecida com os cerca de 38% que o AuxFlow tira do NBJW. Nos frames cobertos por cada série, a propagação fica 0,035 abaixo do detector (mín.–máx. entre os 3 jogos: de −0,078 a −0,003), porque cobre também os frames difíceis. **Ressalva:** o nosso conjunto comum são os frames fáceis do nosso detector, e o do AuxFlow é o test inteiro.
+- **A referência do LocSim.** O gabarito pelas linhas tira 0,946 de LocSim@5 nos frames com gabarito, e a `H_gt_auxflow`, ajustada às próprias pessoas, 0,978, mas acerta só 0,533 das linhas anotadas a 5 px (Seção 6.3). Parte da diferença para o NBJW (0,885) e o AuxFlow (0,929) pode vir daí. No conjunto comum, a propagação chega a 0,930 nos frames que cobre.
 
 ## 6.6 Estabilidade e visibilidade
 
@@ -348,7 +350,7 @@ Esta subseção responde à segunda pergunta. O ECC convergiu em 100% dos 36.701
 - **Inversão de visibilidade:** na interseção, a propagação joga para fora do quadro 0,8% dos jogadores-frame, contra 4,4% do Kalman e 5,0% do detector. Na versão penalizada, sobre todos os frames, a inversão cai de 53,5% no detector para 11,8% na propagação, puxada pela cobertura; nos frames cobertos, cai de 5,6% para 2,1%.
 - **Frames com 0 jogadores visíveis** (o indicador de Bassek et al., 2025): 0,1% na propagação, nos frames cobertos, contra 3% no feed de scouting deles. Os dados e os sistemas são diferentes, e a comparação vale só como ordem de grandeza.
 
-A homografia congelada da propagação sem fluxo tem tremor zero e deslize de 4,25 px no conjunto dela: tremor e deslize medem coisas diferentes, e nenhuma das duas basta sozinha. **A resposta à segunda pergunta depende da medida:** o Kalman é o mais liso, a propagação é a mais fiel ao movimento da câmera e a que menos erra a visibilidade.
+A homografia congelada da propagação sem fluxo tem tremor zero e deslize mediano de 4,25 px no conjunto dela: tremor e deslize medem coisas diferentes, e nenhuma das duas basta sozinha. **A resposta à segunda pergunta depende da medida:** o Kalman é o mais liso, a propagação é a mais fiel ao movimento da câmera e a que menos erra a visibilidade.
 
 ## 6.7 Âncoras e lacunas
 
@@ -426,7 +428,7 @@ O detector cobre de 0,7% a 15,9% dos frames desses clipes. **É uma limitação 
 
 ![Figura 7 — NPE mediano da propagação (à esquerda, em escala logarítmica) e fração de frames com NPE > 0,05 (à direita), pela distância à âncora aceita mais próxima, separados pela situação do detector naquele frame.](../outputs/figures/relatorio/fig4_deriva.png)
 
-**A suavização S-G entre bordas erradas.** Das 537 lacunas de 4 a 25 frames do test, 331 têm as duas bordas erradas, 106 têm uma e 99 têm as duas certas. A Figura 8 mostra um caso: o detector toma o arco da grande área pelo círculo central dos dois lados da lacuna, e a interpolação no meio dá NPE de 7,1. A suavização não tem como corrigir o que as bordas erram.
+**A suavização S-G entre bordas erradas.** Das 537 lacunas de 4 a 25 frames do test, 331 têm as duas bordas erradas, 106 têm uma, 99 têm as duas certas e 1 tem uma borda sem gabarito. A Figura 8 mostra um caso: o detector toma o arco da grande área pelo círculo central dos dois lados da lacuna, e a interpolação no meio dá NPE de 7,1. A suavização não tem como corrigir o que as bordas erram.
 
 ![Figura 8 — A suavização S-G (Bassek) numa lacuna de 4 a 25 frames com as duas bordas erradas (SNGS-121, lacuna 2–26): borda esquerda (detector), meio da lacuna (suavização S-G) e borda direita (detector).](../outputs/figures/relatorio/fig7_lacuna.jpg)
 
@@ -473,7 +475,7 @@ A métrica de decisão é o LocSim@5 penalizado da propagação, por jogo. Quand
 
 : Tabela 11 — v2, Δ do LocSim@5 penalizado da propagação por jogo de dev (jogos 4, 6 e 9 do treino; 2, 3 e 5 da validação), contra a base de cada hipótese (o B1, para C, B2 e B1b; o B1 nos mesmos clipes da metade fixa, para o A'). Origem: `docs/decisoes.md`, entradas de 2026-10-21 e 2026-10-22 (linha de cada número em `docs/trabalho-final-numeros.md`).
 
-- **B1, aceita.** Uma âncora verificada só entra com nota (IoU com o gramado mais fração explicada) de pelo menos um limiar escolhido no treino. Ganhou em 5 de 6 jogos na leitura leave-one-game-out. O custo dele aparece no test (Seção 8.5).
+- **B1, aceita.** Uma âncora verificada só entra com nota da âncora (IoU com o gramado mais fração explicada; Seção 3.2) de pelo menos um limiar escolhido no treino. Ganhou em 5 de 6 jogos na leitura leave-one-game-out. O custo dele aparece no test (Seção 8.5).
 - **C, recusada.** A propagação bidirecional entre âncoras piorou em 5 de 6 jogos, pouco em cada um. A lição está no desenho: a homografia fundida das duas propagações era reestimada sem passar de novo pelo ajuste às linhas do frame, que é o que segura a deriva na propagação de um lado só (Seção 6.7). A recusa mede essa versão, e não a ideia da fusão; corrigi-la seria uma hipótese nova.
 - **B2, recusada pela regra, não pelo efeito.** Um limite na distância do centro da câmera da âncora ao do jogo recusou as âncoras erradas onde havia (jogos 4 e 3) e deu Δ = 0 exato onde não havia nada a recusar. Perdeu no jogo 2, em que a câmera do jogo é a mais espalhada e o limite recusou âncoras certas. Com Δ = 0 em 3 jogos, não chegou a 4 de 6 com ganho.
 - **B1b, recusada por construção.** Recuperar a melhor candidata quando o B1 deixa um clipe sem âncora mexia em 4 clipes de 2 jogos. Com Δ = 0 exato nos outros quatro, não tinha como cumprir os 4 de 6, e isso foi registrado antes de rodar.
@@ -520,7 +522,7 @@ A métrica de decisão é o LocSim@5 penalizado da propagação, por jogo. Quand
 : Tabela 13 — v2 (exploratória), os 5 clipes sem âncora do v1. O limiar de âncora errada é NPE > 0,05. Copiada do adendo v2 (Tabela 10).
 <!-- fim: copia -->
 
-**Comparação indicativa com o AuxFlow.** Com as ressalvas da Seção 8.1, o v2 fica 0,027 abaixo do AuxFlow e 0,017 acima do NBJW, o detector em que o AuxFlow se apoia. Da distância entre a propagação do v1 e o AuxFlow, o v2 fecha cerca de 85%. **Não supera o estado da arte.** O próximo limite, o teto condicionado (0,914), também fica abaixo do AuxFlow, e um método que acerta as linhas pintadas fica perto de 0,946 nessa métrica (Seção 4.1).
+**Comparação indicativa com o AuxFlow.** Com as ressalvas da Seção 8.1, o v2 fica 0,027 abaixo do AuxFlow e 0,017 acima do NBJW, o detector em que o AuxFlow se apoia. Da distância entre a propagação do v1 e o AuxFlow, o v2 fecha cerca de 85%. **Não supera o estado da arte.** O teto condicionado (0,914) também fica abaixo do AuxFlow, e o gabarito pelas linhas pintadas tira 0,946 nos frames com gabarito, uma referência, e não um teto (Seção 9.1).
 
 ## 8.5 O que piorou
 
@@ -547,25 +549,25 @@ A lista das candidatas desses dois clipes, com o NPE e a nota de cada uma, está
 
 As ressalvas da Seção 8.1 valem aqui e não se repetem. Esta seção traz três leituras que só aparecem juntando os dois ciclos, as limitações e o trabalho futuro.
 
-## 9.1 O limite de 0,946 não vem da lente; a explicação provável é a calibração do dataset
+## 9.1 Por que o gabarito tira 0,946
 
-O LocSim@5 mede a concordância com o `bbox_pitch`, e não com as linhas pintadas. Segundo o material suplementar do GSR (Somers et al., 2024, p. 14), a calibração que gera o `bbox_pitch` usa um modelo pinhole com um coeficiente de distorção radial. Nos frames com marcações suficientes, ela vem de uma homografia. Nos outros, a posição da câmera é fixa na sequência (a mediana), e o foco, o pan e o tilt saem de uma versão do algoritmo Two-Point PTZ. O que ainda sobra é calibrado com uma ferramenta industrial. A nossa homografia de gabarito, planar, livre frame a frame e ajustada só às linhas, não reproduz esse modelo e tira 0,946 no test.
+O LocSim@5 mede a concordância com o `bbox_pitch`, e não com as linhas pintadas. Segundo o material suplementar do GSR (Somers et al., 2024, p. 14), a calibração que gera o `bbox_pitch` usa um modelo pinhole com um coeficiente de distorção radial. Nos frames com marcações suficientes, ela vem de uma homografia. Nos outros, a posição da câmera é fixa na sequência (a mediana), e o foco, o pan e o tilt saem de uma versão do algoritmo Two-Point PTZ. O que ainda sobra é calibrado com uma ferramenta industrial. A nossa homografia de gabarito, planar, livre frame a frame e ajustada só às linhas, não reproduz esse modelo e tira 0,946 nos frames com gabarito do test; penalizado, no test inteiro, tira 0,929.
 
-A suspeita natural era a lente. O diagnóstico D1 (calibração no treino/valid) acrescentou um coeficiente radial ao ajuste do gabarito, livre por frame ou fixo por clipe. Em 3.362 frames do dev (1 a cada 25), o LocSim@5 vai de 0,9319 para 0,9330 e 0,9333, respectivamente. O coeficiente é consistente (mediana de 0,029), mas o efeito é de +0,001. **Não é a lente.** Sobra o centro fixo da câmera, que não foi testado isoladamente. O D2 (calibração no treino/valid) é compatível com essa leitura. Decompondo o gabarito, a mediana do centro de cada clipe fica tipicamente a 0,4–1,3 m da do jogo, mas o centro frame a frame se espalha 1,2–2,4 m. Uma homografia livre por frame não impõe o centro fixo que o dataset impõe.
+A suspeita natural era a lente. O diagnóstico D1 (diagnóstico no dev do v2) acrescentou um coeficiente radial ao ajuste do gabarito, livre por frame ou fixo por clipe. Em 3.362 frames do dev (1 a cada 25), o LocSim@5 vai de 0,9319 para 0,9330 e 0,9333, respectivamente. O coeficiente é consistente (mediana de 0,029), mas o efeito é de +0,001. **Não é a lente.** Sobra o centro fixo da câmera, que não foi testado isoladamente. O D2 (diagnóstico no dev do v2) é compatível com essa leitura. Decompondo o gabarito, a mediana do centro de cada clipe fica tipicamente a 0,4–1,3 m da do jogo, mas o centro frame a frame se espalha 1,2–2,4 m. Uma homografia livre por frame não impõe o centro fixo que o dataset impõe.
 
 Daí três consequências:
 
-- 0,946 é, na prática, o limite de quem acerta as linhas pintadas com uma homografia por frame;
+- 0,946, nos frames com gabarito, é uma referência para quem acerta as linhas pintadas com uma homografia por frame, e não um teto: no jogo 11, o v2 (0,956) já empata com o gabarito do jogo (0,956, penalizado);
 - parte da distância para o AuxFlow pode não ser erro de geometria, porque um gabarito ajustado às pessoas tira mais nessa métrica e acerta menos as linhas (Seção 6.3);
 - a acurácia contra as linhas é a medida que diz se a geometria está certa.
 
 ## 9.2 Uma regra aceita pela média pode inverter a qualidade num clipe
 
-O B1 foi aceito no dev com ganho em 5 de 6 jogos, média dos Δ de +0,0179 e pior Δ de −0,0223. No test, está por trás da maior piora do v2, no SNGS-136 (Seção 8.5). O sinal já estava no dev: o registro da decisão anota como fraqueza conhecida que, no jogo 2, a nota recusa 0 das 4 aceitas erradas.
+O B1 foi aceito no dev com ganho em 5 de 6 jogos, média dos Δ de +0,0179 e pior Δ de −0,0223. No test, está por trás da maior piora do v2, no SNGS-136 (Seção 8.5). O sinal já estava no dev: o registro da decisão anota como fraqueza conhecida que, no jogo 2, a nota da âncora recusa 0 das 4 aceitas erradas.
 
-A nota também não era o sinal mais forte medido. No diagnóstico D3 (calibração no treino/valid), ela separa as candidatas certas das erradas com AUC de 0,855 no treino e 0,918 na valid. O centro da câmera chega a 0,984 e 0,966. Esse é o sinal do B2, que foi medido em cima do B1 e caiu pela regra de contagem (Seção 9.3).
+A nota da âncora também não era o sinal mais forte medido. No D3 (diagnóstico no dev do v2), ela separa as candidatas certas das erradas com AUC de 0,855 no treino e 0,918 na valid. O centro da câmera chega a 0,984 e 0,966. Esse é o sinal do B2, que foi medido em cima do B1 e caiu pela regra de contagem (Seção 9.3).
 
-A nota soma o IoU com o gramado e a fração explicada. Esses termos dizem se o modelo cabe na imagem, e não quanto a homografia erra. Entre candidatas plausíveis do mesmo clipe, a nota pode ordenar ao contrário. O Δ por jogo mede o efeito médio dessa suposição, e não onde ela falha. **Uma regra de filtragem precisa ser julgada também pela cauda por clipe no dev: quantos clipes pioram, e quanto.** O critério deste ciclo não incluía essa conferência.
+A nota da âncora soma o IoU com o gramado e a fração explicada (Seção 3.2). Esses termos dizem se o modelo cabe na imagem, e não quanto a homografia erra. Entre candidatas plausíveis do mesmo clipe, a nota pode ordenar ao contrário. O Δ por jogo mede o efeito médio dessa suposição, e não onde ela falha. **Uma regra de filtragem precisa ser julgada também pela cauda por clipe no dev: quantos clipes pioram, e quanto.** O critério deste ciclo não incluía essa conferência.
 
 ## 9.3 O critério "≥ 4 de 6" não serve para mudanças localizadas
 
@@ -577,7 +579,7 @@ A troca para Δ ≥ 0 resolveu o problema para as hipóteses seguintes. O custo 
 
 - **Três jogos no test.** O v1 varia de 0,650 a 0,920 entre os jogos, e o ganho do v2, de +0,037 (jogo 11) a +0,238 (jogo 7). Outros estádios e outras condições de luz não foram medidos, e o test não tem jogo com sombra.
 - **Gabarito correlacionado com o detector** (Seção 4.1). O NPE, o IoU, o teto condicionado e a classificação das âncoras dependem do gabarito. As conclusões se apoiam no LocSim e na acurácia contra as linhas, que não dependem dele.
-- **O jogo 3 continua sem solução.** Na base B1 + A' do dev, 16 dos 21 clipes seguem sem âncora, por causa da sombra azulada (Seção 6.10).
+- **O jogo 3 continua sem solução.** Eram 13 clipes sem âncora no v1; na base B1 + A' do dev, são 16 dos 21, porque o B1 tirou as âncoras de mais 3 clipes, todas erradas (`docs/decisoes.md`, entrada do B1 aceito, 2026-10-16), e o LocSim@5 penalizado do jogo não caiu (+0,002). A causa é a sombra azulada (Seção 6.10).
 - **Erro sistemático e deriva.** A verificação por maioria não pega um erro que o detector repete em frames seguidos (SNGS-190). Nas pontas a mais de 250 frames de uma âncora, o NPE mediano do v1 é 0,208. O C foi recusado, e o adendo v2 não mede de novo a deriva.
 - **Custo.** Só a série do detector leva cerca de 630 s por clipe, contra 292 s do AuxFlow inteiro com GPU. O custo do v2 não foi medido.
 
@@ -604,7 +606,7 @@ As duas perguntas do projeto são respondidas abaixo com o número limpo do v1 e
 **Até onde chega um pipeline puramente clássico, e quanto da diferença para o estado da arte a propagação fecha?**
 
 - **Frame a frame, o detector acerta quando responde, mas responde pouco.** No v1, tira 0,869 de LocSim@5 nos frames que cobre, mas cobre só 0,505 deles no GSR e 0,575 das imagens do WC14 test.
-- **A propagação é o que transforma o detector num sistema.** Com ela, o v1 chega a 0,749 e fecha cerca de 65% da distância entre o nosso detector e o AuxFlow. O v2 chega a 0,902, 0,027 abaixo do AuxFlow e 0,017 acima do NBJW. **Nenhuma das duas versões alcança o estado da arte**, numa métrica em que acertar as linhas pintadas com uma homografia limita o resultado a cerca de 0,946.
+- **A propagação é o que transforma o detector num sistema.** Com ela, o v1 chega a 0,749 e fecha cerca de 65% da distância entre o nosso detector e o AuxFlow. O v2 chega a 0,902, 0,027 abaixo do AuxFlow e 0,017 acima do NBJW. **Nenhuma das duas versões alcança o estado da arte**, numa métrica em que o gabarito ajustado às linhas pintadas tira 0,946 nos frames com gabarito (0,929 penalizado), uma referência, e não um teto.
 - **A hipótese do detector fraco se confirma só em valor absoluto.** O ganho da propagação é de +0,330, contra +0,044 do AuxFlow. Nos frames que o nosso detector cobre, porém, a propagação tira cerca de 40% do erro residual; o AuxFlow tira cerca de 38% do NBJW no test inteiro (comparação indicativa, em conjuntos diferentes). O ganho a mais vem da cobertura. O v2 confirma a leitura por outro caminho. O ganho dele veio de mais âncoras, com a fração ao teto igual. Nas duas versões, o limite está em onde há âncora.
 
 **Qual estratégia temporal entrega mais estabilidade, e a que custo?** Só o v1 mediu; o adendo v2 não mede de novo a estabilidade nem a visibilidade.
